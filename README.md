@@ -23,6 +23,11 @@ You just need vasm to build the whole project, shrinkler compress it, the final 
 
 Devpac also compiles the project on a real amiga, just feed r.s to devpac and click assemble, it will work (or at least it works on my stock A600).
 
+The makefile will produce this files:
+1. r (for debug, the copper effect are stripped and the background color is used to evaluate performances)
+2. reffect (color debug is turned off and copper effects are in place)
+3. rcompressed (just reffect compressed with shrinkler)
+
 Looking for Resistance members willing to help me
 
 
