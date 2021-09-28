@@ -169,13 +169,9 @@ suppF01	=P61pl	;if 1, split4=1 may cause sound errors. but try it anyway. :)
 	endc
 
 Inizio:
-	move.l	4.w,a6		; Execbase in a6
-	jsr	-$78(a6)	; Disable - ferma il multitasking
-	lea	gfxname(PC),a1	; Indirizzo del nome della lib da aprire in a1
-	jsr	-$198(a6)	; OpenLibrary
-	move.l	d0,gfxbase	; salvo l'indirizzo base GFX in GfxBase
-	move.l	d0,a6
-	move.l	$26(a6),oldcop	; salviamo l'indirizzo della copperlist vecchia
+
+
+	bsr Save_all
 
 ;*****************************************************************************
 ;	FACCIAMO PUNTARE I BPLPOINTERS NELLA COPPELIST AI NOSTRI BITPLANES
@@ -209,14 +205,14 @@ POINTBP:
 				; bplpointers nella copperlist da scrivere.
 	dbra	d1,POINTBP	; Rifai D1 volte POINTBP (D1=num of bitplanes)
 
-	jsr	-$10e(a6)		;WaitTOF
-	jsr	-$10e(a6)		;WaitTOF
+	;jsr	-$10e(a6)		;WaitTOF
+	;jsr	-$10e(a6)		;WaitTOF
 
     lea	$dff000,a6
-	move	$dff002,olddma		;Old DMA
+;	move	$dff002,olddma		;Old DMA
 	move	#$7ff,$96(a6)		;Disable DMAs
 	move	#%1000011111000000,$96(a6) ;Master,Copper,Blitter,Bitplanes
-	move	$1c(a6),-(sp)		;Old IRQ
+;	move	$1c(a6),-(sp)		;Old IRQ
 	move	#$7fff,$9a(a6)		;Disable IRQs
 	move	#$e000,$9a(a6)		;Master and lev6
 					;NO COPPER-IRQ!
@@ -260,7 +256,8 @@ mouse:
 	;or.w    #3,STROKE_DATA
 	jsr ammxmainloop3
 	;move.l #SCREEN_0,d0
-	lea BPLPOINTERS,a0
+	
+    lea BPLPOINTERS,a0
 	move.w d0,6(a0)
 	swap d0
 	move.w d0,2(a0)
@@ -299,16 +296,12 @@ Aspetta:
 	btst	#6,$bfe001	; tasto sinistro del mouse premuto?
 	bne.s	mouse		; se no, torna a mouse:
 
+    bsr P61_End
 
-	move.l	oldcop(PC),$dff080	; Puntiamo la cop di sistema
-	move.w	d0,$dff088		; facciamo partire la vecchia cop
-
-	move.l	4.w,a6
-	jsr	-$7e(a6)	; Enable - riabilita il Multitasking
-	move.l	gfxbase(PC),a1	; Base della libreria da chiudere
-	jsr	-$19e(a6)	; Closelibrary - chiudo la graphics lib
-	move	olddma,$dff096
-	moveq	#0,d0
+	bsr Restore_all
+    
+    clr.l d0
+    
 	rts			; USCITA DAL PROGRAMMA
 
 
@@ -325,6 +318,43 @@ oldcop:			; Qua ci va l'indirizzo della vecchia COP di sistema
 
 olddma:
 	dc.l 0
+
+
+;---------------------------------------------------------------
+Save_all
+	Move.b #$87,$bfd100		; stop drive
+	Move.l $00000004,a6
+	Jsr -132(a6)
+	Move.l $6c,SaveIRQ
+	Move.w $dff01c,Saveint
+	Or.w #$c000,Saveint
+	Move.w $dff002,SaveDMA
+	Or.w #$8100,SaveDMA
+	Rts
+Restore_all:
+	Move.l SaveIRQ,$6c
+	Move.w #$7fff,$dff09a	
+	Move.w Saveint,$dff09a
+	Move.w #$7fff,$dff096
+	Move.w SaveDMA,$dff096
+	Move.l $00000004,a6
+	Lea Name,a1
+	Moveq #0,d0
+	Jsr -552(a6)
+	Move.l d0,a0
+	Move.l 38(a0),$dff080
+	Clr.w $dff088
+	Move.l d0,a1
+	Jsr -414(a6)
+	Jsr -138(a6)
+	Rts
+;---------------------------------------------------------------
+Saveint:Dc.w 0
+SaveDMA:Dc.w 0
+SaveIRQ:Dc.l 0
+Name:DC.B "graphics.library",0
+	Even
+;----------------------------------------------------------------  
 
 Playrtn:
 	include "P6112-Play.i"
@@ -727,5 +757,4 @@ Module1:
 	even
 
 	end
-
 
