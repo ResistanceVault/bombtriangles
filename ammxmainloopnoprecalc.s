@@ -6,18 +6,38 @@ ammxmainloop3:
 
                    move.w                 MUSICCOUNTER,d1
                    cmpi.w                 #64,d1
-                   IFD                    DEBUGCOLORS
-                   move.w                 #$0AAA,$dff180
+                   bne.s                  musicnoreset
+                   move.w                 #$0000,MUSICCOUNTER
+                   add.l                  #4,DRAWFUNCTCOUNTER
+                   IFD                    USE_MUSICCOUNTER
+                   move.w                 #$0FF0,$dff180
                    ENDC
+
+                   bra.s                  musicaddcounter
+musicnoreset:
+                   IFD                    USE_MUSICCOUNTER
+                   move.w                 #$0000,$dff180
+                   ELSE
+                   nop
+                   ENDC
+musicaddcounter:
                    add.w                  #1,MUSICCOUNTER
 
-                   bsr.w                  calculate_triangle
-                   
-                   WAITBLITTER
-                
-                   STROKE                 #3
 
-                   bsr.w                  ammx_fill_table_reversed                    
+                   lea                    DRAWFUNCTARRAY_START,a0
+                   add.l                  DRAWFUNCTCOUNTER,a0
+                   cmp.l                  #DRAWFUNCTARRAY_END,a0
+                   bne.s                  drawfunctcounternoreset
+
+                   move.l                 #0,DRAWFUNCTCOUNTER
+                   lea                    DRAWFUNCTARRAY_START,a0
+drawfunctcounternoreset:
+
+                   ; execute the drawing routine
+                   move.l                 (a0),a0
+                   jsr                    (a0)
+                   ;bsr.w                  DOUBLETRIANGLE
+                         
                    
                    movem.l                (sp)+,d0-d7/a0-a6
                    move.l                 SCREEN_PTR_0,d0
@@ -62,11 +82,12 @@ MUSICCOUNTER:      dc.w                   0
 
 DRAWFUNCTCOUNTER:  dc.l                   0
 
-DRAWFUNCTARRAY_START: 
+DRAWFUNCTARRAY_START:
                    dc.l                   BIGTRIANGLE_Z
-                   dc.l                   SMALLTRIANGLE
-                   dc.l                   MEDIUMTRIANGLE
-                   dc.l                   BIGTRIANGLE
+                   dc.l                   DOUBLETRIANGLE
+                   ;dc.l                   SMALLTRIANGLE
+                   ;dc.l                   MEDIUMTRIANGLE
+                   ;dc.l                   BIGTRIANGLE
 DRAWFUNCTARRAY_END:
 
 SMALLTRIANGLE:
@@ -101,16 +122,14 @@ BIGTRIANGLE:
 
 BIGTRIANGLE_Z:
                    movem.l                d0-d6/a1,-(sp)
-                   move.l                 d1,d6
-                   andi.l                 #$0000FFFF,d6
+                   
                    RESETFILLTABLE
                    LOADIDENTITY
 
                    move.w                 #160,d0
                    move.w                 #128,d1
                    jsr                    TRANSLATE
-                   ROTATE                 d6
-
+                   ROTATE                 ANGLE
 
                    move.w                 #0,d0
                    move.w                 #-15,d1
@@ -120,18 +139,19 @@ BIGTRIANGLE_Z:
 
                    move.w                 #15,d4
                    move.w                 #15,d5
-
-
 	
                    jsr                    TRIANGLE_NODRAW
+                   bsr.w                  increase_angle_by_1
+
+                   WAITBLITTER
+                   STROKE                 #3
+                   jsr                    ammx_fill_table
                    movem.l                (sp)+,d0-d6/a1
 
 
                    rts
 
-
-	
-calculate_triangle:
+DOUBLETRIANGLE:
                    movem.l                d0-d7/a0-a6,-(sp)    
 
                    LOADIDENTITY
@@ -146,15 +166,23 @@ calculate_triangle:
                    IFD                    DEBUGCOLORS
                    move.w                 #$0AAA,$dff180
                    ENDC
-                   add.w                  #1,ANGLE
-                   cmpi.w                 #360,ANGLE
-                   bne.s                  disegnaexit
-                   move.w                 #0,ANGLE
-disegnaexit:
+                   bsr.w                  increase_angle_by_1
+
+                   WAITBLITTER
+                   STROKE                 #3
+                   bsr.w                  ammx_fill_table_reversed              
                    movem.l                (sp)+,d0-d7/a0-a6
                    rts
 
 ANGLE:             dc.w                   0
+
+increase_angle_by_1:
+                   add.w                  #1,ANGLE
+                   cmpi.w                 #360,ANGLE
+                   bne.s                  increase_angle_by_1_exit
+                   move.w                 #0,ANGLE
+increase_angle_by_1_exit:
+                   rts
 
 ; draws the same figure into the second bpl but reversed
 ; clipping each line
