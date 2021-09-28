@@ -178,35 +178,7 @@ Inizio:
 ;*****************************************************************************
 
 
-	MOVE.L	#SCREEN_0,d0		; in d0 mettiamo l'indirizzo della PIC,
-				; ossia dove inizia il primo bitplane
-
-	LEA	BPLPOINTERS,A1	; in a1 mettiamo l'indirizzo dei
-				; puntatori ai planes della COPPERLIST
-	MOVEQ	#0,D1		; numero di bitplanes -1 (qua sono 3)
-				; per eseguire il ciclo col DBRA
-POINTBP:
-	;move.w	d0,6(a1)	; copia la word BASSA dell'indirizzo del plane
-				; nella word giusta nella copperlist
-	swap	d0		; scambia le 2 word di d0 (es: 1234 > 3412)
-				; mettendo la word ALTA al posto di quella
-				; BASSA, permettendone la copia col move.w!!
-	;move.w	d0,2(a1)	; copia la word ALTA dell'indirizzo del plane
-				; nella word giusta nella copperlist
-	swap	d0		; scambia le 2 word di d0 (es: 3412 > 1234)
-				; rimettendo a posto l'indirizzo.
-	ADD.L	#40*256,d0	; Aggiungiamo 10240 ad D0, facendolo puntare
-				; al secondo bitplane (si trova dopo il primo)
-				; (cioe' aggiungiamo la lunghezza di un plane)
-				; Nei cicli seguenti al primo faremo puntare
-				; al terzo, al quarto bitplane eccetera.
-
-	addq.w	#8,a1		; a1 ora contiene l'indirizzo dei prossimi
-				; bplpointers nella copperlist da scrivere.
-	dbra	d1,POINTBP	; Rifai D1 volte POINTBP (D1=num of bitplanes)
-
-	;jsr	-$10e(a6)		;WaitTOF
-	;jsr	-$10e(a6)		;WaitTOF
+	
 
     lea	$dff000,a6
 ;	move	$dff002,olddma		;Old DMA
@@ -231,7 +203,6 @@ POINTBP:
 	sub.l a2,a2
 	moveq #0,d0
 
-	;lea p61coppoke+3,a4		;only used in P61mode >=3
 	jsr P61_Init
 
     jsr _ammxmainloop3_init
@@ -482,7 +453,7 @@ scrollcolors:
 	include "AProcessing/libs/rasterizers/3dglobals.i"
 	include "AProcessing/libs/rasterizers/processingfill.s"
 	include "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
-	include "AProcessing/libs/rasterizers/processingclearfunctions.s"
+	;include "AProcessing/libs/rasterizers/processingclearfunctions.s"
     include "AProcessing/libs/trigtables.i"
 	include "AProcessing/libs/rasterizers/point.s"
 	include "AProcessing/libs/rasterizers/triangle.s"

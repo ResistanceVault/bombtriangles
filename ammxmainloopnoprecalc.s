@@ -8,7 +8,12 @@ ammxmainloop3:
                    cmpi.w                 #64,d1
                    bne.s                  musicnoreset
                    move.w                 #$0000,MUSICCOUNTER
+                   subi.l                  #1,BEATCOUNTER
+                   bne.s                  noresetbeatcounter
+                   move.l                 #1,BEATCOUNTER
                    add.l                  #4,DRAWFUNCTCOUNTER
+
+noresetbeatcounter:
                    IFD                    USE_MUSICCOUNTER
                    move.w                 #$0FF0,$dff180
                    ENDC
@@ -81,49 +86,61 @@ FRAMECOUNTER:      dc.w                   0
 MUSICCOUNTER:      dc.w                   0
 
 DRAWFUNCTCOUNTER:  dc.l                   0
+BEATCOUNTER:       dc.l                   1
 
 DRAWFUNCTARRAY_START:
                    dc.l                   BIGTRIANGLE_Z
                    dc.l                   DOUBLETRIANGLE
-                   ;dc.l                   SMALLTRIANGLE
-                   ;dc.l                   MEDIUMTRIANGLE
-                   ;dc.l                   BIGTRIANGLE
+                   dc.l                   SMALLTRIANGLE
+                   dc.l                   MEDIUMTRIANGLE
+                   dc.l                   BIGTRIANGLE
 DRAWFUNCTARRAY_END:
 
 SMALLTRIANGLE:
-                   RESETFILLTABLE
                    LOADIDENTITY
                    VERTEX_INIT            1,#0,#-10,#0
                    VERTEX_INIT            2,#10,#10,#0
                    VERTEX_INIT            3,#-10,#10,#0
-                   ROTATE_X_INV_Q_5_11    d1
+                   ROTATE_X_INV_Q_5_11    ANGLE
                    jsr                    TRIANGLE3D_NODRAW
+                   bsr.w                  increase_angle_by_1
+
+                   WAITBLITTER
+                   STROKE                 #3
+                   jsr                    ammx_fill_table
                    rts
 
 MEDIUMTRIANGLE:
-                   RESETFILLTABLE
                    LOADIDENTITY
                    VERTEX_INIT            1,#0,#-25,#0
                    VERTEX_INIT            2,#25,#25,#0
                    VERTEX_INIT            3,#-25,#25,#0
-                   ROTATE_X_INV_Q_5_11    d1
+                   ROTATE_X_INV_Q_5_11    ANGLE
                    jsr                    TRIANGLE3D_NODRAW
+                   bsr.w                  increase_angle_by_1
+
+                   WAITBLITTER
+                   STROKE                 #3
+                   jsr                    ammx_fill_table
                    rts
 
 BIGTRIANGLE:
-                   RESETFILLTABLE
                    LOADIDENTITY
                    VERTEX_INIT            1,#0,#-50,#0
                    VERTEX_INIT            2,#50,#50,#0
                    VERTEX_INIT            3,#-50,#50,#0
-                   ROTATE_X_INV_Q_5_11    d1
+                   ROTATE_X_INV_Q_5_11    ANGLE
                    jsr                    TRIANGLE3D_NODRAW
+                   bsr.w                  increase_angle_by_1
+
+                   WAITBLITTER
+                   STROKE                 #3
+                   jsr                    ammx_fill_table
                    rts
 
 BIGTRIANGLE_Z:
                    movem.l                d0-d6/a1,-(sp)
                    
-                   RESETFILLTABLE
                    LOADIDENTITY
 
                    move.w                 #160,d0
