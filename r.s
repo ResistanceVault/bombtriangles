@@ -176,9 +176,21 @@ Inizio:
 ;*****************************************************************************
 ;	FACCIAMO PUNTARE I BPLPOINTERS NELLA COPPELIST AI NOSTRI BITPLANES
 ;*****************************************************************************
+	MOVE.L  #SCREEN_2,d0
+	LEA     BPLPOINTERS2,A1
+	move.w  d0,6(a1)
+	swap    d0
+	move.w  d0,2(a1)
 
+	MOVE.L  #SCREEN_3,d0
+	LEA     BPLPOINTERS3,A1
+	move.w  d0,6(a1)
+	swap    d0
+	move.w  d0,2(a1)
 
-	
+	; test per vedere se lo sprite si elimina
+	;JSR 	-$10E (A6) ; WaitOf ( Ri si s t e m a l ’ e v e n t u a l e i n t e r l a c e )
+	;JSR		-$10E (A6) ; WaitOf
 
     lea	$dff000,a6
 ;	move	$dff002,olddma		;Old DMA
@@ -453,7 +465,7 @@ scrollcolors:
 	include "AProcessing/libs/rasterizers/3dglobals.i"
 	include "AProcessing/libs/rasterizers/processingfill.s"
 	include "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
-	;include "AProcessing/libs/rasterizers/processingclearfunctions.s"
+	include "AProcessing/libs/rasterizers/clipping.s"
     include "AProcessing/libs/trigtables.i"
 	include "AProcessing/libs/rasterizers/point.s"
 	include "AProcessing/libs/rasterizers/triangle.s"
@@ -491,7 +503,9 @@ COPPERLIST:
 ; Il BPLCON0 per uno schermo a 3 bitplanes: (8 colori)
 
 		    ; 5432109876543210
-	dc.w	$100,%0010001000000000	; bits 13 e 12 accesi!! (3 = %011)
+	dc.w	$100
+BPLCON0POINTER:
+	dc.w %0100001000000000	; bits 13 e 12 accesi!! (3 = %011)
 
 ;	Facciamo puntare i bitplanes direttamente mettendo nella copperlist
 ;	i registri $dff0e0 e seguenti qua di seguito con gli indirizzi
@@ -501,7 +515,10 @@ BPLPOINTERS:
 	dc.w $e0,$0000,$e2,$0000	;primo	 bitplane - BPL0PT
 BPLPOINTERS1:
 	dc.w $e4,$0000,$e6,$0000	;secondo bitplane - BPL1PT
-	;dc.w $e8,$0000,$ea,$0000	;terzo	 bitplane - BPL2PT
+BPLPOINTERS2:
+	dc.w $e8,$0000,$ea,$0000	;terzo	 bitplane - BPL2PT
+BPLPOINTERS3:
+	dc.w $ec,$0000,$ee,$0000	;terzo	 bitplane - BPL2PT
 
 
 	IFD EFFECTS
@@ -719,8 +736,19 @@ BARRA:
 ;	in questo caso basta scrivere: "V df0:SORGENTI2"
 
 					; 3 bitplanes consecutivi
-PIC:
-        dcb.b 40*256*3,$01
+SCREEN_2
+    dcb.b 40*256,$00
+
+SCREEN_3
+    dcb.b 40*256,$00
+
+    IFD USE_DBLBUF
+SCREEN_20
+    dcb.b 40*256,$00
+
+SCREEN_31
+    dcb.b 40*256,$00
+	ENDC
 
 Module1:
 	;incbin "P61.sowhat-intro"			;usecode $9410
