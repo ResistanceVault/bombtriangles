@@ -79,6 +79,7 @@ print "Using WOLFRAM appid "+appid
 # Check input params , if wrong print message and exit
 if len(sys.argv) < 6:
     print "Usage: getpath.py x1 y1 x2 y2 steps"
+    exit(1)
 
 # Asssign input params and print on screen
 x1 = float(sys.argv[1])
