@@ -53,8 +53,8 @@ CLEAR:
                        WAITBLITTER
                        move.w                      #$0100,$dff040
                        move.w                      #$0000,$dff042        
-                       move.l                      SCREEN_PTR_0,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ; copy to d channel
-                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ;D mod
+                       move.l                      SCREEN_PTR_0,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; copy to d channel
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
                        move.w                      #$8014,$dff058
                        rts
 
@@ -62,8 +62,8 @@ CLEAR_BPL_1:
                        WAITBLITTER
                        move.w                      #$0100,$dff040
                        move.w                      #$0000,$dff042        
-                       move.l                      SCREEN_PTR_0,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ; copy to d channel
-                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ;D mod
+                       move.l                      SCREEN_PTR_0,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; copy to d channel
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
                        move.w                      #$4014,$dff058
                        rts
 
@@ -74,8 +74,8 @@ waitblit_copy4bis:
                        bne.s                       waitblit_copy4bis
                        move.w                      #$0100,$dff040
                        move.w                      #$0000,$dff042        
-                       move.l                      SCREEN_PTR_1,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ; copy to d channel
-                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ;D mod
+                       move.l                      SCREEN_PTR_1,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; copy to d channel
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
                        move.w                      #$4014,$dff058
                        rts
 
@@ -89,6 +89,8 @@ BEATCOUNTER:           dc.l                        1
 BEATDELAY:             dc.l                        1
 
 DRAWFUNCTARRAY_START:
+                       dc.l                        BIGTRIANGLE_Z
+                       dc.l                        BIGTRIANGLE_Z
                        dc.l                        BIGTRIANGLE_Z
                        dc.l                        BIGTRIANGLE_Z_2
                        dc.l                        DOUBLETRIANGLE
@@ -139,12 +141,44 @@ BIGTRIANGLE:
                        jsr                         ammx_fill_table
                        rts
 
+ROTATIONS_ANGLES_64:   dc.w                        5,11,16,22,28,33,39,44,50,56,61,67,72,78,84,89,95,100,106,112,117,123,129,134,140,145,151,157,162,168,173,179,185,190,196,201,207,213,218,224,229,235,241,246,252,258,263,269,274,280,286,291,297,302,308,314,319,325,330,336,342,347,353,0
+
+ROTATIONS_ANGLES_64_PTR: 
+                       dc.l                        ROTATIONS_ANGLES_64
 BIGTRIANGLE_Z_YPOS:    dc.w                        0
+
+; Triangle path cordinate - each chunk is 256 bytes (one long for each of the 64 coordinates)
 BIGTRIANGLE_Z_COORDS:
-                    ;dc.w 0,0,2,2,4,5,6,7,8,10,11,12,13,14,15,17,17,19,19,22,21,24,23,26,25,29,27,31,30,33,32,36,34,38,36,41,38,43,40,45,42,48,44,50,46,53,49,55,51,57,53,60,55,62,57,65,59,67,61,69,63,72,65,74,68,77,70,79,72,81,74,84,76,86,78,88,80,91,82,93,84,96,86,98,89,100,91,103,93,105,95,108,97,110,99,112,101,115,103,117,105,120,108,122,110,124,112,127,114,129,116,131,118,134,120,136,122,139,124,141,127,143,129,146,131,148,133,151,135,153
-                    ; dc.w 0,0,2,2,4,5,6,7,8,10,11,12,13,14,15,17,17,19,19,22,21,24,23,26,25,29,27,31,30,33,32,36,34,38,36,41,38,43,40,45,42,48,44,50,46,53,49,55,51,57,53,60,55,62,57,65,59,67,61,69,63,72,65,74,68,77,70,79,72,81,74,84,76,86,78,88,80,91,82,93,84,96,86,98,89,100,91,103,93,105,95,108,97,110,99,112,101,115,103,117,105,120,108,122,110,124,112,127,114,129,116,131,118,134,120,136,122,139,124,141,127,143,129,146,131,148,133,151,135,153
-                       ;dc.w                        -25,-25,-23,-22,-20,-19,-18,-17,-15,-14,-13,-11,-10,-8,-8,-6,-5,-3,-3,0,0,3,3,6,5,8,8,11,10,14,13,17,15,20,18,22,20,25,23,28,25,31,28,33,30,36,33,39,35,42,38,45,40,47,43,50,45,53,48,56,50,58,53,61,55,64,58,67,60,70,63,72,65,75,68,78,70,81,73,83,75,86,78,89,80,92,83,95,85,97,88,100,90,103,93,106,95,109,98,111,100,114,103,117,105,120,108,122,110,125,113,128,115,131,118,134,120,136,123,139,125,142,128,145,130,147,133,150,135,153
-      dc.w -25,281,-23,279,-20,277,-18,275,-15,273,-13,271,-10,269,-8,267,-5,265,-3,263,0,261,3,259,5,257,8,255,10,253,13,251,15,249,18,247,20,245,23,243,25,241,28,239,30,237,33,235,35,233,38,231,40,229,43,227,45,225,48,223,50,221,53,219,55,217,58,215,60,213,63,211,65,209,68,207,70,205,73,203,75,201,78,199,80,197,83,195,85,193,88,191,90,189,93,187,95,185,98,183,100,181,103,179,105,177,108,175,110,173,113,171,115,169,118,167,120,165,123,163,125,161,128,159,130,157,133,155,135,153
+                       ; start of first path
+                       dc.w                               -23,279,-20,277,-18,275,-15,273,-13,271,-10,269,-08,267,-05,265,-03,263
+                       dc.w                        000,261,003,259,005,257,008,255,010,253,013,251,015,249,018,247,020,245,023,243
+                       dc.w                        025,241,028,239,030,237,033,235,035,233,038,231,040,229,043,227,045,225,048,223
+                       dc.w                        050,221,053,219,055,217,058,215,060,213,063,211,065,209,068,207,070,205,073,203
+                       dc.w                        075,201,078,199,080,197,083,195,085,193,088,191,090,189,093,187,095,185,098,183
+                       dc.w                        100,181,103,179,105,177,108,175,110,173,113,171,115,169,118,167,120,165,123,163
+                       dc.w                        125,161,128,159,130,157,133,155,135,153
+
+                       ; start of second path
+                       dc.w                                343,279,340,277,338,275,335,273,333,271,330,269,328,267,325,265,323,263
+                       dc.w                        320,261,318,259,315,257,313,255,310,253,308,251,305,249,303,247,300,245,298,243
+                       dc.w                        295,241,293,239,290,237,288,235,285,233,283,231,280,229,278,227,275,225,273,223
+                       dc.w                        270,221,268,219,265,217,263,215,260,213,258,211,255,209,253,207,250,205,248,203
+                       dc.w                        245,201,243,199,240,197,238,195,235,193,233,191,230,189,228,187,225,185,223,183
+                       dc.w                        220,181,218,179,215,177,213,175,210,173,208,171,205,169,203,167,200,165,198,163
+                       dc.w                        195,161,193,159,190,157,188,155,185,153
+
+                       ; start of thrid path
+                       dc.w                               -23,278,-20,275,-18,273,-15,270,-13,267,-10,264,-08,262,-05,259,-03,256
+                       dc.w                        000,253,003,250,005,248,008,245,010,242,013,239,015,237,018,234,020,231,023,228
+                       dc.w                        025,225,028,223,030,220,033,217,035,214,038,211,040,209,043,206,045,203,048,200
+                       dc.w                        050,198,053,195,055,192,058,189,060,186,063,184,065,181,068,178,070,175,073,173
+                       dc.w                        075,170,078,167,080,164,083,161,085,159,088,156,090,153,093,150,095,148,098,145
+                       dc.w                        100,142,103,139,105,136,108,134,110,131,113,128,115,125,118,122,120,120,123,117
+                       dc.w                        125,114,128,111,130,109,133,106,135,103
+
+BIGTRIANGLE_Z_COORDS_PTR: 
+                       dc.l                        BIGTRIANGLE_Z_COORDS
+
 BIGTRIANGLE_Z:
                        movem.l                     d0-d6/a0/a1,-(sp)
                        
@@ -152,9 +186,7 @@ BIGTRIANGLE_Z:
 
                        ENABLE_CLIPPING
                    
-                     ;LOADIDENTITY
-
-                       lea                         BIGTRIANGLE_Z_COORDS(PC),a1
+                       move.l                      BIGTRIANGLE_Z_COORDS_PTR(PC),a1
                        move.w                      BIGTRIANGLE_Z_YPOS(PC),d1
                        adda                        d1,a1
 
@@ -162,10 +194,10 @@ BIGTRIANGLE_Z:
                        asl.w                       #6,d0
                        move.w                      2(a1),d1
                        asl.w                       #6,d1
-                     jsr                    TRANSLATE
+                       jsr                         TRANSLATE
                        LOADIDENTITYANDTRANSLATE    d0,d1
-                       ROTATE                      ANGLE
-                       
+                       move.l                      ROTATIONS_ANGLES_64_PTR,a0
+                       ROTATE                      (a0)
 
                        move.w                      #0,d0
                        move.w                      #-25,d1
@@ -178,26 +210,35 @@ BIGTRIANGLE_Z:
 	
                        jsr                         TRIANGLE_NODRAW
 
-                       
-
                        moveq                       #6,d0
                        bsr.w                       increase_angle_by_n
-
-                       
 
                        WAITBLITTER
                        STROKE                      #3
                        jsr                         ammx_fill_table_clip
                        DISABLE_CLIPPING
-
                        
                        add.w                       #4,BIGTRIANGLE_Z_YPOS
+                       add.l                       #2,ROTATIONS_ANGLES_64_PTR
 
                      ; if last frame of the section blit the triangle on bitplane 3
                        cmpi.w                      #64*4,BIGTRIANGLE_Z_YPOS
-                       bne.s                       BIGTRIANGLE_Z_EXIT
-                       move.l                      #$FFFFFFFF,SCREEN_2
+                       bne.w                       BIGTRIANGLE_Z_EXIT
+                       
+                       WAITBLITTER
+                       move.w                      #$0DFC,$dff040
+                       move.w                      #$0000,$dff042   
+                       move.l                      SCREEN_PTR_0,$dff050                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; a source
+                       move.l                      #SCREEN_2,$DFF04C
+                       move.l                      #SCREEN_2,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ; d destination 
+                       move.w                      #$0000,$dff062                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; b mod
+                       move.w                      #$0000,$dff064                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; copy to d channel
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
+                       move.w                      #$4014,$dff058
+
                        move.w                      #0,BIGTRIANGLE_Z_YPOS
+                       add.l                       #256,BIGTRIANGLE_Z_COORDS_PTR
+                       move.l                      #ROTATIONS_ANGLES_64,ROTATIONS_ANGLES_64_PTR
 
 BIGTRIANGLE_Z_EXIT:
                        movem.l                     (sp)+,d0-d6/a0/a1
@@ -206,8 +247,7 @@ BIGTRIANGLE_Z_EXIT:
 BIGTRIANGLE_Z_2_YPOS:  dc.w                        0
 BIGTRIANGLE_Z_2_COORDS: 
                        ;dc.w                        350,-25,347,-22,343,-19,340,-17,337,-14,333,-11,330,-8,326,-6,323,-3,320,0,316,3,313,6,310,8,306,11,303,14,300,17,296,20,293,22,290,25,286,28,283,31,279,33,276,36,273,39,269,42,266,45,263,47,259,50,256,53,253,56,249,58,246,61,243,64,239,67,236,70,232,72,229,75,226,78,222,81,219,83,216,86,212,89,209,92,206,95,202,97,199,100,195,103,192,106,189,109,185,111,182,114,179,117,175,120,172,122,169,125,165,128,162,131,159,134,155,136,152,139,148,142,145,145,142,147,138,150,135,153
-                       dc.w 345,281,342,279,339,277,336,275,333,273,331,271,328,269,325,267,322,265,319,263,316,261,313,259,310,257,307,255,305,253,302,251,299,249,296,247,293,245,290,243,287,241,284,239,281,237,279,235,276,233,273,231,270,229,267,227,264,225,261,223,258,221,255,219,253,217,250,215,247,213,244,211,241,209,238,207,235,205,232,203,229,201,226,199,224,197,221,195,218,193,215,191,212,189,209,187,206,185,203,183,200,181,198,179,195,177,192,175,189,173,186,171,183,169,180,167,177,165,174,163,172,161,169,159,166,157,163,155,160,153
-
+                       dc.w                        345,281,343,279,340,277,338,275,335,273,333,271,330,269,328,267,325,265,323,263,320,261,318,259,315,257,313,255,310,253,308,251,305,249,303,247,300,245,298,243,295,241,293,239,290,237,288,235,285,233,283,231,280,229,278,227,275,225,273,223,270,221,268,219,265,217,263,215,260,213,258,211,255,209,253,207,250,205,248,203,245,201,243,199,240,197,238,195,235,193,233,191,230,189,228,187,225,185,223,183,220,181,218,179,215,177,213,175,210,173,208,171,205,169,203,167,200,165,198,163,195,161,193,159,190,157,188,155,185,153
 BIGTRIANGLE_Z_2:
                        movem.l                     d0-d6/a1,-(sp)
                        move.w                      #%0100001000000000,BPLCON0POINTER
@@ -223,7 +263,8 @@ BIGTRIANGLE_Z_2:
                        move.w                      2(a1),d1
                        asl.w                       #6,d1
                        LOADIDENTITYANDTRANSLATE    d0,d1
-                       ROTATE                      ANGLE
+                       move.l                      ROTATIONS_ANGLES_64_PTR,a0
+                       ROTATE                      (a0)
 
                        move.w                      #0,d0
                        move.w                      #-25,d1
@@ -241,14 +282,27 @@ BIGTRIANGLE_Z_2:
 
                        WAITBLITTER
                        STROKE                      #3
-                       jsr                         ammx_fill_table_clip
+                       ;jsr                         ammx_fill_table_clip
                        DISABLE_CLIPPING
                        add.w                       #4,BIGTRIANGLE_Z_2_YPOS
+                       add.l                       #2,ROTATIONS_ANGLES_64_PTR
 
                      ; if last frame of the section blit the triangle on bitplane 3
                        cmpi.w                      #64*4,BIGTRIANGLE_Z_2_YPOS
                        bne.s                       BIGTRIANGLE_Z_2_EXIT
+                       WAITBLITTER
+                       move.w                      #$0DFC,$dff040
+                       move.w                      #$0000,$dff042   
+                       move.l                      SCREEN_PTR_0,$dff050                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; a source
+                       move.l                      #SCREEN_2,$DFF04C
+                       move.l                      #SCREEN_2,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ; d destination 
+                       move.w                      #$0000,$dff062                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; b mod
+                       move.w                      #$0000,$dff064                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; copy to d channel
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
+                       move.w                      #$4014,$dff058
                        move.w                      #0,BIGTRIANGLE_Z_2_YPOS
+                       move.l                      #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
+                       move.l                      #ROTATIONS_ANGLES_64,ROTATIONS_ANGLES_64_PTR
 
 BIGTRIANGLE_Z_2_EXIT:
                        movem.l                     (sp)+,d0-d6/a1
@@ -304,7 +358,7 @@ COUNTER_REVERSED:
                        dc.w                        0
 
 ammx_fill_table_reversed:
-                       movem.l                     d0/d2-d7/a0/a1/a2/a3/a4/a5/a6,-(sp)                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; stack save
+                       movem.l                     d0/d2-d7/a0/a1/a2/a3/a4/a5/a6,-(sp)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ; stack save
 
                        move.w                      #1,AMMX_FILL_TABLE_FIRST_DRAW
                        move.w                      AMMXFILLTABLE_END_ROW,d5
@@ -340,30 +394,30 @@ ammx_fill_table_reversed:
                        move.w                      #$0000,COUNTER_REVERSED
 ammx_fill_table_nextline_reversed:
 
-                       move.w                      (a0),d6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ; start of fill line
-                       move.w                      2(a0),d7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ; end of fill line
+                       move.w                      (a0),d6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ; start of fill line
+                       move.w                      2(a0),d7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ; end of fill line
                        move.l                      a2,(a0)+
 	
                        jsr                         ammx_fill_table_single_line_bpl1
 
 	; experimental, calculate the top of the figure addr in a1
-                       move.l                      SCREEN_PTR_0,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ; experimental
-                       adda.w                      d1,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ; experimental (now a1 is the addr of the top of the figure)
+                       move.l                      SCREEN_PTR_0,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ; experimental
+                       adda.w                      d1,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ; experimental (now a1 is the addr of the top of the figure)
 
 	; blitting in reverse
                        WAITBLITTER
                        move.w                      #$09F0,$dff040
                        move.w                      #$0000,$dff042
-                       move.l                      a1,$dff050                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ; bltAptr
-                       adda.l                      #40*256,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ; experimental go to bpl 2
+                       move.l                      a1,$dff050                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ; bltAptr
+                       adda.l                      #40*256,a1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ; experimental go to bpl 2
                        move.w                      d5,d0
                        sub.w                       COUNTER_REVERSED,d0
                        mulu.w                      #40,d0
                        adda.w                      d0,a1
                        add.w                       #1,COUNTER_REVERSED
-                       move.l                      a1,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ; copy to d channel
+                       move.l                      a1,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ; copy to d channel
                        move.w                      #$0000,$dff064
-                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ;D mod
+                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
                        move.w                      #$0054,$dff058
 	; end blitting in reverse
                        add.w                       a6,d1
