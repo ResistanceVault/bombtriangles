@@ -262,7 +262,7 @@ mouse:
 	;move.l #$FFFFFFFF,(a0)
 	IFD EFFECTS
 	jsr	muovicopper	; barra rossa sotto linea $ff
-	jsr	CopperDestSin	; Routine di scorrimento destra/sinistra
+	;jsr	CopperDestSin	; Routine di scorrimento destra/sinistra
 	jsr	scrollcolors	; scorrimento ciclico dei colori
 	ENDC
 Aspetta:
@@ -611,7 +611,6 @@ col14:
 	dc.w	$018e,$444	; color7
 
 ;	EFFETTO DELLA LEZIONE3h.s
-
 	dc.w	$9007,$fffe	; aspettiamo l'inizio della linea
 	dc.w	$180,$000	; grigio al minimo, ossia NERO!!!
 CopBar:

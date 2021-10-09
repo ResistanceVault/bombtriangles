@@ -93,7 +93,9 @@ DRAWFUNCTARRAY_START:
                        dc.l                        BIGTRIANGLE_Z
                        dc.l                        BIGTRIANGLE_Z
                        dc.l                        BIGTRIANGLE_Z
-                       dc.l                        BIGTRIANGLE_Z_2
+                       dc.l                        BIGTRIANGLE_Z
+                       dc.l                        BIGTRIANGLE_Z
+                       ;dc.l                        BIGTRIANGLE_Z_2
                        dc.l                        DOUBLETRIANGLE
                        dc.l                        SMALLTRIANGLE
                        dc.l                        MEDIUMTRIANGLE
@@ -202,6 +204,25 @@ BIGTRIANGLE_Z_COORDS:
                        dc.w                        139,142,142,139,146,136,149,134,152,131,155,128,159,125,162,122,165,120,169,117
                        dc.w                        172,114,175,111,178,109,182,106,185,103
 
+                       ; start of fifth path
+                       dc.w                        -22,278,-19,275,-16,273,-13,270,-11,267,-08,264,-05,262,-02,259,001,256
+                       dc.w                        004,253,007,250,010,248,013,245,015,242,018,239,021,237,024,234,027,231,030,228
+                       dc.w                        033,225,036,223,039,220,041,217,044,214,047,211,050,209,053,206,056,203,059,200
+                       dc.w                        062,198,065,195,068,192,070,189,073,186,076,184,079,181,082,178,085,175,088,173
+                       dc.w                        091,170,094,167,096,164,099,161,102,159,105,156,108,153,111,150,114,148,117,145
+                       dc.w                        120,142,122,139,125,136,128,134,131,131,134,128,137,125,140,122,143,120,146,117
+                       dc.w                        148,114,151,111,154,109,157,106,160,103
+
+                       ; start of sixth path
+                       dc.w                        -22,279,-19,277,-16,275,-13,273,-11,271,-08,269,-05,267,-02,265,001,263
+                       dc.w                        004,261,007,259,010,257,013,255,015,253,018,251,021,249,024,247,027,245,030,243
+                       dc.w                        033,241,036,239,039,237,041,235,044,233,047,231,050,229,053,227,056,225,059,223
+                       dc.w                        062,221,065,219,067,217,070,215,073,213,076,211,079,209,082,207,085,205,088,203
+                       dc.w                        091,201,094,199,096,197,099,195,102,193,105,191,108,189,111,187,114,185,117,183
+                       dc.w                        120,181,122,179,125,177,128,175,131,173,134,171,137,169,140,167,143,165,146,163
+                       dc.w                        148,161,151,159,154,157,157,155,160,153
+BIGTRIANGLE_Z_COORDS_END:
+
 BIGTRIANGLE_Z_COORDS_PTR: 
                        dc.l                        BIGTRIANGLE_Z_COORDS
 
@@ -267,85 +288,20 @@ BIGTRIANGLE_Z:
 
                        
                        move.l                      ROTATIONS_ANGLES_64_PTR,d0
-                       ;add.l #128,d0
-                       move.l                       d0,ROTATIONS_ANGLES_64_PTR
-                       cmpi.l #ROTATIONS_ANGLES_64_END,ROTATIONS_ANGLES_64_PTR
-                       bne.s donotresetrotationangles
+                       move.l                      d0,ROTATIONS_ANGLES_64_PTR
+                       cmpi.l                      #ROTATIONS_ANGLES_64_END,ROTATIONS_ANGLES_64_PTR
+                       bne.s                       donotresetrotationangles
                        move.l                      #ROTATIONS_ANGLES_64,ROTATIONS_ANGLES_64_PTR
 donotresetrotationangles:
-                       ;subi.l #64,d0
-                       ;move.l d0,ROTATIONS_ANGLES_64_PTR
-                       ;add.l        #128,d0
-                       ;move.l                      d0,ROTATIONS_ANGLES_64_PTR
-                       ;neg.l ROTATIONS_ANGLES_SIZE
-                       ;move.l d0,ROTATIONS_ANGLES_SIZE
+
+                      ; if last of the routine calls
+                      cmpi.l #BIGTRIANGLE_Z_COORDS_END,BIGTRIANGLE_Z_COORDS_PTR
+                      bne.s donotchangedelay
+                      move.w  #8,BEATDELAY+2
+donotchangedelay:
 
 BIGTRIANGLE_Z_EXIT:
                        movem.l                     (sp)+,d0-d6/a0/a1
-                       rts
-
-BIGTRIANGLE_Z_2_YPOS:  dc.w                        0
-BIGTRIANGLE_Z_2_COORDS: 
-                       ;dc.w                        350,-25,347,-22,343,-19,340,-17,337,-14,333,-11,330,-8,326,-6,323,-3,320,0,316,3,313,6,310,8,306,11,303,14,300,17,296,20,293,22,290,25,286,28,283,31,279,33,276,36,273,39,269,42,266,45,263,47,259,50,256,53,253,56,249,58,246,61,243,64,239,67,236,70,232,72,229,75,226,78,222,81,219,83,216,86,212,89,209,92,206,95,202,97,199,100,195,103,192,106,189,109,185,111,182,114,179,117,175,120,172,122,169,125,165,128,162,131,159,134,155,136,152,139,148,142,145,145,142,147,138,150,135,153
-                       dc.w                        345,281,343,279,340,277,338,275,335,273,333,271,330,269,328,267,325,265,323,263,320,261,318,259,315,257,313,255,310,253,308,251,305,249,303,247,300,245,298,243,295,241,293,239,290,237,288,235,285,233,283,231,280,229,278,227,275,225,273,223,270,221,268,219,265,217,263,215,260,213,258,211,255,209,253,207,250,205,248,203,245,201,243,199,240,197,238,195,235,193,233,191,230,189,228,187,225,185,223,183,220,181,218,179,215,177,213,175,210,173,208,171,205,169,203,167,200,165,198,163,195,161,193,159,190,157,188,155,185,153
-BIGTRIANGLE_Z_2:
-                       movem.l                     d0-d6/a1,-(sp)
-                       move.w                      #%0100001000000000,BPLCON0POINTER
-
-                       ENABLE_CLIPPING
-                   
-                       lea                         BIGTRIANGLE_Z_2_COORDS(PC),a1
-                       move.w                      BIGTRIANGLE_Z_2_YPOS(PC),d1
-                       adda                        d1,a1
-
-                       move.w                      (a1),d0
-                       asl.w                       #6,d0
-                       move.w                      2(a1),d1
-                       asl.w                       #6,d1
-                       LOADIDENTITYANDTRANSLATE    d0,d1
-                       move.l                      ROTATIONS_ANGLES_64_PTR,a0
-                       ROTATE                      (a0)
-
-                       move.w                      #0,d0
-                       move.w                      #-25,d1
-
-                       move.w                      #-25,d6
-                       move.w                      #25,d3
-
-                       move.w                      #25,d4
-                       move.w                      #25,d5
-	
-                       jsr                         TRIANGLE_NODRAW
-
-                       moveq                       #6,d0
-                       bsr.w                       increase_angle_by_n
-
-                       WAITBLITTER
-                       STROKE                      #3
-                       ;jsr                         ammx_fill_table_clip
-                       DISABLE_CLIPPING
-                       add.w                       #4,BIGTRIANGLE_Z_2_YPOS
-                       add.l                       #2,ROTATIONS_ANGLES_64_PTR
-
-                     ; if last frame of the section blit the triangle on bitplane 3
-                       cmpi.w                      #64*4,BIGTRIANGLE_Z_2_YPOS
-                       bne.s                       BIGTRIANGLE_Z_2_EXIT
-                       WAITBLITTER
-                       move.w                      #$0DFC,$dff040
-                       move.w                      #$0000,$dff042   
-                       move.l                      SCREEN_PTR_0,$dff050                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ; a source
-                       move.l                      #SCREEN_2,$DFF04C
-                       move.l                      #SCREEN_2,$dff054                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ; d destination 
-                       move.w                      #$0000,$dff062                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; b mod
-                       move.w                      #$0000,$dff064                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ; copy to d channel
-                       move.w                      #$0000,$dff066                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;D mod
-                       move.w                      #$4014,$dff058
-                       move.w                      #0,BIGTRIANGLE_Z_2_YPOS
-                       move.l                      #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
-                       move.l                      #ROTATIONS_ANGLES_64,ROTATIONS_ANGLES_64_PTR
-
-BIGTRIANGLE_Z_2_EXIT:
-                       movem.l                     (sp)+,d0-d6/a1
                        rts
 
 
@@ -353,6 +309,8 @@ DOUBLETRIANGLE:
                        movem.l                     d0-d7/a0-a6,-(sp)
 
                        move.w                      #%0010001000000000,BPLCON0POINTER
+                       move.l                      #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
+
 
                        LOADIDENTITY
                        VERTEX_INIT                 1,#0,#-50,#0
@@ -370,7 +328,8 @@ DOUBLETRIANGLE:
 
                        WAITBLITTER
                        STROKE                      #3
-                       bsr.w                       ammx_fill_table_reversed              
+                       bsr.w                       ammx_fill_table_reversed
+                       move.w  #8,BEATDELAY+2
                        movem.l                     (sp)+,d0-d7/a0-a6
                        rts
 
