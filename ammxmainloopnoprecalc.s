@@ -103,18 +103,19 @@ DRAWFUNCTARRAY_START:
             dc.l                   BIGTRIANGLE_Z
             dc.l                   BIGTRIANGLE_Z
             dc.l                   BIGTRIANGLE_Z
-            dc.l                   DOUBLETRIANGLE
+            dc.l                   DOUBLETRIANGLEX
+            dc.l                   DOUBLETRIANGLEY
             dc.l                   SMALLTRIANGLE
             dc.l                   MEDIUMTRIANGLE
             dc.l                   BIGTRIANGLE
 DRAWFUNCTARRAY_END:
 
 SMALLTRIANGLE:
-            LOADIDENTITY
+              move.w ANGLE,d0
+            jsr LOADIDENTITYANDROTATEX
             VERTEX_INIT            1,#0,#-10,#0
             VERTEX_INIT            2,#10,#10,#0
             VERTEX_INIT            3,#-10,#10,#0
-            ROTATE_X_INV_Q_5_11    ANGLE
             jsr                    TRIANGLE3D_NODRAW
             bsr.w                  increase_angle_by_1
 
@@ -124,11 +125,11 @@ SMALLTRIANGLE:
             rts
 
 MEDIUMTRIANGLE:
-            LOADIDENTITY
+              move.w ANGLE,d0
+            jsr LOADIDENTITYANDROTATEX
             VERTEX_INIT            1,#0,#-25,#0
             VERTEX_INIT            2,#25,#25,#0
             VERTEX_INIT            3,#-25,#25,#0
-            ROTATE_X_INV_Q_5_11    ANGLE
             jsr                    TRIANGLE3D_NODRAW
             bsr.w                  increase_angle_by_1
 
@@ -138,11 +139,11 @@ MEDIUMTRIANGLE:
             rts
 
 BIGTRIANGLE:
-            LOADIDENTITY
+              move.w ANGLE,d0
+            jsr LOADIDENTITYANDROTATEX
             VERTEX_INIT            1,#0,#-50,#0
             VERTEX_INIT            2,#50,#50,#0
             VERTEX_INIT            3,#-50,#50,#0
-            ROTATE_X_INV_Q_5_11    ANGLE
             jsr                    TRIANGLE3D_NODRAW
             bsr.w                  increase_angle_by_1
 
@@ -315,17 +316,43 @@ BIGTRIANGLE_Z_EXIT:
             rts
 
 
-DOUBLETRIANGLE:
+DOUBLETRIANGLEX:
             movem.l                d0-d7/a0-a6,-(sp)
 
             move.w                 #%0010001000000000,BPLCON0POINTER
             move.l                 #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
 
-            LOADIDENTITY
+            move.w ANGLE,d0
+            jsr LOADIDENTITYANDROTATEX
             VERTEX_INIT            1,#0,#-50,#0
             VERTEX_INIT            2,#50,#50,#0
             VERTEX_INIT            3,#-50,#50,#0
-            ROTATE_X_INV_Q_5_11    ANGLE
+            IFD                    DEBUGCOLORS
+            move.w                 #$00F0,$dff180
+            ENDC
+            jsr                    TRIANGLE3D_NODRAW
+            IFD                    DEBUGCOLORS
+            move.w                 #$0AAA,$dff180
+            ENDC
+            bsr.w                  increase_angle_by_1
+
+            WAITBLITTER
+            STROKE                 #3
+            bsr.w                  ammx_fill_table_reversed
+            movem.l                (sp)+,d0-d7/a0-a6
+            rts
+
+DOUBLETRIANGLEY:
+            movem.l                d0-d7/a0-a6,-(sp)
+
+            move.w                 #%0010001000000000,BPLCON0POINTER
+            move.l                 #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
+
+            move.w ANGLE,d0
+            jsr LOADIDENTITYANDROTATEY
+            VERTEX_INIT            1,#0,#-50,#0
+            VERTEX_INIT            2,#50,#50,#0
+            VERTEX_INIT            3,#-50,#50,#0
             IFD                    DEBUGCOLORS
             move.w                 #$00F0,$dff180
             ENDC
