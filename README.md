@@ -1,4 +1,4 @@
-Flashparty 2022
+# Flashparty 2022 intro compo entry
 
 This is a new repo for flashparty 2022.
 The main idea here is to produce a small intro (executable <64k).
@@ -10,16 +10,17 @@ I'd like to target an A1000, so staying under 512k of chip ram is mandatory. For
 
 Right now it crashes at exit and the music it's reported to do not work on my friend's A1000 but works for me with fsuae... dunno...
 
+### Problems
 What I need now
 
-1. fix the exit problem
-2. fix the music problem
-3. ideas on how to syncronize rotation with the music
-4. ideas on general how to proceed
+- [x] fix the exit problem (THX Kristoff)
+- [ ] fix the music problem
+- [ ] ideas on how to syncronize rotation with the music
+- [ ] ideas on general how to proceed
 
-Buling
+### How to build
 
-You just need vasm to build the whole project, shrinkler compress it, the final executable for now it's about 13k, this means we have space to add more stuff.
+You just need vasm to build the whole project, shrinkler compress it, the final executable for now it's about 15k, this means we have space to add more stuff.
 
 Devpac also compiles the project on a real amiga, just feed r.s to devpac and click assemble, it will work (or at least it works on my stock A600).
 
