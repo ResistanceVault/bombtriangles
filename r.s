@@ -189,14 +189,10 @@ Inizio:
 	move.w  d0,2(a1)
 
 	; test per vedere se lo sprite si elimina
-	;JSR 	-$10E (A6) ; WaitOf ( Ri si s t e m a l ’ e v e n t u a l e i n t e r l a c e )
-	;JSR		-$10E (A6) ; WaitOf
 
     lea	$dff000,a6
-;	move	$dff002,olddma		;Old DMA
 	move	#$7ff,$96(a6)		;Disable DMAs
 	move	#%1000011111000000,$96(a6) ;Master,Copper,Blitter,Bitplanes
-;	move	$1c(a6),-(sp)		;Old IRQ
 	move	#$7fff,$9a(a6)		;Disable IRQs
 	move	#$e000,$9a(a6)		;Master and lev6
 					;NO COPPER-IRQ!
@@ -215,9 +211,12 @@ Inizio:
 	sub.l a2,a2
 	moveq #0,d0
 
+
 	jsr P61_Init
 
     jsr _ammxmainloop3_init
+		move	#%1000011111000000,$96(a6) ;Master,Copper,Blitter,Bitplanes
+
 
 mouse:
 	cmpi.b	#$ff,$dff006	; Siamo alla linea 255?
@@ -235,6 +234,7 @@ mouse:
 	IFD DEBUGCOLORS
     move.w #$0F00,$dff180
 	ENDC
+
 	;STROKE #3
 	;or.w    #3,STROKE_DATA
 	jsr ammxmainloop3
@@ -290,17 +290,17 @@ Aspetta:
 
 ;	Dati
 
-gfxname:
-	dc.b	"graphics.library",0,0	
+;gfxname:
+;	dc.b	"graphics.library",0,0	
 
-gfxbase:		; Qua ci va l'indirizzo di base per gli Offset
-	dc.l	0	; della graphics.library
+;gfxbase:		; Qua ci va l'indirizzo di base per gli Offset
+;	dc.l	0	; della graphics.library
 
-oldcop:			; Qua ci va l'indirizzo della vecchia COP di sistema
-	dc.l	0
+;oldcop:			; Qua ci va l'indirizzo della vecchia COP di sistema
+;	dc.l	0
 
-olddma:
-	dc.l 0
+;olddma:
+;	dc.l 0
 
 
 ;---------------------------------------------------------------
@@ -588,13 +588,13 @@ col14:
 
 	dc.w	$0180,$000	; color0
 	ENDC
-	dc.w	$0182,$550	; color1	; ridefiniamo il colore della
-	dc.w	$0184,$0F00	; color2	; scritta COMMODORE! GIALLA!
-	dc.w	$0186,$00F0	; color3
-	dc.w	$0188,$990	; color4
-	dc.w	$018a,$220	; color5
-	dc.w	$018c,$770	; color6
-	dc.w	$018e,$440	; color7
+	;dc.w	$0182,$550	; color1	; ridefiniamo il colore della
+	;dc.w	$0184,$0F00	; color2	; scritta COMMODORE! GIALLA!
+	;dc.w	$0186,$00F0	; color3
+	;dc.w	$0188,$990	; color4
+	;dc.w	$018a,$220	; color5
+	;dc.w	$018c,$770	; color6
+	;dc.w	$018e,$440	; color7
 
 	IFD EFFECTS
 	dc.w	$7007,$fffe	; Aspettiamo la fine della scritta COMMODORE
@@ -602,13 +602,13 @@ col14:
 ;	Gli 8 colori della figura sono definiti qui:
 
 	dc.w	$0180,$000	; color0
-	dc.w	$0182,$475	; color1
+	;dc.w	$0182,$475	; color1
 	;dc.w	$0184,$fff	; color2
 	;dc.w	$0186,$ccc	; color3
-	dc.w	$0188,$999	; color4
-	dc.w	$018a,$232	; color5
-	dc.w	$018c,$777	; color6
-	dc.w	$018e,$444	; color7
+	;dc.w	$0188,$999	; color4
+	;dc.w	$018a,$232	; color5
+	;dc.w	$018c,$777	; color6
+	;dc.w	$018e,$444	; color7
 
 ;	EFFETTO DELLA LEZIONE3h.s
 	dc.w	$9007,$fffe	; aspettiamo l'inizio della linea

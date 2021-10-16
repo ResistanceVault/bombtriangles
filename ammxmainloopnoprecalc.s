@@ -1,8 +1,15 @@
+SETBEATDELAY MACRO
+            move.w              \1,BEATDELAY+2
+            ENDM
+
+SET2BITPLANES MACRO
+            move.w              #%0010001000000000,BPLCON0POINTER
+            ENDM
+
 ammxmainloop3:
             movem.l             d0-d7/a0-a6,-(sp)    
   
             SWAP_BPL
-            ;bsr.w                  CLEAR
             move.l              CLEARFUNCTION,a0
             jsr                 (a0)
 
@@ -87,6 +94,17 @@ CLEAR_BPL_3:
             move.w              #$0000,$dff066                                                                     ;D mod
             move.w              #$4014,$dff058
             rts
+CLEAR_BPL_4: 
+            WAITBLITTER
+            move.w              #$0100,$dff040
+            move.w              #$0000,$dff042        
+            move.l              #SCREEN_3,$dff054                                                                  ; copy to d channel
+            move.w              #$0000,$dff066                                                                     ;D mod
+            move.w              #$4014,$dff058
+            rts
+
+VOID:
+            rts
 
 FRAMECOUNTER:  
             dc.w                0 
@@ -106,12 +124,31 @@ DRAWFUNCTARRAY_START:
             dc.l                BIGTRIANGLE_Z
             dc.l                BIGTRIANGLE_Z
             dc.l                BIGTRIANGLE_Z
+            dc.l                TRANSITION1
             dc.l                DOUBLETRIANGLEX
             dc.l                DOUBLETRIANGLEY
             dc.l                SMALLTRIANGLE
             dc.l                MEDIUMTRIANGLE
             dc.l                BIGTRIANGLE
 DRAWFUNCTARRAY_END:
+
+TRANSITION1:
+            IFND                LOL
+            WAITBLITTER
+            move.w              #$09F0,$dff040
+            move.w              #$0000,$dff042   
+            move.l              #SCREEN_2,$dff050                                                                  ; a source
+            move.l              SCREEN_PTR_0,$dff054                                                               ; d destination 
+            move.w              #0,$dff064                                                                         ; A MOD
+            move.w              #0,$dff066                                                                         ; D mod
+            move.w              #$8014,$dff058
+            move.l              #VOID,CLEARFUNCTION
+            ENDC
+            SETBEATDELAY        #8
+            move.l              #BIGTRIANGLE_Z_COLOR,BIGTRIANGLE_Z_COLOR_PTR
+            SET2BITPLANES
+            rts
+
 
 SMALLTRIANGLE:
             move.l              #CLEAR,CLEARFUNCTION
@@ -125,6 +162,8 @@ SMALLTRIANGLE:
             bsr.w               increase_angle_by_1
 
             WAITBLITTER
+            bsr.w               CLEAR_BPL_4
+            bsr.w               CLEAR_BPL_3
             STROKE              #3
             jsr                 ammx_fill_table
             rts
@@ -245,6 +284,11 @@ BIGTRIANGLE_Z_COORDS_END:
 BIGTRIANGLE_Z_COORDS_PTR: 
             dc.l                BIGTRIANGLE_Z_COORDS
 
+BIGTRIANGLE_Z_COLOR:
+            dc.b                1,2,1,2,3,3
+BIGTRIANGLE_Z_COLOR_PTR:
+            dc.l                BIGTRIANGLE_Z_COLOR
+
 BIGTRIANGLE_Z:
             movem.l             d0-d6/a0/a1,-(sp)
                        
@@ -273,11 +317,10 @@ BIGTRIANGLE_Z:
 	
             jsr                 TRIANGLE_NODRAW
 
-            moveq               #6,d0
-            bsr.w               increase_angle_by_n
-
             WAITBLITTER
-            STROKE              #3
+            move.l              BIGTRIANGLE_Z_COLOR_PTR,a0
+
+            STROKE              (a0)
             jsr                 ammx_fill_table_clip
             DISABLE_CLIPPING
                        
@@ -292,12 +335,19 @@ BIGTRIANGLE_Z:
             move.w              #$0DFC,$dff040
             move.w              #$0000,$dff042   
             move.l              SCREEN_PTR_0,$dff050                                                               ; a source
+            ;add.w #16,$DFF050
             move.l              #SCREEN_2,$DFF04C
+            ;add.w #16,$DFF04C
             move.l              #SCREEN_2,$dff054                                                                  ; d destination 
-            move.w              #$0000,$dff062                                                                     ; b mod
-            move.w              #$0000,$dff064                                                                     ; copy to d channel
-            move.w              #$0000,$dff066                                                                     ;D mod
-            move.w              #$4014,$dff058
+            ;add.w #16,$DFF054
+            move.w              #0,$dff062                                                                         ; b mod
+            move.w              #0,$dff064                                                                         ; A MOD
+            move.w              #0,$dff066                                                                         ;D mod
+            move.w              #$8014,$dff058
+
+            move.w              #0,ANGLE
+
+            add.l               #1,BIGTRIANGLE_Z_COLOR_PTR
 
             move.w              #0,BIGTRIANGLE_Z_YPOS
             add.l               #256,BIGTRIANGLE_Z_COORDS_PTR
@@ -308,12 +358,13 @@ BIGTRIANGLE_Z:
             cmpi.l              #ROTATIONS_ANGLES_64_END,ROTATIONS_ANGLES_64_PTR
             bne.s               donotresetrotationangles
             move.l              #ROTATIONS_ANGLES_64,ROTATIONS_ANGLES_64_PTR
+           
 donotresetrotationangles:
 
                       ; if last of the routine calls
-            cmpi.l              #BIGTRIANGLE_Z_COORDS_END,BIGTRIANGLE_Z_COORDS_PTR
-            bne.s               donotchangedelay
-            move.w              #8,BEATDELAY+2
+            ;cmpi.l              #BIGTRIANGLE_Z_COORDS_END,BIGTRIANGLE_Z_COORDS_PTR
+            ;bne.s               donotchangedelay
+            ;move.w              #8,BEATDELAY+2
             
 donotchangedelay:
 
@@ -327,8 +378,10 @@ DOUBLETRIANGLEX:
 
             move.w              #%0010001000000000,BPLCON0POINTER
             move.l              #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
+            move.l              #CLEAR,CLEARFUNCTION
 
             move.w              ANGLE,d0
+            ;moveq               #0,d0
             jsr                 LOADIDENTITYANDROTATEX
             VERTEX_INIT         1,#0,#-50,#0
             VERTEX_INIT         2,#50,#50,#0
