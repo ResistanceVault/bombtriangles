@@ -8,7 +8,7 @@ the first one on bitplane 1 the second on bitplane 2, the intersecting area gene
 
 I'd like to target an A1000, so staying under 512k of chip ram is mandatory. For this reason i must precalculate as less as possibile and the code must be quick to fit into a 68k at 50fps.
 
-Right now it crashes at exit and the music it's reported to do not work on my friend's A1000 but works for me with fsuae... dunno...
+Right now the music it's reported to do not work on my friend's A1000 but works for me with fsuae... dunno...
 
 ### Problems
 What I need now
