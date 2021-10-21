@@ -724,33 +724,15 @@ BARRA:
 	ENDC
 
 
-	dc.w	$FFFF,$FFFE	; FINE DELLA COPPERLIST
+	dc.w	$FFFF,$FFFE	; End of copperlist
 
-
-; **************************************************************************
-; *			FIGURA AD 8 COLORI 320x256			   *
-; **************************************************************************
-
-;	Ricordatevi di selezionare la directory dove si trova la figura
-;	in questo caso basta scrivere: "V df0:SORGENTI2"
-
-					; 3 bitplanes consecutivi
 SCREEN_2
     dcb.b 40*256,$00
 
 SCREEN_3
     dcb.b 40*256,$00
 
-    IFD USE_DBLBUF
-SCREEN_20
-    dcb.b 40*256,$00
-
-SCREEN_31
-    dcb.b 40*256,$00
-	ENDC
-
 Module1:
-	;incbin "P61.sowhat-intro"			;usecode $9410
 	incbin "P61.chippy_nr.399" ; usecode $945A
 	even
 
