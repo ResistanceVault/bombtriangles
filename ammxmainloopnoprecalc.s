@@ -1,7 +1,3 @@
-SETBEATDELAY MACRO
-            move.w              \1,BEATDELAY+2
-            ENDM
-
 SET2BITPLANES MACRO
             move.w              #%0010001000000000,BPLCON0POINTER
             ENDM
@@ -22,7 +18,7 @@ ammxmainloop3:
             move.l              BEATDELAY,BEATCOUNTER
             add.l               #4,DRAWFUNCTCOUNTER
             move.l              LAST_ITERATION_FUNCTION_PTR,a0
-            move.l (a0),a0
+            move.l              (a0),a0
             jsr                 (a0)
             add.l               #4,LAST_ITERATION_FUNCTION_PTR
 
@@ -122,38 +118,10 @@ BEATCOUNTER:
             dc.l                1
 BEATDELAY:  dc.l                1
 
-DRAWFUNCTARRAY_START:
-            dc.l                BIGTRIANGLE_Z           ; 1
-            dc.l                BIGTRIANGLE_Z           ; 2
-            dc.l                BIGTRIANGLE_Z           ; 3
-            dc.l                BIGTRIANGLE_Z           ; 4
-            dc.l                BIGTRIANGLE_Z           ; 5
-            dc.l                BIGTRIANGLE_Z           ; 6
-            dc.l                TRANSITION1             ; 7
-            dc.l                DOUBLETRIANGLEX         ; 8
-            dc.l                DOUBLETRIANGLEY         ; 9
-            dc.l                SMALLTRIANGLE           ; 10
-            dc.l                MEDIUMTRIANGLE          ; 11
-            dc.l                BIGTRIANGLE             ; 12
-DRAWFUNCTARRAY_END:
 
-LAST_ITERATION_FUNCTION_START: 
-            dc.l                VOID                    ; 1
-            dc.l                VOID                    ; 2
-            dc.l                VOID                    ; 3
-            dc.l                VOID                    ; 4
-            dc.l                VOID                    ; 5
-            dc.l                VOID                    ; 6
-            dc.l                VOID                    ; 7
-            dc.l                RESET_ANGLE_512         ; 8
-            dc.l                RESET_ANGLE_512         ; 9
-            dc.l                VOID                    ; 10
-            dc.l                VOID                    ; 11
-            dc.l                VOID                    ; 12
-LAST_ITERATION_FUNCTION_END:
 LAST_ITERATION_FUNCTION_PTR:
             dc.l                LAST_ITERATION_FUNCTION_START
-
+            
 TRANSITION1:
             WAITBLITTER
             move.w              #$09F0,$dff040
@@ -171,19 +139,21 @@ TRANSITION1:
 
 
 SMALLTRIANGLE:
-            move.l              #CLEAR,CLEARFUNCTION
+            ;move.l              #CLEAR,CLEARFUNCTION
 
             move.w              ANGLE,d0
-            jsr                 LOADIDENTITYANDROTATEX
+            jsr                 LOADIDENTITYANDROTATEY
             VERTEX_INIT         1,#0,#-10,#0
             VERTEX_INIT         2,#10,#10,#0
             VERTEX_INIT         3,#-10,#10,#0
             jsr                 TRIANGLE3D_NODRAW
             bsr.w               increase_angle_by_1
 
+            ;move.w              #$0555,$dff182
+            ;WAITBLITTER
+            ;bsr.w               CLEAR_BPL_4
+            ;bsr.w               CLEAR_BPL_3
             WAITBLITTER
-            bsr.w               CLEAR_BPL_4
-            bsr.w               CLEAR_BPL_3
             STROKE              #3
             jsr                 ammx_fill_table
             rts
@@ -215,7 +185,7 @@ BIGTRIANGLE:
             bsr.w               CLEAR_BPL_3
             STROKE              #3
             jsr                 ammx_fill_table
-            move.w              #1,BEATDELAY+2
+            ;move.w              #1,BEATDELAY+2
 
 
             rts
@@ -382,10 +352,10 @@ BIGTRIANGLE_Z:
 donotresetrotationangles:
 
             ; if last of the routine calls
-            cmpi.l              #BIGTRIANGLE_Z_COORDS_END,BIGTRIANGLE_Z_COORDS_PTR
-            bne.s               donotchangedelay
-            SETBEATDELAY        #2            
-donotchangedelay:
+            ;cmpi.l              #BIGTRIANGLE_Z_COORDS_END,BIGTRIANGLE_Z_COORDS_PTR
+            ;bne.s               donotchangedelay
+            ;SETBEATDELAY        #2            
+;donotchangedelay:
 
 BIGTRIANGLE_Z_EXIT:
             movem.l             (sp)+,d0-d6/a0/a1
@@ -419,8 +389,13 @@ ROTATION_ANGLES_512_START:
             dc.w                353,354,355,355,356,357,358,358
 ROTATION_ANGLES_512_END:
 RESET_ANGLE_512:
-       move.l #ROTATION_ANGLES_512_START,ROTATION_ANGLES_512_PTR
-       rts
+            move.l              #ROTATION_ANGLES_512_START,ROTATION_ANGLES_512_PTR
+            rts
+RESET_ANGLE_512_AND_BPL_3_4:
+            bsr.w               CLEAR_BPL_4
+            bsr.w               CLEAR_BPL_3
+            move.l              #ROTATION_ANGLES_512_START,ROTATION_ANGLES_512_PTR
+            rts
 ROTATION_ANGLES_512_PTR:
             dc.l                ROTATION_ANGLES_512_START
 

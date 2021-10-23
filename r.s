@@ -168,6 +168,9 @@ suppF01	=P61pl	;if 1, split4=1 may cause sound errors. but try it anyway. :)
 
 	endc
 
+    include "AProcessing/libs/ammxmacros.i"
+
+
 Inizio:
 
 
@@ -278,7 +281,8 @@ Aspetta:
 
 	btst	#6,$bfe001	; tasto sinistro del mouse premuto?
 	bne.s	mouse		; se no, torna a mouse:
-
+exit_demo:
+	WAITBLITTER
     bsr P61_End
 
 	bsr Restore_all
@@ -460,7 +464,6 @@ scrollcolors:
 
 
 	include	"AProcessing/libs/rasterizers/globaloptions.s"
-    include "AProcessing/libs/ammxmacros.i"
     include "AProcessing/libs/matrix/matrix.s"
 	include "AProcessing/libs/rasterizers/3dglobals.i"
 	include "AProcessing/libs/rasterizers/processingfill.s"
@@ -473,6 +476,7 @@ scrollcolors:
 	include "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
 
 	include "initnoprecalc.s"
+	include "schedule.s"
 	include "ammxmainloopnoprecalc.s"
 
 ; **************************************************************************
