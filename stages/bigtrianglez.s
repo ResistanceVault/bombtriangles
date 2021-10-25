@@ -1,3 +1,6 @@
+BIGTRIANGLE_Z_YPOS:    
+            dc.w                0
+
 ; Triangle path cordinate - each chunk is 256 bytes (one long for each of the 64 coordinates)
 BIGTRIANGLE_Z_COORDS:
                        ; start of first path
@@ -65,9 +68,8 @@ BIGTRIANGLE_Z_COLOR_PTR:
 
 BIGTRIANGLE_Z:
             movem.l             d0-d6/a0/a1,-(sp)
-       
+                       
             move.w              #%0100001000000000,BPLCON0POINTER
-              ;move.l           #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
 
             ENABLE_CLIPPING
                    
@@ -77,8 +79,6 @@ BIGTRIANGLE_Z:
 
             move.w              (a1),d0
             move.w              2(a1),d1
-            ;move.w #160,d0
-            ;move.w #128,d1
             jsr                 LOADIDENTITYANDTRANSLATE   
             move.l              ROTATIONS_ANGLES_64_PTR,a0
             ROTATE              (a0)
