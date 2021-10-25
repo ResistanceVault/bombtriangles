@@ -137,6 +137,7 @@ TRANSITION1:
             SET2BITPLANES
             rts
 
+       include "stages/rollingtriangle.s"
 
 SMALLTRIANGLE:
             ;move.l              #CLEAR,CLEARFUNCTION
@@ -159,6 +160,7 @@ SMALLTRIANGLE:
             rts
 
 MEDIUMTRIANGLE:
+              SETBEATDELAY    #1
             move.w              ANGLE,d0
             jsr                 LOADIDENTITYANDROTATEX
             VERTEX_INIT         1,#0,#-25,#0
@@ -173,6 +175,7 @@ MEDIUMTRIANGLE:
             rts
 
 BIGTRIANGLE:
+       ;SETBEATDELAY    #1
             move.w              ANGLE,d0
             jsr                 LOADIDENTITYANDROTATEX
             VERTEX_INIT         1,#0,#-50,#0

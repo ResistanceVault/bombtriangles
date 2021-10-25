@@ -15,7 +15,7 @@ DRAWFUNCTARRAY_START:
   dc.l       TRANSITION1              ; 7
   dc.l       DOUBLETRIANGLEX          ; 8
   dc.l       DOUBLETRIANGLEY          ; 9
-  dc.l       SMALLTRIANGLE           ; 10
+  dc.l       ROLLINGTRIANGLE           ; 10
   dc.l       MEDIUMTRIANGLE           ; 11
   dc.l       BIGTRIANGLE              ; 12
 DRAWFUNCTARRAY_END:

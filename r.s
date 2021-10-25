@@ -173,7 +173,11 @@ suppF01	=P61pl	;if 1, split4=1 may cause sound errors. but try it anyway. :)
 
 Inizio:
 
-
+.loop; Wait for vblank
+	move.l $dff004,d0
+	and.l #$1ff00,d0
+	cmp.l #303<<8,d0
+	bne.b .loop
 	bsr Save_all
 
 ;*****************************************************************************
