@@ -16,8 +16,9 @@ DRAWFUNCTARRAY_START:
   dc.l       DOUBLETRIANGLEX          ; 8
   dc.l       DOUBLETRIANGLEY          ; 9
   dc.l       ROLLINGTRIANGLE           ; 10
-  dc.l       MEDIUMTRIANGLE           ; 11
-  dc.l       BIGTRIANGLE              ; 12
+  dc.l       SMALLTRIANGLE           ; 11
+  dc.l       MEDIUMTRIANGLE           ; 12
+  dc.l       BIGTRIANGLE              ; 13
 DRAWFUNCTARRAY_END:
 
 LAST_ITERATION_FUNCTION_START: 
@@ -30,7 +31,9 @@ LAST_ITERATION_FUNCTION_START:
   dc.l       TRANSITION_CLEAR          ; 7
   dc.l       DOUBLETRIANGLEX_CLEAR    ; 8
   dc.l       DOUBLETRIANGLEY_CLEAR                     ; 9
-  dc.l       WALKINGSMALLTRIANGLES_CLEAR                     ; 10
+  dc.l       ROLLINGTRIANGLE_CLEAR                     ; 10
   dc.l       VOID                     ; 11
   dc.l       VOID                     ; 12
+  dc.l       VOID                     ; 12
+
 LAST_ITERATION_FUNCTION_END:

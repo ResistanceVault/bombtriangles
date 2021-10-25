@@ -20,7 +20,3 @@ DOUBLETRIANGLEY_CLEAR:
   move.l          #CLEAR,CLEARFUNCTION
   rts
 
-WALKINGSMALLTRIANGLES_CLEAR:
-  move.w          #0,ANGLE
-  move.w #0,XROLLINGOFFSET
-  rts

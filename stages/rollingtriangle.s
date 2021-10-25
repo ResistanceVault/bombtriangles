@@ -18,7 +18,7 @@ ROLLINGTRIANGLE:
   jsr                 TRANSLATE
 
   ROTATE              ANGLE
-  bsr.w               increase_angle_by_1
+  bsr.w               decrease_angle_by_1
   cmpi.w              #240,ANGLE
   bne.s               rollingtriangle_no_reset_angle
   move.w              #0,ANGLE
