@@ -1,9 +1,11 @@
+NUMROLLS equ 16
+
 ; Variables
 XROLLINGOFFSET:
   dc.w                0
 
 XROLLINGANGLE:
-  dc.l ROTATION_ANGLES_512_END-2
+  dc.l                ROTATIONS_ANGLES_64_180-2
 
 ; Animation function
 ROLLINGTRIANGLE:
@@ -11,7 +13,7 @@ ROLLINGTRIANGLE:
 
   LOADIDENTITY
 
-  move.w              #0,d0
+  move.w              #-90,d0
   move.w              #128,d1
   jsr                 TRANSLATE
 
@@ -20,10 +22,10 @@ ROLLINGTRIANGLE:
   move.w              #13,d1
   jsr                 TRANSLATE
 
-  move.l XROLLINGANGLE,a0
-  move.w (a0),ANGLE
-  suba.l #4,a0
-    move.l a0,XROLLINGANGLE
+  move.l              XROLLINGANGLE,a0
+  move.w              (a0),ANGLE
+  suba.l              #2,a0
+  move.l              a0,XROLLINGANGLE
 
 
   ROTATE              ANGLE
@@ -33,7 +35,7 @@ ROLLINGTRIANGLE:
   bne.s               rollingtriangle_no_reset_angle
   move.w              #0,ANGLE
   add.w               #30,XROLLINGOFFSET
-    move.l #ROTATION_ANGLES_512_END-2,XROLLINGANGLE
+  move.l              #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE
 
 
 rollingtriangle_no_reset_angle:
@@ -53,7 +55,7 @@ rollingtriangle_no_reset_angle:
 
   LOADIDENTITY
 
-  move.w              #-60,d0
+  move.w              #-150,d0
   move.w              #128,d1
   jsr                 TRANSLATE
 
@@ -61,9 +63,9 @@ rollingtriangle_no_reset_angle:
   add.w               XROLLINGOFFSET,d0
   move.w              #13,d1
   jsr                 TRANSLATE
-  ROTATE ANGLE
+  ROTATE              ANGLE
 
-    move.w              #-15,d0
+  move.w              #-15,d0
   move.w              #-26,d1
 
   move.w              #-30,d6
@@ -72,6 +74,11 @@ rollingtriangle_no_reset_angle:
   move.w              #0,d4
   move.w              #0,d5
   jsr                 TRIANGLE
+
+  cmpi.w              #30*NUMROLLS,XROLLINGOFFSET
+  bne.s               noresetxrolling
+  move.w              #0,XROLLINGOFFSET
+noresetxrolling
 
   DISABLE_CLIPPING
   rts
