@@ -10,13 +10,3 @@ TRANSITION_CLEAR:
   bsr.w           CLEAR_BPL_3
   rts
 
-DOUBLETRIANGLEX_CLEAR:
-  jsr             RESET_ANGLE_512
-  SETBEATDELAY    #8
-  rts
-
-DOUBLETRIANGLEY_CLEAR:
-  jsr             RESET_ANGLE_512
-  move.l          #CLEAR,CLEARFUNCTION
-  rts
-

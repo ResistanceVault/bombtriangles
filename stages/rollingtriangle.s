@@ -11,11 +11,9 @@ XROLLINGANGLE:
 ROLLINGTRIANGLE:
   ENABLE_CLIPPING
 
-  LOADIDENTITY
-
   move.w              #-90,d0
   move.w              #128,d1
-  jsr                 TRANSLATE
+  jsr                 LOADIDENTITYANDTRANSLATE
 
   move.w              #15,d0
   add.w               XROLLINGOFFSET,d0
@@ -27,10 +25,8 @@ ROLLINGTRIANGLE:
   suba.l              #2,a0
   move.l              a0,XROLLINGANGLE
 
-
   ROTATE              ANGLE
   
-  ;bsr.w               decrease_angle_by_1
   cmpi.w              #241,ANGLE
   bne.s               rollingtriangle_no_reset_angle
   move.w              #0,ANGLE
@@ -53,11 +49,10 @@ rollingtriangle_no_reset_angle:
   WAITBLITTER
   jsr                 TRIANGLE
 
-  LOADIDENTITY
 
   move.w              #-150,d0
   move.w              #128,d1
-  jsr                 TRANSLATE
+  jsr                 LOADIDENTITYANDTRANSLATE
 
   move.w              #15,d0
   add.w               XROLLINGOFFSET,d0
