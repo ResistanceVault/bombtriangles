@@ -87,6 +87,15 @@ CLEAR_BPL_2:
             move.w           #$4014,$dff058
             rts
 
+CLEAR_BPL_2_OTH: 
+            WAITBLITTER
+            move.w           #$0100,$dff040
+            move.w           #$0000,$dff042        
+            move.l           SCREEN_PTR_OTHER_1,$dff054                                                                   ; copy to d channel
+            move.w           #$0000,$dff066                                                                         ;D mod
+            move.w           #$4014,$dff058
+            rts
+
 CLEAR_BPL_3: 
             WAITBLITTER
             move.w           #$0100,$dff040
