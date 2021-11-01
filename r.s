@@ -277,6 +277,8 @@ scrollcolors:
 
   include        "AProcessing/libs/rasterizers/globaloptions.s"
   include        "AProcessing/libs/matrix/matrix.s"
+  include        "AProcessing/libs/matrix/shear.s"
+
   include        "AProcessing/libs/rasterizers/3dglobals.i"
   include        "AProcessing/libs/rasterizers/processingfill.s"
   include        "AProcessing/libs/rasterizers/processing_table_plotrefs.s"

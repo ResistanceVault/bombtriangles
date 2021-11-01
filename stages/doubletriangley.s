@@ -30,5 +30,7 @@ DOUBLETRIANGLEY_CLEAR:
   bsr.w CLEAR_BPL_2_OTH
   jsr            RESET_ANGLE_512
   move.l         #CLEAR,CLEARFUNCTION
+    SETBEATDELAY    #16                                               ; set beat delay to 16 for the shearing triangle
+
 
   rts

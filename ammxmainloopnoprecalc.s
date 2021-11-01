@@ -147,6 +147,7 @@ TRANSITION1:
             rts
 
             include          "stages/rollingtriangle.s"
+            include          "stages/sheartriangle.s"
 
             include          "stages/smalltriangle.s"
 

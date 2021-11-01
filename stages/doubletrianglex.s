@@ -29,6 +29,6 @@ DOUBLETRIANGLEX:
 
 DOUBLETRIANGLEX_CLEAR:
   jsr             RESET_ANGLE_512
-  SETBEATDELAY    #16                                               ; set beat delay to 16 for the rolling triangles
+  SETBEATDELAY    #17                                               ; set beat delay to 16 for the rolling triangles
 
   rts
