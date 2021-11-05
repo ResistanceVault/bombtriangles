@@ -287,6 +287,7 @@ scrollcolors:
   include        "AProcessing/libs/rasterizers/point.s"
   include        "AProcessing/libs/rasterizers/triangle.s"
   include        "AProcessing/libs/rasterizers/triangle3d.s"
+  include        "AProcessing/libs/rasterizers/foursidepolygon3d.s"
   include        "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
 
   include        "initnoprecalc.s"

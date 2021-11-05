@@ -150,6 +150,7 @@ TRANSITION1:
             include          "stages/sheartriangle.s"
 
             include          "stages/smalltriangle.s"
+            include          "stages/pyramid.s"
 
 
 MEDIUMTRIANGLE:
