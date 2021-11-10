@@ -171,7 +171,7 @@ increase_angle_by_1_exit_pyr:
 
 PYRAMID_CLEAR:
   move.w           #180,ANGLE_PYR
-  ;move.l           #CLEAR,CLEARFUNCTION
+  move.l           #CLEAR,CLEARFUNCTION
   move.w           #1,CYCLE_PYR
   rts
 
