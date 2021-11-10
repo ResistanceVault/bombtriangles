@@ -344,7 +344,6 @@ ammx_fill_table_end_bpl2:
 	movem.l (sp)+,d0/d2-d7/a0/a2/a3/a4/a5/a6
 	rts
 
-
 	IFD USE_CLIPPING
 ammx_fill_table_clip:
 	movem.l d0-d7/a0-a6,-(sp) ; stack save
@@ -662,7 +661,7 @@ ammx_fill_table_no_end_0
 	move.l (sp)+,d5
 	rts
 
-; ammx_fill_table_single_line - Fills a single line according to the fill table into first bitplane
+; ammx_fill_table_single_line_bpl1 - Fills a single line according to the fill table into first bitplane
 ; Input:
 ;	- d6.w : left X (0-319)
 ;	- d7.w : right X (0-319)
