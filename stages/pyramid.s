@@ -49,10 +49,10 @@ PYRAMID:
 
   cmpi.w           #1,CYCLE_PYR
   bne.w            oddpyramid
-  move.l           #CLEAR_BPL_1_PYR,CLEARFUNCTION
+  move.l           #CLEAR_PYR,CLEARFUNCTION
 
-  WAITBLITTER
-  jsr              CLEAR_BPL_2_PYR
+  ;WAITBLITTER
+  ;jsr              CLEAR_BPL_2_PYR
 
   ; draw triangle 1
   ; line 1 : from point 1 to top
@@ -72,7 +72,7 @@ PYRAMID:
   ; line 3 : from point 1 to point 2
   move.l           (a0),4(a1)                         ; point1
   jsr              ammxlinefill
-  ;WAITBLITTER
+  WAITBLITTER
   ;STROKE #2
   ;jsr              CLEAR_BPL_2_PYR
   jsr              ammx_fill_table_bpl1
@@ -102,10 +102,10 @@ PYRAMID:
   bra.w            update_pyr_angle
 
 oddpyramid:
-  move.l           #CLEAR_BPL_2_PYR,CLEARFUNCTION
+  ;move.l           #CLEAR_BPL_2_PYR,CLEARFUNCTION
 
-  WAITBLITTER
-  jsr              CLEAR_BPL_1_PYR
+  ;WAITBLITTER
+  ;jsr              CLEAR_BPL_1_PYR
 
   ; draw triangle 1
   ; line 1 : from point 1 to top
@@ -125,7 +125,7 @@ oddpyramid:
   ; line 3 : from point 1 to point 2
   move.l           (a0),4(a1)                         ; point1
   jsr              ammxlinefill
-  ;WAITBLITTER
+  WAITBLITTER
   ;STROKE #2
   ;jsr              CLEAR_BPL_2_PYR
   jsr              ammx_fill_table_bpl2
@@ -171,8 +171,19 @@ increase_angle_by_1_exit_pyr:
 
 PYRAMID_CLEAR:
   move.w           #180,ANGLE_PYR
-  move.l           #CLEAR,CLEARFUNCTION
+  ;move.l           #CLEAR,CLEARFUNCTION
   move.w           #1,CYCLE_PYR
+  rts
+
+CLEAR_PYR: 
+  WAITBLITTER
+  move.w           #$0100,$dff040
+  move.w           #$0000,$dff042
+  move.l           SCREEN_PTR_0,d0
+  add.w            #40*70+8,d0         
+  move.l           d0,$dff054                         ; copy to d channel
+  move.w           #$0010,$dff066                     ;D mod
+  move.w           #$640C,$dff058
   rts
 
 CLEAR_BPL_1_PYR: 
