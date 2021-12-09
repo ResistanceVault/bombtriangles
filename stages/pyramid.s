@@ -1,4 +1,4 @@
-PYRAMID_VERTEX_TOP EQU 70
+PYRAMID_VERTEX_TOP EQU 30
 
 PYRAMID_POINT MACRO
   moveq            \1,d0
@@ -23,7 +23,7 @@ PYRAMID_VERTEX_4:
   dc.l             0
 
 ANGLE_PYR:
-  dc.w             180
+  dc.w             181
 
 CYCLE_PYR
   dc.w             1
@@ -156,9 +156,13 @@ oddpyramid:
 update_pyr_angle:
     ; increase angle by one
   add.w            #1,ANGLE_PYR
-  cmpi.w           #273,ANGLE_PYR
+  cmpi.w           #270,ANGLE_PYR
   bcs.s            increase_angle_by_1_exit_pyr
-  move.w           #180,ANGLE_PYR
+  move.w           #181,ANGLE_PYR
+  move.b PYRCOLOR0,d0
+  move.b PYRCOLOR1,PYRCOLOR0
+  move.b d0,PYRCOLOR1
+
   neg              CYCLE_PYR
 increase_angle_by_1_exit_pyr:
   

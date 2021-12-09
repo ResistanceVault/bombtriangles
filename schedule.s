@@ -17,7 +17,7 @@ DRAWFUNCTARRAY_START:
   dc.l       DOUBLETRIANGLEY          ; 9
   dc.l       ROLLINGTRIANGLE          ; 10
   dc.l       SHEARTRIANGLE            ; 11
-  dc.l       PYRAMID                  ; 12
+  dc.l       PYRAMID2                  ; 12
   dc.l       MEDIUMTRIANGLE           ; 13
   dc.l       BIGTRIANGLE              ; 14
 DRAWFUNCTARRAY_END:
