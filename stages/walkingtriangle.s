@@ -1,9 +1,9 @@
 ; DEFINES
-STARTWALKXPOS EQU 94                                                ; Start triangle position X (signed value)
-STARTWALKYPOS EQU 128+13                                            ; Start triangle position Y (signed value)
+STARTWALKXPOS EQU 0                                                ; Start triangle position X (signed value)
+STARTWALKYPOS EQU 128+30                                            ; Start triangle position Y (signed value)
 
-STARTDXCLIMB  EQU 210                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
-STARTDYCLIMB  EQU 90
+STARTDXCLIMB  EQU 300                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
+STARTDYCLIMB  EQU 150
 
 ; VARIABLES
 YROLLINGOFFSET:
@@ -77,6 +77,7 @@ walkingtriangle_no_reset_angle:
   cmpi.w                #325,ANGLE
   bne.s                 walkingtriangle_no_vertical_climbing
   move.w                #1,STAGEWALK
+  move.w #359,ANGLE
   ;if (angle>=30 && numrevolutions>1)
   ;  {
   ;    angle-=0.5;
@@ -110,24 +111,39 @@ walkingtriangle_ywalk:
   move.w                #STARTWALKYPOS,d1
   sub.w                 YROLLINGOFFSET,d1
   jsr                   LOADIDENTITYANDTRANSLATE
-  ROTATE                ANGLE_YWALK
+  ROTATE                ANGLE
+
+  bsr.w decrease_angle_by_1
+
+  cmp.w #240,ANGLE
+  bne.w                 walkingtriangle_ywalk_noreset
+  move.w                #359,ANGLE
+  add.w                 #30,YROLLINGOFFSET
 
   ; ANGLE_YWALK UPDATE
-  add.w                 #-1,ANGLE_YWALK
-  cmp.w                 #180+60,ANGLE_YWALK
-  bne.w                 walkingtriangle_ywalk_noreset
-  move.w                #359,ANGLE_YWALK
-  add.w                 #30,YROLLINGOFFSET
+  ;add.w                 #-1,ANGLE_YWALK
+  ;cmp.w                 #180+60,ANGLE_YWALK
+  ;bne.w                 walkingtriangle_ywalk_noreset
+  ;move.w                #359,ANGLE_YWALK
+  ;add.w                 #30,YROLLINGOFFSET
 walkingtriangle_ywalk_noreset:
 
-; If got N revolutions and the angle is >= 360-30 SET the stage to 2 to start horizontal climbing for next frame
-  cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
+    cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
   bne.s                 walkingtriangle_no_horizontal_climbing
-  cmpi.w                #331,ANGLE_YWALK
+  cmpi.w                #331,ANGLE
   bne.s                 walkingtriangle_no_horizontal_climbing
   move.w                #30,XROLLINGOFFSET                          ; next stage must start with this value to 30
   move.w                #0,ANGLE                                    ; next stage must start with this value to zero
   move.w                #2,STAGEWALK
+
+; If got N revolutions and the angle is >= 360-30 SET the stage to 2 to start horizontal climbing for next frame
+  ;cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
+  ;bne.s                 walkingtriangle_no_horizontal_climbing
+  ;cmpi.w                #331,ANGLE_YWALK
+  ;bne.s                 walkingtriangle_no_horizontal_climbing
+  ;move.w                #30,XROLLINGOFFSET                          ; next stage must start with this value to 30
+  ;move.w                #0,ANGLE                                    ; next stage must start with this value to zero
+  ;move.w                #2,STAGEWALK
 walkingtriangle_no_horizontal_climbing:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
@@ -254,7 +270,7 @@ walkingtriangle_xwalkright_noanglereset:
   bne.s                 walkingtriangle_no_vertical_climbing_2
   move.w                #1,STAGEWALK
   move.w                #30,YROLLINGOFFSET
-  move.w #359,ANGLE_YWALK
+  move.w #359,ANGLE
 walkingtriangle_no_vertical_climbing_2:
   
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
