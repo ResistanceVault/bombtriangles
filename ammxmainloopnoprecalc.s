@@ -16,7 +16,7 @@ ammxmainloop3:
             subi.l           #1,BEATCOUNTER
             bne.s            noresetbeatcounter
             move.l           BEATDELAY,BEATCOUNTER
-            add.l            #4,DRAWFUNCTCOUNTER
+            ;add.l            #4,DRAWFUNCTCOUNTER comment to stay on first effect
             move.l           LAST_ITERATION_FUNCTION_PTR,a0
             move.l           (a0),a0
             jsr              (a0)
@@ -147,6 +147,7 @@ TRANSITION1:
             rts
 
             include          "stages/rollingtriangle.s"
+            include          "stages/walkingtriangle.s"
             include          "stages/sheartriangle.s"
 
             include          "stages/smalltriangle.s"

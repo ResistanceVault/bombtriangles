@@ -1,12 +1,6 @@
-
 ;		#-----+-----------------------------------------#
-;		|Name:| P6112 - Optimized Player 6.1 Playroutine|
+;		|Name:| P6108 - Optimized Player 6.1 Playroutine|
 ;		+-----+-----------------------------------------+
-;		|V1.06|	P6112,E1x/E2x fix			|
-;		|V1.05|	P6111, EDx fix,better init/exit,Dxx note|
-;		|V1.04|	P6110, E6x command fix+new option	|
-;		|V1.03|	P6109, compatibility changes only.	|
-;		|V1.02|	Cleaned up P6108 with minor changes.	|
 ;		|V1.01|	2.4-3 scanlines faster than my p6107.	|
 ;		|     |	SLen (song length) bug fixed		|
 ;		|     |	lev6 implemented with "poke DMA here"	|
@@ -17,78 +11,7 @@
 ;		+-----+-----------------------------------------+
 ;		|	    	by Photon/Scoopex 		|
 ;		#-----------------------------------------------#
-
-;SPECIAL NOTE FOR THIS VERSION:
-;-----------------------------
-;Tutorial here: http://youtu.be/xBtHO-IuN9E
-;Put it in your demo: http://youtu.be/JYLcIR6tyO4
-
-;I'm leaving the P61 project, feeling I've left it in good shape.
-;There is nothing left to optimize, and I've gone through everything I could 
-;find that was bad and fixed it.
-
-;I support this only with the readme.txt and all the comment documentation.
-;Please follow the advice in my Youtube tutorial specifically made for adding
-;P61 to your demo before deciding the playroutine is at fault. If you are sure 
-;you have found a bug, fix it yourself.
-
-;A song must fail in the example source and play correctly in P61con, before
-;you can suspect the playroutine is at fault.
-
-;A note on syncing: apart from the new options for $1Fx, channel triggers, and 
-;oscilloscope ptrs I added, you should no longer ask musicians to scatter E8x
-;commands in the song. Don't worry, it plays fine in P61 and always has.
-;But some non-legacy trackers destroy the loop with a filter where E8x commands
-;are used. 80x is an alternative, which works in all trackers, according to 
-;them. To use it, just replace E8x with 80x in the module and you need change
-;nothing else.
-
-;P6112:
-;E1x/E2x fix. One line changed in the source, in the GetNote macro used by 
-;these two effects combined with a note trigger (i.e. for F-3 E1x, not --- E1x)
-
-;P6111:
-;- Fix notedelay bug introduced in P6108
-;- Fix in legacy code, CIA regs were modified in init/exit even when p61_cia=0.
-;- Verified that $9xx offset behavior takes effect at loop end, a behavior
-;used by chip musicians.
-
-;Dxx command: P61 has never implemented Dxx support other than for xx=00.
-
-;I took a good look, and the way I see it, only pointers to previously 
-;decrunched notesteps are stored. This means patternloop backjumps work, but 
-;forward jumps to some offset from the pattern start pointer - doesn't.
-;xx steps must first be decrunched. This will cause a spike in rastertime
-;(CPU load) used, which is counter to my efforts to make the P61 playroutine
-;match the performance of optimized normal Protracker playroutines.
-
-;So I've decided to not implement it. Instead, musicians are recommended to 
-;copy the jumped-to pattern and delete xx notes to make the offset=0. Then 
-;the Dxx command can be changed to a D00 command, which is supported.
-;The copied pattern will only add 16 bytes or so to the filesize, and 
-;performance will remain excellent.
-
-;---
-
-;P6110: A bug regarding Patternloops (E6x) was introduced in P6108 when I added
-;super optimization flags. This is fixed, but it also revealed the obvious:
-;that Patternloop is incompatible with suppF01=0. The example will set this 
-;automatically for you, but you will not get the great speed gains if you try
-;split4=1 unless you SET THE USECODE PROPERLY.
-
-;Of course all modes will work properly if you leave everything at default
-;in the example, but I recommend to set the usecode to get the most out of p61
-; - not just the size gain.
-
-;Also, new option: set visuctrs=1 to get elapsed time since last instrument
-;trigger in P61visuctr0..3.
-
-;NOTE: vasm users MUST turn optimizations off for the jmp xx(PC) instructions
-;in the jump tables and at P61_motuuli. If not, the source will assemble
-;without errors, but generate bra.b which WILL cause fatal run-time errors.
-
 ;May the Source be with you! //Photon
-
 
 ;Credits to Jarno for V6.1A, and bugfixers up to 6.1.0.6.
 ;(Notes from previous versions below.)
@@ -122,126 +45,127 @@
 *	 on some Amiga it is really necessary to do a double write to INTREQ
 
 ********************************
-*        Player 6.1A ï¿½         *
+*        Player 6.1A ®         *
 *      All in one-version      *
 *        Version 610.6         *
-*   ï¿½ 1992-95 Jarno Paananen   *
+*   © 1992-95 Jarno Paananen   *
 *     All rights reserved      *
 * Fixed by:  NoName, Platon42, *
 *  Tolkien and The Dark Coder  *
 ********************************
-nowaveforms=noshorts
-copdma=1-lev6
+nowaveforms=noshorts	;Saves a little over a scanline in playtime frame.
+copdma=1~lev6	;Saves 196 cycles in playtime frame, could affect maxtime.
 Custom_Block_Size=16		;d7 used to replace clr.* instead of this const
 
-	ifnd player61_i
-player61_i:set 1
-	ifnd exec_types_i
-exec_types_i:set 1
-include_version:equ 40
-extern_lib:macro
-	xref _lvo\1
-	endm
-structure:macro
+	ifnd PLAYER61_I
+PLAYER61_I:set 1
+	ifnd EXEC_TYPES_I
+	ifnd EXEC_TYPES_I
+EXEC_TYPES_I:set 1
+INCLUDE_VERSION:equ 40
+EXTERN_LIB:MACRO
+	xref _LVO\1
+	ENDM
+STRUCTURE:MACRO
 \1:equ 0
-soffset:set \2
-	endm
-fptr:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-bool:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-byte:macro
-\1:equ soffset
-soffset:set soffset+1
-	endm
-ubyte:macro
-\1:equ soffset
-soffset:set soffset+1
-	endm
-word:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-uword:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-short:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-ushort:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-long:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-ulong:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-float:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-double:macro
-\1:equ soffset
-soffset:set soffset+8
-	endm
-aptr:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-cptr:macro
-\1:equ soffset
-soffset:set soffset+4
-	endm
-rptr:macro
-\1:equ soffset
-soffset:set soffset+2
-	endm
-label:macro
-\1:equ soffset
-	endm
-struct:macro
-\1:equ soffset
-soffset:set soffset+\2
-	endm
-alignword:macro
-soffset:set (soffset+1)&$fffffffe
-	endm
-alignlong:macro
-soffset:set (soffset+3)&$fffffffc
-	endm
-enum:macro
+SOFFSET:set \2
+	ENDM
+FPTR:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+BOOL:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+BYTE:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+1
+	ENDM
+UBYTE:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+1
+	ENDM
+WORD:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+UWORD:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+SHORT:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+USHORT:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+LONG:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+ULONG:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+FLOAT:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+DOUBLE:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+8
+	ENDM
+APTR:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+CPTR:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+4
+	ENDM
+RPTR:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+2
+	ENDM
+LABEL:MACRO
+\1:equ SOFFSET
+	ENDM
+STRUCT:MACRO
+\1:equ SOFFSET
+SOFFSET:set SOFFSET+\2
+	ENDM
+ALIGNWORD:MACRO
+SOFFSET:set (SOFFSET+1)&$fffffffe
+	ENDM
+ALIGNLONG:MACRO
+SOFFSET:set (SOFFSET+3)&$fffffffc
+	ENDM
+ENUM:MACRO
 	ifc '\1',''
-eoffset:set 0
-	endc
+EOFFSET:set 0
+	ENDC
 	ifnc '\1',''
-eoffset:set \1
-	endc
-	endm
-eitem:macro
-\1:equ eoffset
-eoffset:set eoffset+1
-	endm
-bitdef0:macro
+EOFFSET:set \1
+	ENDC
+	ENDM
+EITEM:MACRO
+\1:equ EOFFSET
+EOFFSET:set EOFFSET+1
+	ENDM
+BITDEF:MACRO
+	bitdef0 \1,\2,B_,\3
+\@BITDEF:set 1<<\3
+	bitdef0 \1,\2,F_,\@BITDEF
+	ENDM
+BITDEF0:MACRO
 \1\3\2:equ \4
-	endm
-bitdef:macro
-	bitdef0 \1,\2,b_,\3
-\@bitdef:set 1<<\3
-	bitdef0 \1,\2,f_,\@bitdef
-	endm
-library_minimum:equ 33
-	endc		;ifnd
-
+	ENDM
+LIBRARY_MINIMUM:equ 33
+	ENDC
+	ENDC
 	structure Player_Header,0
 	ulong P61_InitOffset
 	ulong P61_MusicOffset
@@ -301,7 +225,7 @@ library_minimum:equ 33
 	aptr P61_oscptrWrap	;wrap (end) pointer for current Paula soundloop
 	endc
 	uword P61_DMABit
-	label Channel_Block_Size
+	label Channel_Block_SIZE
 	structure Sample_Block,0
 	aptr P61_SampleOffset
 	uword P61_SampleLength
@@ -310,137 +234,117 @@ library_minimum:equ 33
 	uword P61_SampleVolume
 	uword P61_FineTune
 	label Sample_Block_SIZE
-P61_ft=usecode&1
-P61_pu=usecode&2
-P61_pd=usecode&4
-P61_tp=usecode&40
-P61_vib=usecode&80
-P61_tpvs=usecode&32
-P61_vbvs=usecode&64
-P61_tre=usecode&$80
-P61_arp=usecode&$100
-P61_sof=usecode&$200
-P61_vs=usecode&$400
-P61_pj=usecode&$800
-P61_vl=usecode&$1000
-P61_pb=usecode&$2800
-P61_sd=usecode&$8000
-P61_ec=usecode&$ffff0000
-P61_fi=usecode&$10000
-P61_fsu=usecode&$20000
-P61_fsd=usecode&$40000
-P61_sft=usecode&$200000
-P61_pl=usecode&$400000&((1-split4)*$400000)	;incompatible with split4.
-P61_timing=usecode&$1000000
-P61_rt=usecode&$2000000
-P61_fvu=usecode&$4000000
-P61_fvd=usecode&$8000000
-P61_nc=usecode&$10000000
-P61_nd=usecode&$20000000
-P61_pde=usecode&$40000000
-P61_il=usecode&$80000000
-	endc
-
-	ifne asmonereport
-
-********** REPORT **********
-
+P61_ft=use&1
+P61_pu=use&2
+P61_pd=use&4
+P61_tp=use&40
+P61_vib=use&80
+P61_tpvs=use&32
+P61_vbvs=use&64
+P61_tre=use&$80
+P61_arp=use&$100
+P61_sof=use&$200
+P61_vs=use&$400
+P61_pj=use&$800
+P61_vl=use&$1000
+P61_pb=use&$2800
+P61_sd=use&$8000
+P61_ec=use&$ffff0000
+P61_fi=use&$10000
+P61_fsu=use&$20000
+P61_fsd=use&$40000
+P61_sft=use&$200000
+P61_pl=use&$400000
+P61_timing=use&$1000000
+P61_rt=use&$2000000
+P61_fvu=use&$4000000
+P61_fvd=use&$8000000
+P61_nc=use&$10000000
+P61_nd=use&$20000000
+P61_pde=use&$40000000
+P61_il=use&$80000000
+	ENDC
+	ifne asmone
+	ifne asmone
 	printt ""
 	printt "Options used:"
 	printt "-------------"
-
-	ifne p61fade
+	ifd start
+	printt "Starting from position"
+	printv start
+	endc
+	ifne fade
 	printt "Mastervolume on"
 	else
 	printt "Mastervolume off"
 	endc
-
-	ifne p61system
+	ifne system
 	printt "System friendly"
 	else
 	printt "System killer"
 	endc
-
-	ifne p61cia
+	ifne CIA
 	printt "CIA-tempo on"
 	else
 	printt "CIA-tempo off"
 	endc
-
-	ifne p61exec
+	ifne exec
 	printt "ExecBase valid"
 	else
 	printt "ExecBase invalid"
 	endc
-
-;;    ---  wicked nasty nested ifs  ---
-
 	ifne lev6
 	printt "Level 6 IRQ on"
 	else
-
-	ifeq (noshorts&(1-p61system))
-	printt "FAIL: Non-lev6 NOT available for p61system=1 or noshorts=0!"
-
+	ifeq noshorts&~system
+	printt "Non-lev6 NOT available for system=1 or noshorts=0!"
+	if2
+	fail
+	endc
 	else
 	printt "Non-lev6 implemented with 'poke DMAbits byte to a specified address'."
 	printt "* READ DOCS for how to specify it and how it works."
-	endc	;noshorts&(1-p61system)
-
-	endc	;lev6
-
-;;    ---  end of wicked nasty nested ifs  ---
-
+	endc
 	ifne opt020
 	printt "MC68020 optimizations"
 	else
 	printt "Normal MC68000 code"
 	endc
-
 	printt "Channels:"
 	printv channels
-
 	ifgt channels-4
-	printt "FAIL: More than 4 channels."
+	printt "NO MORE THAN 4 CHANNELS!"
+	if2
+	fail
 	endc
-
+	endc
 	ifeq channels
-	printt "FAIL: Can't have 0 channels."
+	printt "MUST HAVE AT LEAST 1 CHANNEL!"
+	if2
+	fail
 	endc
-
+	endc
 	printt "UseCode:"
-	printv usecode
-
-	printt "Player binary size:"
-	printv P61E-P61B
-
-********** REPORT END **********
-
-	endc	;ifne asmonereport
-
-P61B:
+	printv use
+	endc
+	endc
 P61_motuuli:
 	jmp P61_Init(PC)
-
-	ifeq p61cia
+	ifeq CIA
 	jmp P61_Music(PC)
 	else
 	rts
 	rts
 	endc
-
 	jmp P61_End(PC)
-
-	rts				;no P61_SetRepeat
 	rts
-
-	ifne p61jump
+	rts
+	ifne jump
 	jmp P61_SetPosition(PC)
 	else
 	rts
 	rts
 	endc
-
 P61_Master:
 	dc.w 64
 P61_Tempo:
@@ -479,11 +383,11 @@ P61_getnote:macro
 	add P61_Fine(a5),d0
 	endc
 	move d0,P61_Note(a5)
-	move P61_periods-P61_cn(a3,d0),P61_Period(a5)	;P6112 fix.
+	move (a2,d0),P61_Period(a5)
 .nonote:
 	endm
-	ifeq p61system
-	ifne p61cia
+	ifeq system
+	ifne CIA
 P61_intti:
 	movem.l d0-a6,-(sp)
 	tst.b $bfdd00
@@ -496,7 +400,7 @@ P61_intti:
 	rte
 	endc
 	endc
-	ifne p61system
+	ifne system
 P61_lev6server:
 	movem.l d2-d7/a2-a6,-(sp)
 	lea P61_timeron(pc),a0
@@ -524,6 +428,7 @@ P61_ohi:
 
 ********** P61_Init **********
 * Input:	A0=P61-module addr.
+*		A6=your custombase ("$dff000")
 
 *		A1 [LONG] = 0 if samples are internal to the module
 *		     Address of samples otherwise
@@ -536,15 +441,14 @@ P61_ohi:
 *			       is valid otherwise assume PAL
 *		     	    1  assume PAL
 *		            2  assume NTSC
-*		   [Used only in CIA-enabled mode]
+*		   [Used only il CIA-enabled mode]
+
 		
 * Uses:		D0-A7, A6 set to $dff000+C (your custombase) at exit.
 * Returns:	D0=0 if okay (i.e. P61 module!). No need to change D0.l.
-* NOTE: the define 'start' has been made runtime. move.w #<startpos>,P61_InitPos instead.
 
 P61_Init:
-	lea $dff000+C,a6
-	ifeq p61system
+	ifeq system
 	ifne quietstart
 	move.w #$f,$96-C(A6)		;audiodma off
 	lea $a0-C(A6),a5		;chan 0
@@ -563,7 +467,7 @@ P61_Init:
 	beq.b .modok
 	subq.l #4,a0
 .modok:
-	ifne p61cia
+	ifne CIA
 	move d0,-(sp)
 	endc
 	moveq #0,d0
@@ -584,10 +488,10 @@ P61_Init:
 	lea P61_cn(pc),a3
 
 	move.w #$ff00,d1
-	move.w d1,P61_OnOff+P61_temp0-P61_cn(a3)	;stop active decsteps
-	move.w d1,P61_OnOff+P61_temp1-P61_cn(a3)
-	move.w d1,P61_OnOff+P61_temp2-P61_cn(a3)
-	move.w d1,P61_OnOff+P61_temp3-P61_cn(a3)
+	move.w d1,P61_OnOff+P61_Temp0-P61_cn(a3)	;stop active decsteps
+	move.w d1,P61_OnOff+P61_Temp1-P61_cn(a3)
+	move.w d1,P61_OnOff+P61_Temp2-P61_cn(a3)
+	move.w d1,P61_OnOff+P61_Temp3-P61_cn(a3)
 
 	ifne copdma
 	move.l a4,p61_DMApokeAddr-P61_cn(a3)
@@ -677,7 +581,7 @@ P61_gene:
 	subq #1,d7
 	moveq #0,d5
 	moveq #0,d4
-.lo:	move.b (a1)+,d4
+.lo:move.b (a1)+,d4
 	moveq #$f,d3
 	and d4,d3
 	lsr #4,d4
@@ -710,9 +614,9 @@ P61_gene:
 	lea P61_temp1(pc),a2
 	lea P61_temp2(pc),a4
 	lea P61_temp3(pc),a5
-	moveq #Channel_Block_Size/2-2,d0
+	moveq #Channel_Block_SIZE/2-2,d0
 	moveq #0,d1
-.cl:	move d1,(a1)+
+.cl:move d1,(a1)+
 	move d1,(a2)+
 	move d1,(a4)+
 	move d1,(a5)+
@@ -722,7 +626,7 @@ P61_gene:
 	moveq #channels-1,d0
 .loo:
 	move.l a2,P61_Sample(a1)
-	lea Channel_Block_Size(a1),a1
+	lea Channel_Block_SIZE(a1),a1
 	dbf d0,.loo
 	move.l (sp)+,a2
 	move.l a2,P61_positionbase-P61_cn(a3)
@@ -743,15 +647,17 @@ P61_gene:
 	move.l a1,P61_patternbase-P61_cn(a3)
 	move.l a1,d0
 	sub.l a4,d0
-	subq.w #1,d0			;this is the * BUGFIX! whoa!
+	subq.w #1,d0			;this is the bugfix! whoa!
 	move d0,P61_slen-P61_cn(a3)
 ;;    ---  Bugfix: P61_Init gives P61_slen=actual songlength +1.
 ;;    ---  This did not affect NextPattern, because it looks for endbyte flag.
 ;;    ---  It did affect Bxx/Dxx, but I guess nobody has tried to jump or 
 ;;    ---  break to Last Pattern, ever. Now fixed to set correct SLen and 
 ;;    ---  suddenly Bxx/Dxx/Setposition works as they should. //Photon
-	add.w P61_InitPos(pc),a4	;position from which to start playing the song
 
+	ifd start
+	lea start(a4),a4
+	endc
 	moveq #0,d0
 	move.b (a4)+,d0
 	move.l a4,P61_spos-P61_cn(a3)
@@ -797,8 +703,8 @@ P61_gene:
 	and.b $bfe001,d0
 	move.b d0,P61_ofilter-P61_cn(a3)
 	bset #1,$bfe001
-	ifeq p61system
-	ifne p61exec
+	ifeq system
+	ifne exec
 	move.l 4.w,a6
 	moveq #0,d0
 	btst d0,297(a6)
@@ -832,7 +738,7 @@ P61_gene:
 	move.w d0,P61_NewDMA-P61_cn(a3)	;"NEXTframe setloop" to be triggered
 	endc
 
-	ifeq p61system
+	ifeq system
 	ifeq copdma
 	lea P61_dmason(pc),a1		;again?
 	move.l a1,(a0)
@@ -841,31 +747,23 @@ P61_gene:
 	lea $bfd000,a0
 	lea P61_timers(pc),a1
 	move.b #$7f,$d00(a0)
-
-	ifne p61cia			;only affect cia if actually used
 	move.b #$10,$e00(a0)
-	endc
 	move.b #$10,$f00(a0)
-	ifne p61cia
 	move.b $400(a0),(a1)+
 	move.b $500(a0),(a1)+
-	else
-	addq.w #2,a1	
-	endc
-
 	move.b $600(a0),(a1)+
 	move.b $700(a0),(a1)
 	endc
-	ifeq (p61system+p61cia)
+	ifeq system!CIA
 	move.b #$82,$d00(a0)
 	endc
-	ifne p61cia
+	ifne CIA
 	move (sp)+,d0
 	subq #1,d0
 	beq.b P61_ForcePAL
 	subq #1,d0
 	beq.b P61_NTSC
-	ifne p61exec
+	ifne exec
 	move.l 4.w,a1
 	cmp.b #60,$213(a1)
 	beq.b P61_NTSC
@@ -881,7 +779,7 @@ P61_setcia:
 	move d0,P61_thi2-P61_cn(a3)
 	sub #$1f0*2,d0
 	move d0,P61_thi-P61_cn(a3)
-	ifeq p61system
+	ifeq system
 	move P61_thi2-P61_cn(a3),d0
 	move.b d0,$400(a0)
 	lsr #8,d0
@@ -895,7 +793,7 @@ P61_setcia:
 	endc
 	endc
 
-	ifeq p61system
+	ifeq system
 	ifeq copdma
 	move #$e000,$9a-C(a6)	;level 6 timer B int, at least for setloop
 	else
@@ -909,16 +807,16 @@ P61_setcia:
 	moveq #0,d0
 	rts
 
-	ifne p61exec
+	ifne exec
 P61_liko:
 	dc.l $4E7A0801
 	rte
 	endc
 	endc
 
-	ifne p61system
+	ifne system
 	move.l a6,-(sp)
-	ifne p61cia
+	ifne CIA
 	clr P61_server-P61_cn(a3)
 	else
 	move #1,P61_server-P61_cn(a3)
@@ -993,7 +891,7 @@ P61_timerB:
 	and.b #%10000000,(a0)
 	move.b d3,P61_timeropen-P61_cn(a3)
 	moveq #0,d0
-	ifne p61cia
+	ifne CIA
 	move.l P61_craddr+4(pc),a1
 	move.b P61_tlo(pc),(a1)
 	move.b P61_thi(pc),$100(a1)
@@ -1011,39 +909,30 @@ P61_ciaaddr:
 	endc
 
 ********** P61_End **********
-* Input:	none.
-* Uses:		D0-D1/A0-A1/A3/A6, A6 set to $dff000+C (your custombase) at exit.
+* Input:	A6=your custombase ("$dff000")
+* Uses:		D0-D1/A0-A1/A3
 
 P61_End:
-	lea $dff000+C,a6
 	moveq #0,d0
 	move d0,$a8-C(a6)
 	move d0,$b8-C(a6)
 	move d0,$c8-C(a6)
 	move d0,$d8-C(a6)
 	move #$f,$96-C(a6)
-	and.b #%11111101,$bfe001
+	and.b #~2,$bfe001
 	move.b P61_ofilter(pc),d0
 	or.b d0,$bfe001
-	ifeq p61system
+	ifeq system
 	move #$2000,$9a-C(a6)
 	move.l P61_vektori(pc),a0
 	move.l P61_oldlev6(pc),(a0)
 	lea $bfd000,a0
 	lea P61_timers(pc),a1
-
-	ifne p61cia			;only affect cia if used
 	move.b (a1)+,$400(a0)
 	move.b (a1)+,$500(a0)
-	else
-	addq.w #2,a1
-	endc
 	move.b (a1)+,$600(a0)
 	move.b (a1)+,$700(a0)
-	ifne p61cia
 	move.b #$10,$e00(a0)
-	endc
-
 	move.b #$10,$f00(a0)
 	else
 	move.l a6,-(sp)
@@ -1075,9 +964,9 @@ P61_rem3:
 	rts
 
 ;WHY not just cond-add mulu to where the finalvolume is set??
-;"Jag blir sï¿½ matt." (c) The Big A/Phenomena.
+;"Jag blir så matt." (c) The Big A/Phenomena.
 
-	ifne p61fade
+	ifne fade
 P61_mfade:
 	lea $dff0a8,a4
 	move P61_Master(pc),d0
@@ -1192,7 +1081,7 @@ P61_osc:
 	sub.l (a0)+,d0		;loopend hit?
 	blt.b .nowr
 ;;    ---  handle overshoot  ---
-	move.l P61_Sample-P61_DMABit(a0),a1	;a1 "trashed"
+	move.l P61_Sample-P61_DMAbit(a0),a1	;a1 "trashed"
 	ifeq oscbigempty
 	move.w 10(a1),d2	;replen
 	subq.w #1,d2
@@ -1252,33 +1141,29 @@ P61_emptyloop578E:
 	endc
 	endc
 
-	ifne p61jump
 ******************************************
 * P61_SetPosition
 ; Call P61_SetPosition to jump to a specific position in the song
 ; If called AFTER P61_Music, what's written below will be true but happen one 
 ; frame later.
-;ï¿½ OPTIONALLY Starts from the beginning if out of limits. ï¿½
+;­ OPTIONALLY Starts from the beginning if out of limits. ­
 
 * Input:	D0.b=songposition. A6=your custombase ("$dff000")
 * Uses:		D0-D1/A0-A1/A3
 
-;If you want to change pos 'at next note', call this when P61_cn=(P61_speed2-1)
+;If you want to change pos 'at next note', call this when P61_cn=(P61_Speed2-1)
 ;if you also need to change pos 'in rhythm', AND P61_CRow with f.ex. 2^n-1.
 ;if that equals 2^n-1 ("all 1s"), and cn is 'in tempo', you will get a smooth
 ;transition. If n is 64, you are sure to make the switch at pattern end.
 
-;@@ NOTE: If you use this with split4=1, be aware that it must then decrunch 
-;up to 2 framesteps before starting to play the song (meaning the song won't 
-;start playing quite instantly).
-
+	ifne jump
 P61_SetPosition:
 	lea P61_cn(pc),a3
 	ifne split4
-	move.w P61_speed2(PC),d1	;if _Speedis1, _cn doesn't matter.
+	move.w P61_Speed2(PC),d1	;if _Speedis1, _cn doesn't matter.
 	subq.w #3,d1			;allow 2 more pre-decrunch frames.
 	else
-	move.w P61_speed2(PC),d1	;if _Speedis1, _cn doesn't matter.
+	move.w P61_Speed2(PC),d1	;if _Speedis1, _cn doesn't matter.
 	subq.w #1,d1
 	endc
 ;new pattern reaches your ears NEXT frame or CIA-int, or 3 frames later with 
@@ -1345,10 +1230,10 @@ P61_SetPosition:
 	move.w d0,P61_OnOff+Channel_Block_Size*1(a3)
 	move.w d0,P61_OnOff+Channel_Block_Size*2(a3)
 	move.w d0,P61_OnOff+Channel_Block_Size*3(a3)
-	clr.b P61_dma+1-P61_temp0(a3)		;stop playing channels
+	clr.b P61_DMA+1-P61_Temp0(a3)		;stop playing channels
 	move.w #$000f,$96-C(A6)			;indeed, in speakers too.
 	ifne nowaveforms
-	clr P61_NewDMA-P61_temp0(a3)		;stop DMA next note
+	clr P61_NewDMA-P61_Temp0(a3)		;stop DMA next note
 	endc
 	ifne copdma
 	move.l p61_DMApokeAddr(PC),a3		;don't set DMA until playtime
@@ -1365,10 +1250,10 @@ P61_Music:
 	lea $a0-C(a6),a4		;Aud Chan Base.
 
 	ifne playflag
-	tst P61_Play-P61_cn(a3)	;set by init if CIA
+	tst P61_Play-P61_cn(a3)	;set by init if cia
 	bne.b P61_ohitaaa
-	ifne p61cia
-	ifne p61system
+	ifne CIA
+	ifne system
 	move.l P61_craddr+4(pc),a0
 	move.b P61_tlo2(pc),(a0)
 	move.b P61_thi2(pc),$100(a0)
@@ -1378,14 +1263,7 @@ P61_Music:
 	endc
 
 P61_ohitaaa:
-	ifne visuctrs				;easy visualizer counters.
-	addq.w #1,P61_visuctr0-P61_cn(a3)	;inc elapsed #calls since last
-	addq.w #1,P61_visuctr1-P61_cn(a3)
-	addq.w #1,P61_visuctr2-P61_cn(a3)
-	addq.w #1,P61_visuctr3-P61_cn(a3)
-	endc
-	
-	ifne p61fade
+	ifne fade
 	pea P61_mfade(pc)
 	endc
 
@@ -1394,7 +1272,6 @@ P61_ohitaaa:
 	beq.w P61_playtime	;if new note frame, handle
 ;;    ---  no new note  ---
 ;	bsr P61_Synth		;synth/pan/echo cpu-mix routine. Not done yet.
-;(note: re-cmp to d4 if you put something here.)
 	ifeq suppF01
 	blt.b P61_nowrap	;otherwise last was not playtime-frame.
 	endc
@@ -1402,7 +1279,7 @@ P61_ohitaaa:
 ;rolled over from playtime to frame after. incompatible with F01.
 	ifeq suppF01
 	ifne nowaveforms
-	move.b P61_dma+1-P61_cn(a3),P61_NewDMA+1-P61_cn(a3)	;or set by fx
+	move.b P61_Dma+1-P61_cn(a3),P61_NewDMA+1-P61_cn(a3)	;or set by fx
 	endc
 	clr.w d4
 
@@ -1454,7 +1331,7 @@ P61_nonewpatt:
 ;;    ---  end of rolled over code  ---
 
 P61_nowrap:
-	addq.w #1,d4			;NOW I do!
+	addq.w #1,d4		;NOW I do!
 	move d4,(a3)
 
 P61_delay:
@@ -1484,8 +1361,8 @@ P61_delay:
 .nosetloops:
 	endc
 
-	ifne p61cia
-	ifne p61system
+	ifne CIA
+	ifne system
 	move.l P61_craddr+4(pc),a0
 	move.b P61_tlo2(pc),(a0)
 	move.b P61_thi2(pc),$100(a0)
@@ -1629,7 +1506,7 @@ P61_fineup2:
 	cmp P61_Period(a5),d0
 	ble.b .jup
 	move d0,P61_Period(a5)
-.jup:	move P61_Period(a5),6(a4)
+.jup:move P61_Period(a5),6(a4)
 	bra.w P61_contfxdone
 	endc
 	ifne P61_fsd
@@ -1642,7 +1519,7 @@ P61_finedwn2:
 	cmp #856,P61_Period(a5)
 	ble.b .jup
 	move #856,P61_Period(a5)
-.jup:	move P61_Period(a5),6(a4)
+.jup:move P61_Period(a5),6(a4)
 	bra.w P61_contfxdone
 	endc
 	ifne P61_fvu
@@ -1656,7 +1533,7 @@ P61_finevup2:
 	cmp P61_Volume(a5),d0
 	bge.b .jup
 	move d0,P61_Volume(a5)
-.jup:	move P61_Volume(a5),8(a4)
+.jup:move P61_Volume(a5),8(a4)
 	bra.w P61_contfxdone
 	endc
 	ifne P61_fvd
@@ -1668,7 +1545,7 @@ P61_finevdwn2:
 	sub d0,P61_Volume(a5)
 	bpl.b .jup
 	move d7,P61_Volume(a5)
-.jup:	move P61_Volume(a5),8(a4)
+.jup:move P61_Volume(a5),8(a4)
 	bra.w P61_contfxdone
 	endc
 	ifne P61_nc
@@ -1677,7 +1554,7 @@ P61_notecut:
 	and.b P61_Info(a5),d0
 	cmp (a3),d0
 	bne.w P61_contfxdone
-	ifeq p61fade
+	ifeq fade
 	move d7,8(a4)
 	else
 	move d7,P61_Shadow(a5)
@@ -1721,9 +1598,8 @@ P61_notedelay:
 	move.l d1,P61_oscptrWrap(a5)	;wrap endptr for compare.
 	endc
 
-;	move P61_Period(a5),(a4)
-;	subq.l #6,a4
-	move P61_Period(a5),6(a4)	 ;bugfix from P6108+
+	move P61_Period(a5),(a4)
+	subq.l #6,a4
 
 	ifne copdma
 	move.l p61_DMApokeAddr(PC),a0
@@ -1731,7 +1607,7 @@ P61_notedelay:
 	endc
 
 	ifeq copdma&nowaveforms		;both must be on to skip int.
-	ifeq p61system		;int starter.
+	ifeq system		;int starter.
 	lea P61_dmason(pc),a1
 	move.l P61_vektori(pc),a0
 	move.l a1,(a0)
@@ -1786,7 +1662,7 @@ P61_retrig:
 	endc
 
 	ifeq copdma&nowaveforms		;both must be on to skip int.
-	ifeq p61system			;int starter.
+	ifeq system			;int starter.
 	lea P61_dmason(pc),a1
 	move.l P61_vektori(pc),a0
 	move.l a1,(a0)
@@ -1839,7 +1715,7 @@ P61_volslide:
 	sub.b d0,P61_Volume+1(a5)
 	bpl.b .test
 	move d7,P61_Volume(a5)
-	ifeq p61fade
+	ifeq fade
 	move d7,8(a4)
 	else
 	move d7,P61_Shadow(a5)
@@ -1850,14 +1726,14 @@ P61_volslide:
 	cmp P61_Volume(a5),d0
 	bge.b .ncs
 	move d0,P61_Volume(a5)
-	ifeq p61fade
+	ifeq fade
 	move d0,8(a4)
 	else
 	move d0,P61_Shadow(a5)
 	endc
 	bra.w P61_contfxdone
 .ncs:
-	ifeq p61fade
+	ifeq fade
 	move P61_Volume(a5),8(a4)
 	else
 	move P61_Volume(a5),P61_Shadow(a5)
@@ -1870,7 +1746,7 @@ P61_tpochvslide:
 	sub.b d0,P61_Volume+1(a5)
 	bpl.b .test
 	move d7,P61_Volume(a5)
-	ifeq p61fade
+	ifeq fade
 	move d7,8(a4)
 	else
 	move d7,P61_Shadow(a5)
@@ -1882,7 +1758,7 @@ P61_tpochvslide:
 	bge.b .ncs
 	move d0,P61_Volume(a5)
 .ncs:
-	ifeq p61fade
+	ifeq fade
 	move P61_Volume(a5),8(a4)
 	else
 	move P61_Volume(a5),P61_Shadow(a5)
@@ -1913,7 +1789,7 @@ P61_toneport:
 	else
 	nop
 	endc
-	bra.w P61_contfxdone
+	bra.b P61_contfxdone
 
 	ifne P61_pu
 P61_portup:
@@ -1932,7 +1808,7 @@ P61_portup:
 	bra.b P61_contfxdone
 .skip:
 	move P61_Period(a5),6(a4)
-	bra.w P61_contfxdone
+	bra.b P61_contfxdone
 	endc
 	ifne P61_pd
 P61_portdwn:
@@ -1954,18 +1830,21 @@ P61_contfxdone:
 	ifne P61_il
 	bsr.w P61_funk2
 	endc
-	lea Channel_Block_Size(a5),a5
+	lea Channel_block_SIZE(a5),a5
 	lea Custom_Block_Size(a4),a4
 	dbf d5,P61_lopas
 ;;    ---  splitchans or normal decrunch  ---
 	ifeq split4
-	cmp P61_speed2(PC),d4		;'decrunch frame'? (1 before playtime)
+	cmp P61_Speed2(PC),d4		;'decrunch frame'? (1 before playtime)
 	bne.w P61_ret2
 
 P61_preplay2:
 
 .pr:	ifle (channels-splitchans)
+	if2
 	printt "splitchans >= channels! Must be less."
+	fail
+	endc
 	else
 	moveq #(channels-splitchans)-1,d5	;do preplay "first" half
 	lea P61_temp0(pc),a5
@@ -1975,25 +1854,25 @@ P61_preplay2:
 	else					;split4
 ;;    ---  split4 decrunch  ---
 ;Copies relevant chandata from a0 to a5
-CHANCPY:	macro
+CHANCPY:MACRO
 	movem.l (a0),d0-d4
 	movem.l d0-d4,(a5)
-	ifne P61_ft
+	ifne p61_ft
 	move.l P61_Volume(a0),P61_Volume(a5)	;vol+ft
 	else
 	move.w P61_Volume(a0),P61_Volume(a5)	;vol
 	endc
 
-	ifne P61_sof
+	ifne p61_sof
 	move.w P61_Offset(a0),P61_Offset(a5)
 	endc
-	ifne P61_il
+	ifne p61_il
 	move.l P61_Wave(a0),P61_Wave(a5)
 	endc
-	endm
+	ENDM
 
 P61_split4:
-	move.w P61_speed2(PC),d5
+	move.w P61_Speed2(PC),d5
 	cmp.w d5,d4
 	beq.b .pr2
 	subq.w #1,d5
@@ -2035,32 +1914,10 @@ P61_split4:
 	endc				;if split4
 ********** My Jump Table **********
 P61_MyJpt:;jump table,%x1111xxx,%x111xxxx,%x11xxxxx=note,cmd,all - else empty
-;	REPT 12
+	REPT 12
 	jmp P61_all(PC)
 	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-	jmp P61_all(PC)
-	jmp P61_all2(PC)
-;	ENDR
+	ENDR
 	jmp P61_cmd(PC)
 	jmp P61_cmd2(PC)
 	jmp P61_cmd(PC)
@@ -2070,32 +1927,10 @@ P61_MyJpt:;jump table,%x1111xxx,%x111xxxx,%x11xxxxx=note,cmd,all - else empty
 	jmp P61_empty(PC)
 	jmp P61_empty2(PC)
 
-;	REPT 12
+	REPT 12
 	jmp P61_allS(PC)
 	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-	jmp P61_allS(PC)
-	jmp P61_all2S(PC)
-;	ENDR
+	ENDR
 	jmp P61_cmdS(PC)
 	jmp P61_cmd2S(PC)
 	jmp P61_cmdS(PC)
@@ -2103,7 +1938,7 @@ P61_MyJpt:;jump table,%x1111xxx,%x111xxxx,%x11xxxxx=note,cmd,all - else empty
 	jmp P61_noteS(PC)
 	jmp P61_note2S(PC)
 	jmp P61_emptyS(PC)
-;	jmp P61_empty2S(PC)
+	jmp P61_empty2S(PC)
 ********** END OF MYJPT **********
 P61_empty2S:
 	move d7,(a5)+
@@ -2349,10 +2184,9 @@ P61_permdko:
 	and #$1f0,d0
 	beq.b .koto
 	ifne P61_ft
-	lea (a2,d0),a1			;this is not the same a2 as the fix.
+	lea (a2,d0),a1
 	else
-	lea (P61_samples-16)-P61_cn(a3),a1
-	add d0,a1
+	lea (P61_Samples-16)-P61_cn(a3,d0),a1
 	endc
 	move.l a1,P61_Sample-3(a5)
 	ifne P61_ft
@@ -2369,7 +2203,7 @@ P61_permdko:
 .koto:
 P61_koto:
 	ifeq split4			;split4 means only do once.
-	lea Channel_Block_Size-3(a5),a5
+	lea Channel_block_SIZE-3(a5),a5
 	dbf d5,P61_loaps
 	endc
 P61_ret2:
@@ -2401,32 +2235,10 @@ P61_playtime:
 	ifne dupedec			;dupedec...you asked for it...
 ********** My Jump Table **********
 P61_MyJptB:;jump table,%x1111xxx,%x111xxxx,%x11xxxxx=note,cmd,all - else empty
-;	REPT 12
+	REPT 12
 	jmp P61_allB(PC)
 	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-	jmp P61_allB(PC)
-	jmp P61_all2B(PC)
-;	ENDR
+	ENDR
 	jmp P61_cmdB(PC)
 	jmp P61_cmd2B(PC)
 	jmp P61_cmdB(PC)
@@ -2436,32 +2248,10 @@ P61_MyJptB:;jump table,%x1111xxx,%x111xxxx,%x11xxxxx=note,cmd,all - else empty
 	jmp P61_emptyB(PC)
 	jmp P61_empty2B(PC)
 
-;	REPT 12
+	REPT 12
 	jmp P61_allSB(PC)
 	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-	jmp P61_allSB(PC)
-	jmp P61_all2SB(PC)
-;	ENDR
+	ENDR
 	jmp P61_cmdSB(PC)
 	jmp P61_cmd2SB(PC)
 	jmp P61_cmdSB(PC)
@@ -2557,7 +2347,7 @@ P61_playtime:
 	ifne P61_pde
 P61_preplayB:
 	tst P61_pdflag-P61_cn(a3)
-	bne.w P61_return
+	bne.b P61_return
 	else
 P61_preplayB:
 	endc
@@ -2719,8 +2509,7 @@ P61_permdkoB:
 	move -3(a5),d0
 	and #$1f0,d0
 	beq.b .kotoB
-	lea (P61_samples-16)-P61_cn(a3),a1
-	add d0,a1
+	lea (P61_Samples-16)-P61_cn(a3,d0),a1
 	move.l a1,P61_Sample-3(a5)
 	ifne P61_ft
 	move.l P61_SampleVolume(a1),P61_Volume-3(a5)
@@ -2736,7 +2525,7 @@ P61_permdkoB:
 .kotoB:
 P61_kotoB:
 	ifeq split4			;split4 means only do once.
-	lea Channel_Block_Size-3(a5),a5
+	lea Channel_block_SIZE-3(a5),a5
 	dbf d5,P61_loapsB
 	endc
 ;;    ---  end of dupedec  ---
@@ -2765,15 +2554,15 @@ P61_playtimeCont:
 	moveq #channels-1,d5
 .chl:	bsr.w P61_preplay		;then do the remaining from prev frame
 	ifeq split4		;split4 means preplay is one-shot. So ext loop.
-	lea Channel_Block_Size-3(a5),a5
+	lea Channel_block_SIZE-3(a5),a5
 	dbf d5,.chl
 	endc
 
 .mo:
-	endc	;suppF01
+	endc
 
 	ifeq copdma&nowaveforms		;both must be off to skip int.
-	ifeq p61system		;main 'new note' int starter.
+	ifeq system		;main 'new note' int starter.
 	lea P61_dmason(pc),a1
 	move.l P61_vektori(pc),a0
 	move.l a1,(a0)
@@ -2795,85 +2584,65 @@ P61_playtimeCont:
 	moveq #0,d4			;clr dmamask accumulator
 	moveq #channels-1,d5
 	lea P61_temp0(pc),a5
-	bra.w P61_loscont		;I'd trade a bra for 2 Leias any day!
+	bra.w P61_loscont			;I'd trade a bra for 2 Leias any day!
 ;;    ---  start of jtab (jumptable)  ---
-	ifne p61bigjtab
-	rept 16*15
-	dc.w P61_nocha-.j
-	endr
-	endc
-	
-	dc P61_fxdone-.j		;$0xx
-
+	dcb.w 15*16,P61_nocha-.j
+	dc P61_fxdone-.j
 	ifne use1Fx
 	dc P61_Trigger-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	dc P61_fxdone-.j
-
 	ifne P61_tp
 	dc P61_settoneport-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
-	ifne P61_vib			;$4xx
+	ifne P61_vib
 	dc P61_vibrato-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	ifne P61_tpvs
 	dc P61_toponochange-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	dc P61_fxdone-.j
-
 	ifne P61_tre
 	dc P61_settremo-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
-	dc P61_fxdone-.j		;$8xx
-
+	dc P61_fxdone-.j
 	ifne P61_sof
 	dc P61_sampleoffse-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	dc P61_fxdone-.j
-
 	ifne P61_pj
 	dc P61_posjmp-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
-	ifne P61_vl			;$Cxx
+	ifne P61_vl
 	dc P61_volum-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	ifne P61_pb
 	dc P61_pattbreak-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
 	ifne P61_ec
 	dc P61_ecommands-.j
 	else
 	dc P61_fxdone-.j
 	endc
-
-	ifne P61_sd			;Fxx
+	ifne P61_sd
 	dc P61_cspeed-.j
 	else
 	dc P61_fxdone-.j
@@ -2885,13 +2654,9 @@ P61_los:
 	lea Custom_Block_Size(a4),a4
 	lea Channel_Block_Size(a5),a5
 P61_loscont:
-	move P61_OnOff(a5),d0		;$ff00/$ffff? if off, will goto nocha.
-	ifeq p61bigjtab
-	tst.b d0
-	beq.s P61_nocha
-	endc
-	or (a5),d0
-	add d0,d0			;->$fe00..$fffe (if big jtab)
+	move (a5),d0
+	or P61_OnOff(a5),d0		;if off, will goto nocha.
+	add d0,d0
 	move P61_jtab(PC,d0),d0
 	jmp P61_jtab(PC,d0)
 
@@ -2909,7 +2674,7 @@ P61_fxdone:				;this sets dma and paula values
 	add P61_Fine(a5),d0
 	endc
 	move d0,P61_Note(a5)
-	move P61_periods-P61_cn(a3,d0),P61_Period(a5)
+	move P61_Periods-P61_cn(a3,d0),P61_Period(a5)
 P61_zample:				;also direct target for finetune retrig
 	ifne P61_sof
 	tst P61_Offset(a5)
@@ -2918,7 +2683,7 @@ P61_zample:				;also direct target for finetune retrig
 ;;    ---  check DMA-mask for pan/echo samplestarts, modify it, mix.  ---
 ;	bsr P61_Synth		;synth/pan/echo cpu-mix routine. Not done yet.
 ;;   --- modify below code to not touch synth/pan/echo fixchans ---
-	or P61_DMABit(a5),d4		;accumulate channels touched
+	or P61_DMAbit(a5),d4		;accumulate channels touched
 	move.l P61_Sample(a5),a1	;skipped if nocha
 	ifeq oscillo
 	move.l (a1)+,(a4)
@@ -2940,7 +2705,7 @@ P61_zample:				;also direct target for finetune retrig
 	move.l d1,P61_oscptrWrap(a5)	;wrap endptr for compare.
 	endc				;oscillo
 P61_nocha:
-	ifeq p61fade
+	ifeq fade
 	move.l P61_Period(a5),6(a4)
 	else
 	move P61_Period(a5),6(a4)
@@ -2972,30 +2737,11 @@ P61_chansdone:
 	endc
 
 	move d4,$96-C(a6)	;DMAclear - changed to not be written 4 times
-
-	ifne visuctrs
-	lea P61_visuctr0+channels*2(PC),a0
-	moveq #channels-1,d5
-.visul:	subq.w #2,a0
-	btst d5,d4
-	beq.s .noctr0
-	move.w d7,(a0)
-.noctr0:
-	dbf d5,.visul
-	endc
-
 	ifne copdma
 	move.l p61_DMApokeAddr(PC),a0
 	move.b d4,(a0)		;only the low byte is poked, allowing other dma
 	endc
 	move.b d4,P61_dma+1-P61_cn(a3)
-
-;;    ---  non-rolled over code  --- compatible with F01.
-	ifne suppF01				;moved to here in P6110.
-	ifne nowaveforms
-	move.b d4,P61_NewDMA+1-P61_cn(a3)	;or set by fx
-	endc
-	move.w d7,(a3)				;clr p61_cn
 
 	ifne P61_pl
 	tst.b P61_plflag+1-P61_cn(a3)
@@ -3010,7 +2756,7 @@ P61_chansdone:
 	move.l (a0)+,P61_ChaPos(a1)
 	move.l (a0)+,P61_TempPos(a1)
 	move (a0)+,P61_TempLen(a1)
-	lea Channel_Block_Size(a1),a1
+	lea Channel_block_SIZE(a1),a1
 	dbf d0,.talt
 	move P61_plrowpos(pc),P61_rowpos-P61_cn(a3)
 	move.b d7,P61_plflag+1-P61_cn(a3)
@@ -3018,9 +2764,14 @@ P61_chansdone:
 	sub P61_rowpos-P61_cn(a3),d0
 	move d0,P61_CRow-P61_cn(a3)
 	rts
-P61_ohittaa:					;nextrow
 	endc
-
+P61_ohittaa:					;nextrow
+;;    ---  non-rolled over code  --- compatible with F01.
+	ifne suppF01
+	ifne nowaveforms
+	move.b d4,P61_NewDMA+1-P61_cn(a3)	;or set by fx
+	endc
+	move.w d7,(a3)				;clr p61_cn
 	subq #1,P61_rowpos-P61_cn(a3)		;next pattern-step
 	bpl.b P61_nonewpatt
 
@@ -3065,8 +2816,8 @@ P61_nonewpatt:
 	moveq #63,d0
 	sub P61_rowpos-P61_cn(a3),d0
 	move d0,P61_CRow-P61_cn(a3)
+	endc
 ;;    ---  end of non-rolled over code  ---
-	endc	;suppF01
 	rts				;end of P61_playtime.
 
 ********** FX routines **********
@@ -3075,7 +2826,7 @@ P61_Trigger:
 	move.b P61_Info(a5),d0
 	cmp.b #$f0,d0
 	blo.w P61_fxdone
-	move.b d0,P61_PTrig+1-P61_cn(a3)
+	move.b d0,P61_Ptrig+1-P61_cn(a3)
 	bra.w P61_fxdone
 	endc
 
@@ -3090,7 +2841,7 @@ P61_toponochange:
 	beq.w P61_nocha
 	add P61_Fine(a5),d0
 	move d0,P61_Note(a5)
-	move P61_periods-P61_cn(a3,d0),P61_ToPeriod(a5)
+	move P61_Periods-P61_cn(a3,d0),P61_ToPeriod(a5)
 	bra.w P61_nocha
 	endc
 
@@ -3121,13 +2872,13 @@ P61_sampleoffse:
 	add P61_Fine(a5),d0
 	endc
 	move d0,P61_Note(a5)
-	move P61_periods-P61_cn(a3,d0),P61_Period(a5)
+	move P61_Periods-P61_cn(a3,d0),P61_Period(a5)
 	bra.b P61_hup
 P61_pek:
 	moveq #0,d1
 	move P61_Offset(a5),d1
 P61_hup:
-	or P61_DMABit(a5),d4			;don't write 4 times, please.
+	or P61_DMAbit(a5),d4			;don't write 4 times, please.
 
 	move.l P61_Sample(a5),a1
 	move.l (a1)+,d0
@@ -3141,7 +2892,6 @@ P61_hup:
 	moveq #1,d6
 P61_offok:
 	move d6,4(a4)
-
 	ifne oscillo
 ;;    ---  wohoo oscilloscope ptrs  ---
 	moveq #0,d1
@@ -3174,7 +2924,7 @@ P61_posjmp:
 	blo.b .e
 	moveq #0,d0
 	endc
-.e:	move d0,P61_Pos-P61_cn(a3)
+.e:move d0,P61_Pos-P61_cn(a3)
 	add.l P61_possibase(pc),d0
 	move.l d0,P61_spos-P61_cn(a3)
 	endc
@@ -3267,43 +3017,34 @@ P61_etab:
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
 	ifne P61_fsu
 	dc P61_fineup-P61_etab
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
 	ifne P61_fsd
 	dc P61_finedwn-P61_etab
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
-	dc P61_fxdone-P61_etab		;e3
-
-	dc P61_fxdone-P61_etab		;e4
-
-	ifne P61_sft			;e5
+	dc P61_fxdone-P61_etab
+	dc P61_fxdone-P61_etab
+	ifne P61_sft
 	dc P61_setfinetune-P61_etab
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
-	ifne P61_pl			;e6,patternloop
+	ifne P61_pl
 	dc P61_patternloop-P61_etab
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
-	dc P61_fxdone-P61_etab		;e7
-
+	dc P61_fxdone-P61_etab
 	ifne P61_timing
 	dc P61_sete8-P61_etab
 	else
 	dc P61_fxdone-P61_etab
 	endc
-
 	ifne P61_rt
 	dc P61_setretrig-P61_etab
 	else
@@ -3368,7 +3109,7 @@ P61_finedwn:
 	cmp #856,P61_Period(a5)
 	ble.b .jup
 	move #856,P61_Period(a5)
-.jup:	moveq #$7e,d0
+.jup:moveq #$7e,d0
 	and.b (a5),d0
 	bne.w P61_zample
 	bra.w P61_nocha
@@ -3387,44 +3128,39 @@ P61_setfinetune:
 P61_mulutab:
 	dc 0,74,148,222,296,370,444,518,592,666,740,814,888,962,1036,1110
 	endc
-;;    ---  E6x start  ---
 	ifne P61_pl
 P61_patternloop:
 	moveq #$f,d0
-	and.b P61_Info(a5),d0		;E6x, x=0?
-	beq.b P61_setloop		;then set loop start point ONLY
-
-	tst.b P61_plflag-P61_cn(a3)	;not first encounter?
-	bne.b P61_noset			;then don't set start count
-
-	move d0,P61_plcount-P61_cn(a3)	;set start count
-	st.b P61_plflag-P61_cn(a3)	;and flag
+	and.b P61_Info(a5),d0
+	beq.b P61_setloop
+	tst.b P61_plflag-P61_cn(a3)
+	bne.b P61_noset
+	move d0,P61_plcount-P61_cn(a3)
+	st.b P61_plflag-P61_cn(a3)
 P61_noset:
-	tst P61_plcount-P61_cn(a3)	;loop count expired?
+	tst P61_plcount-P61_cn(a3)
 	bne.b P61_looppaa
-	move.b d7,P61_plflag-P61_cn(a3)	;then clear flag and done
+	move.b d7,P61_plflag-P61_cn(a3)
 	bra.w P61_fxdone
 P61_looppaa:
-	st.b P61_plflag+1-P61_cn(a3)	;else special-flag jump later
-	subq #1,P61_plcount-P61_cn(a3)	;and dec loop count
+	st.b P61_plflag+1-P61_cn(a3)
+	subq #1,P61_plcount-P61_cn(a3)
 	bra.w P61_fxdone
-
 P61_setloop:
-	tst.b P61_plflag-P61_cn(a3)			;flag already set?
-	bne.w P61_fxdone				;then do nothing
-	move P61_rowpos(pc),P61_plrowpos-P61_cn(a3)	;else set pos
-	lea P61_temp0+P61_TData(pc),a1			;& prep chans
+	tst.b P61_plflag-P61_cn(a3)
+	bne.w P61_fxdone
+	move P61_rowpos(pc),P61_plrowpos-P61_cn(a3)
+	lea P61_temp0+P61_TData(pc),a1
 	lea P61_looppos(pc),a0
 	moveq #channels-1,d0
 .talt:
 	move.l (a1)+,(a0)+
 	move.l (a1)+,(a0)+
 	move.l (a1),(a0)+
-	lea Channel_Block_Size-8(a1),a1
+	lea Channel_block_SIZE-8(a1),a1
 	dbf d0,.talt
-	bra.w P61_fxdone				;and done.
+	bra.w P61_fxdone
 	endc
-;;    ---  E6x end  ---
 	ifne P61_fvu
 P61_finevup:
 	moveq #$f,d0
@@ -3474,8 +3210,8 @@ P61_ndelay:
 	add P61_Fine(a5),d0
 	endc
 	move d0,P61_Note(a5)
-	move P61_periods-P61_cn(a3,d0),P61_Period(a5)
-	ifeq p61fade
+	move P61_Periods-P61_cn(a3,d0),P61_Period(a5)
+	ifeq fade
 	move P61_Volume(a5),8(a4)
 	else
 	move P61_Volume(a5),P61_Shadow(a5)
@@ -3494,7 +3230,7 @@ P61_pattdelay:
 P61_cspeed:
 	moveq #0,d0
 	move.b P61_Info(a5),d0
-	ifne p61cia
+	ifne CIA
 	tst P61_Tempo-P61_cn(a3)
 	beq.b P61_VBlank
 	cmp.b #32,d0
@@ -3513,14 +3249,14 @@ P61_jkd:
 	move.b d0,P61_speed2+1-P61_cn(a3)
 	st P61_speedis1-P61_cn(a3)
 	bra.w P61_fxdone
-	ifne p61cia
+	ifne CIA
 P61_STempo:
 	move.l P61_timer(pc),d1
 	divu d0,d1
 	move d1,P61_thi2-P61_cn(a3)
 	sub #$1f0*2,d1
 	move d1,P61_thi-P61_cn(a3)
-	ifeq p61system
+	ifeq system
 	move P61_thi2-P61_cn(a3),d1
 	move.b d1,$bfd400
 	lsr #8,d1
@@ -3535,7 +3271,7 @@ P61_vibochvslide:
 	sub.b d0,P61_Volume+1(a5)
 	bpl.b P61_test62
 	move d7,P61_Volume(a5)
-	ifeq p61fade
+	ifeq fade
 	move d7,8(a4)
 	else
 	move d7,P61_Shadow(a5)
@@ -3547,7 +3283,7 @@ P61_test62:
 	bge.b .ncs2
 	move d0,P61_Volume(a5)
 .ncs2:
-	ifeq p61fade
+	ifeq fade
 	move P61_Volume(a5),8(a4)
 	else
 	move P61_Volume(a5),P61_Shadow(a5)
@@ -3602,7 +3338,7 @@ P61_tremo:
 	bpl.b P61_tre4
 	moveq #0,d1
 P61_tre4:
-	ifeq p61fade
+	ifeq fade
 	move d1,8(a4)
 	else
 	move d1,P61_Shadow(a5)
@@ -3613,74 +3349,9 @@ P61_tre4:
 	add.b d0,P61_TrePos(a5)
 	bra.w P61_contfxdone
 	endc
-	ifne (P61_vib+P61_tre)
+	ifne P61_vib!P61_tre
 P61_vibtab:
-;	incbin "vibtab"
-	dc.b	$00,$00,$00,$00,$00,$00,$00,$00
-	dc.b	$00,$00,$00,$00,$00,$00,$00,$00
-	dc.b	$00,$00,$00,$00,$00,$00,$00,$00
-	dc.b	$00,$00,$00,$00,$00,$00,$00,$00
-	dc.b	$00,$00,$00,$00,$00,$00,$01,$01
-	dc.b	$01,$01,$01,$01,$01,$01,$01,$01
-	dc.b	$01,$01,$01,$01,$01,$01,$01,$01
-	dc.b	$01,$01,$01,$00,$00,$00,$00,$00
-	dc.b	$00,$00,$00,$01,$01,$01,$02,$02
-	dc.b	$02,$03,$03,$03,$03,$03,$03,$03
-	dc.b	$03,$03,$03,$03,$03,$03,$03,$03
-	dc.b	$02,$02,$02,$01,$01,$01,$00,$00
-	dc.b	$00,$00,$01,$01,$02,$02,$03,$03
-	dc.b	$04,$04,$04,$05,$05,$05,$05,$05
-	dc.b	$05,$05,$05,$05,$05,$05,$04,$04
-	dc.b	$04,$03,$03,$02,$02,$01,$01,$00
-	dc.b	$00,$00,$01,$02,$03,$03,$04,$05
-	dc.b	$05,$06,$06,$07,$07,$07,$07,$07
-	dc.b	$07,$07,$07,$07,$07,$07,$06,$06
-	dc.b	$05,$05,$04,$03,$03,$02,$01,$00
-	dc.b	$00,$00,$01,$02,$03,$04,$05,$06
-	dc.b	$07,$07,$08,$08,$09,$09,$09,$09
-	dc.b	$09,$09,$09,$09,$09,$08,$08,$07
-	dc.b	$07,$06,$05,$04,$03,$02,$01,$00
-	dc.b	$00,$01,$02,$03,$04,$05,$06,$07
-	dc.b	$08,$09,$09,$0a,$0b,$0b,$0b,$0b
-	dc.b	$0b,$0b,$0b,$0b,$0b,$0a,$09,$09
-	dc.b	$08,$07,$06,$05,$04,$03,$02,$01
-	dc.b	$00,$01,$02,$04,$05,$06,$07,$08
-	dc.b	$09,$0a,$0b,$0c,$0c,$0d,$0d,$0d
-	dc.b	$0d,$0d,$0d,$0d,$0c,$0c,$0b,$0a
-	dc.b	$09,$08,$07,$06,$05,$04,$02,$01
-	dc.b	$00,$01,$03,$04,$06,$07,$08,$0a
-	dc.b	$0b,$0c,$0d,$0e,$0e,$0f,$0f,$0f
-	dc.b	$0f,$0f,$0f,$0f,$0e,$0e,$0d,$0c
-	dc.b	$0b,$0a,$08,$07,$06,$04,$03,$01
-	dc.b	$00,$01,$03,$05,$06,$08,$09,$0b
-	dc.b	$0c,$0d,$0e,$0f,$10,$11,$11,$11
-	dc.b	$11,$11,$11,$11,$10,$0f,$0e,$0d
-	dc.b	$0c,$0b,$09,$08,$06,$05,$03,$01
-	dc.b	$00,$01,$03,$05,$07,$09,$0b,$0c
-	dc.b	$0e,$0f,$10,$11,$12,$13,$13,$13
-	dc.b	$13,$13,$13,$13,$12,$11,$10,$0f
-	dc.b	$0e,$0c,$0b,$09,$07,$05,$03,$01
-	dc.b	$00,$02,$04,$06,$08,$0a,$0c,$0d
-	dc.b	$0f,$10,$12,$13,$14,$14,$15,$15
-	dc.b	$15,$15,$15,$14,$14,$13,$12,$10
-	dc.b	$0f,$0d,$0c,$0a,$08,$06,$04,$02
-	dc.b	$00,$02,$04,$06,$09,$0b,$0d,$0f
-	dc.b	$10,$12,$13,$15,$16,$16,$17,$17
-	dc.b	$17,$17,$17,$16,$16,$15,$13,$12
-	dc.b	$10,$0f,$0d,$0b,$09,$06,$04,$02
-	dc.b	$00,$02,$04,$07,$09,$0c,$0e,$10
-	dc.b	$12,$14,$15,$16,$17,$18,$19,$19
-	dc.b	$19,$19,$19,$18,$17,$16,$15,$14
-	dc.b	$12,$10,$0e,$0c,$09,$07,$04,$02
-	dc.b	$00,$02,$05,$08,$0a,$0d,$0f,$11
-	dc.b	$13,$15,$17,$18,$19,$1a,$1b,$1b
-	dc.b	$1b,$1b,$1b,$1a,$19,$18,$17,$15
-	dc.b	$13,$11,$0f,$0d,$0a,$08,$05,$02
-	dc.b	$00,$02,$05,$08,$0b,$0e,$10,$12
-	dc.b	$15,$17,$18,$1a,$1b,$1c,$1d,$1d
-	dc.b	$1d,$1d,$1d,$1c,$1b,$1a,$18,$17
-	dc.b	$15,$12,$10,$0e,$0b,$08,$05,$02
-
+	incbin "A:INC/SND/vibtab"
 	endc
 	ifne P61_il
 P61_funk:
@@ -3720,7 +3391,7 @@ P61_FunkTable:
 ;;    ---  first int, DMAs on again.  ---
 	ifeq copdma
 P61_dmason:
-	ifeq p61system
+	ifeq system
 	tst.b $bfdd00
 	move #$2000,$dff09c
 	move #$2000,$dff09c
@@ -3732,6 +3403,7 @@ P61_dmason:
 	move.l P61_intaddr(pc),(a0)
 	move.l (sp)+,a0
 	endc
+
 	move P61_dma(pc),$dff096	;on only. includes $8200.
 	nop
 	rte
@@ -3747,7 +3419,7 @@ P61_dmason:
 ;;    ---  second chained int, replen  ---
 	ifeq nowaveforms
 P61_setrepeat:
-	ifeq p61system
+	ifeq system
 	tst.b $bfdd00
 	movem.l a0/a1,-(sp)
 	lea $dff0a0,a1
@@ -3780,8 +3452,8 @@ P61_setrepeat:
 	move (a0),48(a1)
 	endc
 
-	ifne p61system
-	ifne p61cia
+	ifne system
+	ifne CIA
 	lea P61_server(pc),a3
 	clr (a3)
 	move.l P61_craddr+4(pc),a0
@@ -3790,8 +3462,8 @@ P61_setrepeat:
 	endc
 	bra P61_ohi
 	endc
-	ifeq p61system
-	ifne p61cia
+	ifeq system
+	ifne CIA
 	move.l P61_vektori(pc),a0
 	move.l P61_tintti(pc),(a0)
 	endc
@@ -3802,16 +3474,16 @@ P61_setrepeat:
 	endc				;ifeq nowaveforms
 
 P61_temp0:
-	dcb.b Channel_Block_Size-2,0
+	dcb.b Channel_Block_SIZE-2,0
 	dc 1
 P61_temp1:
-	dcb.b Channel_Block_Size-2,0
+	dcb.b Channel_Block_SIZE-2,0
 	dc 2
 P61_temp2:
-	dcb.b Channel_Block_Size-2,0
+	dcb.b Channel_Block_SIZE-2,0
 	dc 4
 P61_temp3:
-	dcb.b Channel_Block_Size-2,0
+	dcb.b Channel_Block_SIZE-2,0
 	dc 8
 	ifne split4
 P61_temp0copy:	dcb.b P61_Wave+4,0	;temp storage for split4.
@@ -3821,90 +3493,9 @@ P61_cn:
 	dc 0
 P61_periods:
 	ifne P61_ft
-;	incbin "A:INC/SND/periods"
-	dc.w	$0358,$0358,$0328,$02fa,$02d0,$02a6,$0280,$025c
-	dc.w	$023a,$021a,$01fc,$01e0,$01c5,$01ac,$0194,$017d
-	dc.w	$0168,$0153,$0140,$012e,$011d,$010d,$00fe,$00f0
-	dc.w	$00e2,$00d6,$00ca,$00be,$00b4,$00aa,$00a0,$0097
-	dc.w	$008f,$0087,$007f,$0078,$0071,$0352,$0352,$0322
-	dc.w	$02f5,$02cb,$02a2,$027d,$0259,$0237,$0217,$01f9
-	dc.w	$01dd,$01c2,$01a9,$0191,$017b,$0165,$0151,$013e
-	dc.w	$012c,$011c,$010c,$00fd,$00ef,$00e1,$00d5,$00c9
-	dc.w	$00bd,$00b3,$00a9,$009f,$0096,$008e,$0086,$007e
-	dc.w	$0077,$0071,$034c,$034c,$031c,$02f0,$02c5,$029e
-	dc.w	$0278,$0255,$0233,$0214,$01f6,$01da,$01bf,$01a6
-	dc.w	$018e,$0178,$0163,$014f,$013c,$012a,$011a,$010a
-	dc.w	$00fb,$00ed,$00e0,$00d3,$00c7,$00bc,$00b1,$00a7
-	dc.w	$009e,$0095,$008d,$0085,$007d,$0076,$0070,$0346
-	dc.w	$0346,$0317,$02ea,$02c0,$0299,$0274,$0250,$022f
-	dc.w	$0210,$01f2,$01d6,$01bc,$01a3,$018b,$0175,$0160
-	dc.w	$014c,$013a,$0128,$0118,$0108,$00f9,$00eb,$00de
-	dc.w	$00d1,$00c6,$00bb,$00b0,$00a6,$009d,$0094,$008c
-	dc.w	$0084,$007d,$0076,$006f,$0340,$0340,$0311,$02e5
-	dc.w	$02bb,$0294,$026f,$024c,$022b,$020c,$01ef,$01d3
-	dc.w	$01b9,$01a0,$0188,$0172,$015e,$014a,$0138,$0126
-	dc.w	$0116,$0106,$00f7,$00e9,$00dc,$00d0,$00c4,$00b9
-	dc.w	$00af,$00a5,$009c,$0093,$008b,$0083,$007c,$0075
-	dc.w	$006e,$033a,$033a,$030b,$02e0,$02b6,$028f,$026b
-	dc.w	$0248,$0227,$0208,$01eb,$01cf,$01b5,$019d,$0186
-	dc.w	$0170,$015b,$0148,$0135,$0124,$0114,$0104,$00f5
-	dc.w	$00e8,$00db,$00ce,$00c3,$00b8,$00ae,$00a4,$009b
-	dc.w	$0092,$008a,$0082,$007b,$0074,$006d,$0334,$0334
-	dc.w	$0306,$02da,$02b1,$028b,$0266,$0244,$0223,$0204
-	dc.w	$01e7,$01cc,$01b2,$019a,$0183,$016d,$0159,$0145
-	dc.w	$0133,$0122,$0112,$0102,$00f4,$00e6,$00d9,$00cd
-	dc.w	$00c1,$00b7,$00ac,$00a3,$009a,$0091,$0089,$0081
-	dc.w	$007a,$0073,$006d,$032e,$032e,$0300,$02d5,$02ac
-	dc.w	$0286,$0262,$023f,$021f,$0201,$01e4,$01c9,$01af
-	dc.w	$0197,$0180,$016b,$0156,$0143,$0131,$0120,$0110
-	dc.w	$0100,$00f2,$00e4,$00d8,$00cc,$00c0,$00b5,$00ab
-	dc.w	$00a1,$0098,$0090,$0088,$0080,$0079,$0072,$006c
-	dc.w	$038b,$038b,$0358,$0328,$02fa,$02d0,$02a6,$0280
-	dc.w	$025c,$023a,$021a,$01fc,$01e0,$01c5,$01ac,$0194
-	dc.w	$017d,$0168,$0153,$0140,$012e,$011d,$010d,$00fe
-	dc.w	$00f0,$00e2,$00d6,$00ca,$00be,$00b4,$00aa,$00a0
-	dc.w	$0097,$008f,$0087,$007f,$0078,$0384,$0384,$0352
-	dc.w	$0322,$02f5,$02cb,$02a3,$027c,$0259,$0237,$0217
-	dc.w	$01f9,$01dd,$01c2,$01a9,$0191,$017b,$0165,$0151
-	dc.w	$013e,$012c,$011c,$010c,$00fd,$00ee,$00e1,$00d4
-	dc.w	$00c8,$00bd,$00b3,$00a9,$009f,$0096,$008e,$0086
-	dc.w	$007e,$0077,$037e,$037e,$034c,$031c,$02f0,$02c5
-	dc.w	$029e,$0278,$0255,$0233,$0214,$01f6,$01da,$01bf
-	dc.w	$01a6,$018e,$0178,$0163,$014f,$013c,$012a,$011a
-	dc.w	$010a,$00fb,$00ed,$00df,$00d3,$00c7,$00bc,$00b1
-	dc.w	$00a7,$009e,$0095,$008d,$0085,$007d,$0076,$0377
-	dc.w	$0377,$0346,$0317,$02ea,$02c0,$0299,$0274,$0250
-	dc.w	$022f,$0210,$01f2,$01d6,$01bc,$01a3,$018b,$0175
-	dc.w	$0160,$014c,$013a,$0128,$0118,$0108,$00f9,$00eb
-	dc.w	$00de,$00d1,$00c6,$00bb,$00b0,$00a6,$009d,$0094
-	dc.w	$008c,$0084,$007d,$0076,$0371,$0371,$0340,$0311
-	dc.w	$02e5,$02bb,$0294,$026f,$024c,$022b,$020c,$01ee
-	dc.w	$01d3,$01b9,$01a0,$0188,$0172,$015e,$014a,$0138
-	dc.w	$0126,$0116,$0106,$00f7,$00e9,$00dc,$00d0,$00c4
-	dc.w	$00b9,$00af,$00a5,$009c,$0093,$008b,$0083,$007b
-	dc.w	$0075,$036b,$036b,$033a,$030b,$02e0,$02b6,$028f
-	dc.w	$026b,$0248,$0227,$0208,$01eb,$01cf,$01b5,$019d
-	dc.w	$0186,$0170,$015b,$0148,$0135,$0124,$0114,$0104
-	dc.w	$00f5,$00e8,$00db,$00ce,$00c3,$00b8,$00ae,$00a4
-	dc.w	$009b,$0092,$008a,$0082,$007b,$0074,$0364,$0364
-	dc.w	$0334,$0306,$02da,$02b1,$028b,$0266,$0244,$0223
-	dc.w	$0204,$01e7,$01cc,$01b2,$019a,$0183,$016d,$0159
-	dc.w	$0145,$0133,$0122,$0112,$0102,$00f4,$00e6,$00d9
-	dc.w	$00cd,$00c1,$00b7,$00ac,$00a3,$009a,$0091,$0089
-	dc.w	$0081,$007a,$0073,$035e,$035e,$032e,$0300,$02d5
-	dc.w	$02ac,$0286,$0262,$023f,$021f,$0201,$01e4,$01c9
-	dc.w	$01af,$0197,$0180,$016b,$0156,$0143,$0131,$0120
-	dc.w	$0110,$0100,$00f2,$00e4,$00d8,$00cb,$00c0,$00b5
-	dc.w	$00ab,$00a1,$0098,$0090,$0088,$0080,$0079,$0072
-
+	incbin "A:INC/SND/periods"
 	else
-;	incbin "periods.nft"
-	dc.w	$0358,$0358,$0328,$02fa,$02d0,$02a6,$0280,$025c
-	dc.w	$023a,$021a,$01fc,$01e0,$01c5,$01ac,$0194,$017d
-	dc.w	$0168,$0153,$0140,$012e,$011d,$010d,$00fe,$00f0
-	dc.w	$00e2,$00d6,$00ca,$00be,$00b4,$00aa,$00a0,$0097
-	dc.w	$008f,$0087,$007f,$0078,$0071
-
+	incbin "A:INC/SND/periods.nft"
 	endc
 P61_dma:
 	dc $8200
@@ -3920,7 +3511,7 @@ P61_speedis1:
 	dc 0
 P61_spos:
 	dc.l 0
-	ifeq p61system
+	ifeq system
 P61_vektori:
 	dc.l 0
 P61_oldlev6:
@@ -3930,7 +3521,7 @@ P61_ofilter:
 	dc 0
 P61_timers:
 	dc.l 0
-	ifne p61cia
+	ifne CIA
 P61_tintti:
 	dc.l 0
 P61_thi:
@@ -3974,8 +3565,7 @@ P61_patternbase:
 	dc.l 0
 P61_intaddr:
 	dc.l 0
-
-	ifne p61system
+	ifne system
 P61_server:
 	dc 0
 P61_miscbase:
@@ -4027,10 +3617,7 @@ P61_timeropen:
 P61_timerint:
 	dc.b 'P61_TimerInterrupt',0,0
 	endc
-P61_InitPos:
-	dc.w 0		;P61_Init starts playing the song from this position.
 ;;    ---  optional declares  ---
-
 	ifne use1Fx
 P61_PTrig:	dc.w 0	;Poll this Custom trigger, using 'Bxx',pos $80-$ff
 	endc
@@ -4046,13 +3633,4 @@ P61_etu:
 	ifne quietstart
 P61_Quiet:	dc.w 0	;@@this "sample" MUST be in chipmem!
 	endc
-
-	ifne visuctrs
-P61_visuctr0:	dc.w $4000	;pretend long elapsed time at start
-P61_visuctr1:	dc.w $4000	;(to not show inital trigger on all channels.)
-P61_visuctr2:	dc.w $4000
-P61_visuctr3:	dc.w $4000
-	endc
-
-P61E:			;end of player binary
-samples:		;ds.b 65536 <--declare some space if used.
+samples:		;ds.b 65536 <--enable if used.

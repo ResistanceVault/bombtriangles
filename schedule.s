@@ -6,6 +6,7 @@ SETBEATDELAY MACRO
 
 
 DRAWFUNCTARRAY_START:
+  dc.l      WALKINGTRIANGLE
   dc.l       BIGTRIANGLE_Z            ; 1
   dc.l       BIGTRIANGLE_Z            ; 2
   dc.l       BIGTRIANGLE_Z            ; 3
@@ -32,7 +33,7 @@ LAST_ITERATION_FUNCTION_START:
   dc.l       TRANSITION_CLEAR         ; 7
   dc.l       DOUBLETRIANGLEX_CLEAR    ; 8
   dc.l       DOUBLETRIANGLEY_CLEAR    ; 9
-  dc.l       ROLLINGTRIANGLE_CLEAR    ; 10
+  dc.l       VOID    ; 10
   dc.l       SHEARTRIANGLE_CLEAR      ; 11
   dc.l       PYRAMID_CLEAR            ; 12
   dc.l       VOID                     ; 13
