@@ -1,13 +1,13 @@
 ; DEFINES
-STARTWALKXPOS EQU 0                                                ; Start triangle position X (signed value)
-STARTWALKYPOS EQU 128+30                                            ; Start triangle position Y (signed value)
+STARTWALKXPOS EQU 30                                                   ; Start triangle position X (signed value)
+STARTWALKYPOS EQU 128+30                                               ; Start triangle position Y (signed value)
 
-STARTDXCLIMB  EQU 300                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
+STARTDXCLIMB  EQU 300-30                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB  EQU 150
 
 ; VARIABLES
 YROLLINGOFFSET:
-  dc.w                  30                                          ; Increment by 30 while climbing
+  dc.w                  30                                             ; Increment by 30 while climbing
 
 ANGLE_YWALK:
   dc.w                  359
@@ -25,9 +25,21 @@ NEXT_WALKING_ANGLE  MACRO
   move.l                a0,XROLLINGANGLE
   ENDM
 
+UPDATE_TRANSLATION MACRO
+  cmpi.w                \1,ANGLE
+  bne.s                 .walkingtriangle_no_reset_angle
+  move.w                #0,ANGLE
+  add.w                 \3,\2
+  move.l                #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE
+.walkingtriangle_no_reset_angle:
+  ENDM
+
 ; Animation function
 WALKINGTRIANGLE:
-  ENABLE_CLIPPING
+  ;ENABLE_CLIPPING
+
+  STROKE                #1
+  FILL                  #2
 
     ; call the appropriate routine according to stage
   move.w                STAGEWALK(PC),d0
@@ -40,6 +52,7 @@ WALKINGTRIANGLE:
   cmpi.w                #4,d0
   beq.w                 walkingtriangle_xwalk_right
 
+  ; START OF FIRST HORIZONTAL WALKING
   ; Calculate the origin point which is the lower right vertex of the triangle
   ; This is important because the triangle must rotate around this vertex
   ; To calculate this point:
@@ -48,7 +61,7 @@ WALKINGTRIANGLE:
   ; Pseudocode:
   ; - resetMatrix();
   ; - translate(STARTWALKXPOS+XROLLINGOFFSET,STARTWALKYPOS)
-  move.w                #STARTWALKXPOS,d0
+  moveq                 #STARTWALKXPOS,d0
   add.w                 XROLLINGOFFSET,d0
   move.w                #STARTWALKYPOS,d1
   jsr                   LOADIDENTITYANDTRANSLATE
@@ -64,12 +77,7 @@ WALKINGTRIANGLE:
   ; - reset the angle
   ; - reset the angle pointer
   ; add the length of the triangle to the XROLLINGOFFSET
-  cmpi.w                #241,ANGLE
-  bne.s                 walkingtriangle_no_reset_angle
-  move.w                #0,ANGLE
-  add.w                 #30,XROLLINGOFFSET
-  move.l                #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE
-walkingtriangle_no_reset_angle:
+  UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
 
 ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
   cmpi.w                #STARTDXCLIMB,XROLLINGOFFSET
@@ -77,92 +85,55 @@ walkingtriangle_no_reset_angle:
   cmpi.w                #325,ANGLE
   bne.s                 walkingtriangle_no_vertical_climbing
   move.w                #1,STAGEWALK
-  move.w #359,ANGLE
-  ;if (angle>=30 && numrevolutions>1)
-  ;  {
-  ;    angle-=0.5;
-  ;        stagewalk =1;
-;
- ;   }
+  move.w                #359,ANGLE
 walkingtriangle_no_vertical_climbing:
-
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
-  moveq                 #-15,d0                                     ; vertex 1 (X)
-  moveq                 #-26,d1                                     ; vertex 2 (Y)
-  moveq                 #-30,d6                                     ; vertex 2 (X)
-  moveq                 #0,d3                                       ; vertex 2 (Y)
-  moveq                 #0,d4                                       ; vertex 3 (X)
-  moveq                 #0,d5                                       ; vertex 3 (Y)
-  jsr                   TRIANGLE_NODRAW
+  VERTEX2D_INIT         1,#-15,#-26
+  VERTEX2D_INIT         2,#-30,#0
+  VERTEX2D_INIT         3,#0,#0
 
-  WAITBLITTER
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
 
-  ; Color 1
-  STROKE                #1
-
-  ; Draw the triangle
-  jsr                   ammx_fill_table_clip
+  bsr.w                 DRAWCANVAS
+  
   rts
 
 ; ---- START IMPLEMENTATION OF Y CLIMBING ------------------
 walkingtriangle_ywalk:
-  move.w                #STARTWALKXPOS,d0
+  moveq                 #STARTWALKXPOS,d0
   add.w                 #STARTDXCLIMB,d0
   move.w                #STARTWALKYPOS,d1
   sub.w                 YROLLINGOFFSET,d1
   jsr                   LOADIDENTITYANDTRANSLATE
   ROTATE                ANGLE
 
-  bsr.w decrease_angle_by_1
+  bsr.w                 decrease_angle_by_1
 
-  cmp.w #240,ANGLE
-  bne.w                 walkingtriangle_ywalk_noreset
-  move.w                #359,ANGLE
-  add.w                 #30,YROLLINGOFFSET
+  UPDATE_TRANSLATION    #240,YROLLINGOFFSET,#30
 
-  ; ANGLE_YWALK UPDATE
-  ;add.w                 #-1,ANGLE_YWALK
-  ;cmp.w                 #180+60,ANGLE_YWALK
-  ;bne.w                 walkingtriangle_ywalk_noreset
-  ;move.w                #359,ANGLE_YWALK
-  ;add.w                 #30,YROLLINGOFFSET
-walkingtriangle_ywalk_noreset:
-
-    cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
+  cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
   bne.s                 walkingtriangle_no_horizontal_climbing
-  cmpi.w                #331,ANGLE
+  cmpi.w                #330,ANGLE
   bne.s                 walkingtriangle_no_horizontal_climbing
-  move.w                #30,XROLLINGOFFSET                          ; next stage must start with this value to 30
-  move.w                #0,ANGLE                                    ; next stage must start with this value to zero
+  move.w                #30,XROLLINGOFFSET                             ; next stage must start with this value to 30
+  move.w                #0,ANGLE                                       ; next stage must start with this value to zero
   move.w                #2,STAGEWALK
-
-; If got N revolutions and the angle is >= 360-30 SET the stage to 2 to start horizontal climbing for next frame
-  ;cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
-  ;bne.s                 walkingtriangle_no_horizontal_climbing
-  ;cmpi.w                #331,ANGLE_YWALK
-  ;bne.s                 walkingtriangle_no_horizontal_climbing
-  ;move.w                #30,XROLLINGOFFSET                          ; next stage must start with this value to 30
-  ;move.w                #0,ANGLE                                    ; next stage must start with this value to zero
-  ;move.w                #2,STAGEWALK
 walkingtriangle_no_horizontal_climbing:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  moveq                 #0,d0                                       ; vertex 1 (X)
-  moveq                 #0,d1                                       ; vertex 2 (Y)
-  moveq                 #0,d6                                       ; vertex 2 (X)
-  moveq                 #30,d3                                      ; vertex 2 (Y)
-  moveq                 #-26,d4                                     ; vertex 3 (X)
-  moveq                 #15,d5                                      ; vertex 3 (Y)
-  jsr                   TRIANGLE_NODRAW
-  WAITBLITTER
-  STROKE                #1
-  ; Draw the triangle
-  jsr                   ammx_fill_table_clip
+  VERTEX2D_INIT         1,#0,#0
+  VERTEX2D_INIT         2,#0,#30
+  VERTEX2D_INIT         3,#-26,#15
+
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
+
   rts
 
 ; ---- START IMPLEMENTATION OF X REVERSE CLIMBING ------------------
 walkingtriangle_xwalk_rev:
-  move.w                #STARTWALKXPOS,d0
+  moveq                 #STARTWALKXPOS,d0
   add.w                 #STARTDXCLIMB,d0
   sub.w                 XROLLINGOFFSET,d0
   move.w                #STARTWALKYPOS,d1
@@ -172,11 +143,7 @@ walkingtriangle_xwalk_rev:
 
   bsr.w                 decrease_angle_by_1
 
-  cmpi.w                #241,ANGLE
-  bne.s                 walkingtriangle_xwalk_noanglereset
-  move.w                #359,ANGLE
-  add.w                 #30,XROLLINGOFFSET
-walkingtriangle_xwalk_noanglereset:
+  UPDATE_TRANSLATION    #240,XROLLINGOFFSET,#30
 
   ; If got N revolutions and the angle is >= 360-30 SET the stage to 3 to start vertical descending for next frame
   cmpi.w                #STARTDXCLIMB,XROLLINGOFFSET
@@ -184,42 +151,33 @@ walkingtriangle_xwalk_noanglereset:
   cmpi.w                #331,ANGLE
   bne.s                 walkingtriangle_no_vertical_descending
   move.w                #3,STAGEWALK
-  sub.w #30,YROLLINGOFFSET
-  move.w #0,ANGLE
+  sub.w                 #30,YROLLINGOFFSET
+  move.w                #0,ANGLE
 walkingtriangle_no_vertical_descending:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  moveq                 #0,d0                                       ; vertex 1 (X)
-  moveq                 #0,d1                                       ; vertex 2 (Y)
-  moveq                 #30,d6                                      ; vertex 2 (X)
-  moveq                 #0,d3                                       ; vertex 2 (Y)
-  moveq                 #15,d4                                      ; vertex 3 (X)
-  moveq                 #26,d5                                      ; vertex 3 (Y)
-  jsr                   TRIANGLE_NODRAW
+  VERTEX2D_INIT         1,#0,#0
+  VERTEX2D_INIT         2,#30,#0
+  VERTEX2D_INIT         3,#15,#26
 
-  WAITBLITTER
-  STROKE                #1
-  ; Draw the triangle
-  jsr                   ammx_fill_table_clip
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
+  
   rts
 
 ; ---- START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 walkingtriangle_ywalk_desending:
-  move.w                #STARTWALKXPOS,d0
+  moveq                 #STARTWALKXPOS,d0
   add.w                 #STARTDXCLIMB,d0
   sub.w                 XROLLINGOFFSET,d0
   move.w                #STARTWALKYPOS,d1
   sub.w                 YROLLINGOFFSET,d1
   jsr                   LOADIDENTITYANDTRANSLATE
-  ROTATE ANGLE
+  ROTATE                ANGLE
 
-  bsr.w decrease_angle_by_1
+  bsr.w                 decrease_angle_by_1
 
-  cmpi.w                #241,ANGLE
-  bne.s                 walkingtriangle_ywalkdescent_noanglereset
-  move.w                #359,ANGLE
-  sub.w #30,YROLLINGOFFSET
-walkingtriangle_ywalkdescent_noanglereset:
+  UPDATE_TRANSLATION    #240,YROLLINGOFFSET,#-30
 
   ; If got N revolutions and the angle is >= 360-30 SET the stage to 0 to start horizontal for next frame
   cmpi.w                #0,YROLLINGOFFSET
@@ -227,41 +185,30 @@ walkingtriangle_ywalkdescent_noanglereset:
   cmpi.w                #330,ANGLE
   bne.s                 walkingtriangle_no_vertical_left_descending
   move.w                #4,STAGEWALK
-  move.w #30,XROLLINGOFFSET
-  move.w #0,ANGLE
+  move.w                #30,XROLLINGOFFSET
+  move.w                #0,ANGLE
 walkingtriangle_no_vertical_left_descending:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  moveq                 #0,d0                                       ; vertex 1 (X)
-  moveq                 #0,d1                                       ; vertex 2 (Y)
-  moveq                 #0,d6                                      ; vertex 2 (X)
-  moveq                 #-30,d3                                       ; vertex 2 (Y)
-  moveq                 #26,d4                                      ; vertex 3 (X)
-  moveq                 #-15,d5                                      ; vertex 3 (Y)
-  jsr                   TRIANGLE_NODRAW
+  VERTEX2D_INIT         1,#0,#0
+  VERTEX2D_INIT         2,#0,#-30
+  VERTEX2D_INIT         3,#26,#-15
 
-  WAITBLITTER
-  STROKE                #1
-  ; Draw the triangle
-  jsr                   ammx_fill_table_clip
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
   rts
 
   ; ---- START IMPLEMENTATION OF X WALKING TO RIGHT ------------------
 walkingtriangle_xwalk_right:
-  move.w                #STARTWALKXPOS,d0
-  ;add.w                 #STARTDXCLIMB,d0
+  moveq                 #STARTWALKXPOS,d0
   add.w                 XROLLINGOFFSET,d0
   move.w                #STARTWALKYPOS,d1
   jsr                   LOADIDENTITYANDTRANSLATE
-  ROTATE ANGLE
+  ROTATE                ANGLE
 
-  bsr.w decrease_angle_by_1
+  bsr.w                 decrease_angle_by_1
 
-  cmpi.w                #241,ANGLE
-  bne.s                 walkingtriangle_xwalkright_noanglereset
-  move.w                #359,ANGLE
-  add.w #30,XROLLINGOFFSET
-walkingtriangle_xwalkright_noanglereset:
+  UPDATE_TRANSLATION    #240,XROLLINGOFFSET,#30
 
   ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
   cmpi.w                #STARTDXCLIMB,XROLLINGOFFSET
@@ -270,20 +217,39 @@ walkingtriangle_xwalkright_noanglereset:
   bne.s                 walkingtriangle_no_vertical_climbing_2
   move.w                #1,STAGEWALK
   move.w                #30,YROLLINGOFFSET
-  move.w #359,ANGLE
+  move.w                #359,ANGLE
 walkingtriangle_no_vertical_climbing_2:
   
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  moveq                 #-15,d0                                     ; vertex 1 (X)
-  moveq                 #-26,d1                                     ; vertex 2 (Y)
-  moveq                 #-30,d6                                     ; vertex 2 (X)
-  moveq                 #0,d3                                       ; vertex 2 (Y)
-  moveq                 #0,d4                                       ; vertex 3 (X)
-  moveq                 #0,d5                                       ; vertex 3 (Y)
-  jsr                   TRIANGLE_NODRAW
-  WAITBLITTER
+  VERTEX2D_INIT         1,#-15,#-26
+  VERTEX2D_INIT         2,#-30,#0
+  VERTEX2D_INIT         3,#0,#0
+
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
+  rts
+
+DRAWCANVAS:
+  rts
+  RESETMATRIX
+  VERTEX2D_INIT         1,#310,#100
+  VERTEX2D_INIT         2,#300,#255
+  VERTEX2D_INIT         3,#319,#255
+
   STROKE                #1
-  ; Draw the triangle
-  jsr                   ammx_fill_table_clip
+  FILL                  #3
+
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
+
+  VERTEX2D_INIT         1,#310,#255
+  VERTEX2D_INIT         2,#300,#100
+  VERTEX2D_INIT         3,#319,#100
+
+  STROKE                #2
+  FILL                  #1
+
+  lea                   OFFBITPLANEMEM,a4
+  jsr                   TRIANGLE_BLIT
   rts
 

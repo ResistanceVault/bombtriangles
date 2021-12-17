@@ -10,6 +10,8 @@ XROLLINGANGLE:
 XDIFF:
   dc.w                0
 
+
+
 ; Animation function
 ROLLINGTRIANGLE:
   ENABLE_CLIPPING

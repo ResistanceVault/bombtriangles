@@ -290,6 +290,7 @@ scrollcolors:
   include        "AProcessing2/libs/rasterizers/foursidepolygon3d.s"
   include        "AProcessing2/libs/rasterizers/processing_bitplanes_fast.s"
   include        "AProcessing2/libs/blitter/lines.s"
+  include        "AProcessing2/libs/blitter/triangle.s"
 
   include        "initnoprecalc.s"
   include        "schedule.s"
