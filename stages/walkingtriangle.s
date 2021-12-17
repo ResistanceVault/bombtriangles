@@ -5,12 +5,106 @@ STARTWALKYPOS EQU 128+30                                               ; Start t
 STARTDXCLIMB  EQU 300-30                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB  EQU 150
 
+TIMEDELAY     EQU 360
+
 ; VARIABLES
 YROLLINGOFFSET:
   dc.w                  30                                             ; Increment by 30 while climbing
 
-ANGLE_YWALK:
-  dc.w                  359
+;ANGLE_YWALK:
+ ; dc.w                  359
+
+STROKEDATA:
+  dc.w                  0
+FILLDATA:
+  dc.w                  0
+
+TRIANGLES:
+TRIANGLE_1:
+  dc.w                  0                                              ; ANGLE
+  dc.w                  0                                              ; XROLLINGOFFSET
+  dc.w                  30                                             ; YROLLINGOFFSET
+  dc.w                  0                                              ; STAGE
+  dc.l                  ROTATIONS_ANGLES_64_180-2                      ;XROLLINGANGLE
+  dc.b                  1                                              ; STROKE
+  dc.b                  2                                              ; FILL
+  dc.w                  TIMEDELAY*0                                    ; SLEEP
+TRIANGLE_2:
+  dc.w                  0                                              ; ANGLE
+  dc.w                  0                                              ; XROLLINGOFFSET
+  dc.w                  30                                             ; YROLLINGOFFSET
+  dc.w                  0                                              ; STAGE
+  dc.l                  ROTATIONS_ANGLES_64_180-2                      ;XROLLINGANGLE
+  dc.b                  2                                              ; STROKE
+  dc.b                  1                                              ; FILL
+  dc.w                  TIMEDELAY*1                                    ; SLEEP
+TRIANGLE_3:
+  dc.w                  0                                              ; ANGLE
+  dc.w                  0                                              ; XROLLINGOFFSET
+  dc.w                  30                                             ; YROLLINGOFFSET
+  dc.w                  0                                              ; STAGE
+  dc.l                  ROTATIONS_ANGLES_64_180-2                      ;XROLLINGANGLE
+  dc.b                  3                                              ; STROKE
+  dc.b                  1                                              ; FILL
+  dc.w                  TIMEDELAY*2                                    ; SLEEP
+TRIANGLE_4:
+  dc.w                  0                                              ; ANGLE
+  dc.w                  0                                              ; XROLLINGOFFSET
+  dc.w                  30                                             ; YROLLINGOFFSET
+  dc.w                  0                                              ; STAGE
+  dc.l                  ROTATIONS_ANGLES_64_180-2                      ;XROLLINGANGLE
+  dc.b                  1                                              ; STROKE
+  dc.b                  3                                              ; FILL
+  dc.w                  TIMEDELAY*3                                    ; SLEEP
+
+WALKINGTRIANGLE:
+  ; For each triangle
+  lea                   TRIANGLES(PC),a0
+  moveq                 #4-1,d5
+walkingtriangle_start:
+  move.w                0(a0),ANGLE
+  move.w                2(a0),XROLLINGOFFSET
+  move.w                4(a0),YROLLINGOFFSET
+  move.w                6(a0),STAGEWALK
+  move.l                8(a0),XROLLINGANGLE
+  move.b                12(a0),STROKEDATA
+  move.b                13(a0),FILLDATA
+  tst.w                 14(a0)
+  beq.s                 walkingtriangle_nodelay
+  sub.w                 #1,14(a0)
+  bra.s                 walkingtriangle_gotonext
+walkingtriangle_nodelay
+  bsr.w                 WALKINGTRIANGLE_PROCESS
+walkingtriangle_gotonext:
+  move.w                ANGLE,(a0)+
+  move.w                XROLLINGOFFSET,(a0)+
+  move.w                YROLLINGOFFSET,(a0)+
+  move.w                STAGEWALK,(a0)+
+  move.l                XROLLINGANGLE,(a0)+
+  move.b                STROKEDATA,(a0)+
+  move.b                FILLDATA,(a0)+
+  adda.w                #2,a0
+  dbra                  d5,walkingtriangle_start
+
+  ;lea                   TRIANGLE_2,a0
+  ;move.w                (a0)+,ANGLE
+  ;move.w                (a0)+,XROLLINGOFFSET
+  ;move.w                (a0)+,YROLLINGOFFSET
+  ;move.w                (a0)+,STAGEWALK
+  ;move.l                (a0)+,XROLLINGANGLE
+  ;move.b                (a0)+,STROKEDATA
+  ;move.b                (a0)+,FILLDATA
+  ;bsr.w                 WALKINGTRIANGLE_PROCESS
+  ;lea                   TRIANGLE_2,a0
+  ;move.w                ANGLE,(a0)+
+  ;move.w                XROLLINGOFFSET,(a0)+
+  ;move.w                YROLLINGOFFSET,(a0)+
+  ;move.w                STAGEWALK,(a0)+
+  ;move.l                XROLLINGANGLE,(a0)+
+  ;move.b                STROKEDATA,(a0)+
+  ;move.b                FILLDATA,(a0)+
+  
+  rts
 
 STAGEWALK: ; 0 => X right walk 1 => Climb the screen on the right side
   dc.w                  0
@@ -35,11 +129,12 @@ UPDATE_TRANSLATION MACRO
   ENDM
 
 ; Animation function
-WALKINGTRIANGLE:
+WALKINGTRIANGLE_PROCESS:
+  movem.l               d5/a0,-(sp)
   ;ENABLE_CLIPPING
 
-  STROKE                #1
-  FILL                  #2
+  STROKE                STROKEDATA
+  FILL                  FILLDATA
 
     ; call the appropriate routine according to stage
   move.w                STAGEWALK(PC),d0
@@ -95,8 +190,8 @@ walkingtriangle_no_vertical_climbing:
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
 
-  bsr.w                 DRAWCANVAS
-  
+  ;bsr.w                 DRAWCANVAS
+  movem.l               (sp)+,d5/a0
   rts
 
 ; ---- START IMPLEMENTATION OF Y CLIMBING ------------------
@@ -128,7 +223,7 @@ walkingtriangle_no_horizontal_climbing:
 
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
-
+  movem.l               (sp)+,d5/a0
   rts
 
 ; ---- START IMPLEMENTATION OF X REVERSE CLIMBING ------------------
@@ -162,7 +257,7 @@ walkingtriangle_no_vertical_descending:
 
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
-  
+  movem.l               (sp)+,d5/a0
   rts
 
 ; ---- START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
@@ -196,6 +291,7 @@ walkingtriangle_no_vertical_left_descending:
 
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
+  movem.l               (sp)+,d5/a0
   rts
 
   ; ---- START IMPLEMENTATION OF X WALKING TO RIGHT ------------------
@@ -227,6 +323,7 @@ walkingtriangle_no_vertical_climbing_2:
 
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
+  movem.l               (sp)+,d5/a0
   rts
 
 DRAWCANVAS:
