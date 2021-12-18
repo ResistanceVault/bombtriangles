@@ -85,24 +85,6 @@ walkingtriangle_gotonext:
   move.b                FILLDATA,(a0)+
   adda.w                #2,a0
   dbra                  d5,walkingtriangle_start
-
-  ;lea                   TRIANGLE_2,a0
-  ;move.w                (a0)+,ANGLE
-  ;move.w                (a0)+,XROLLINGOFFSET
-  ;move.w                (a0)+,YROLLINGOFFSET
-  ;move.w                (a0)+,STAGEWALK
-  ;move.l                (a0)+,XROLLINGANGLE
-  ;move.b                (a0)+,STROKEDATA
-  ;move.b                (a0)+,FILLDATA
-  ;bsr.w                 WALKINGTRIANGLE_PROCESS
-  ;lea                   TRIANGLE_2,a0
-  ;move.w                ANGLE,(a0)+
-  ;move.w                XROLLINGOFFSET,(a0)+
-  ;move.w                YROLLINGOFFSET,(a0)+
-  ;move.w                STAGEWALK,(a0)+
-  ;move.l                XROLLINGANGLE,(a0)+
-  ;move.b                STROKEDATA,(a0)+
-  ;move.b                FILLDATA,(a0)+
   
   rts
 
@@ -234,20 +216,22 @@ walkingtriangle_xwalk_rev:
   move.w                #STARTWALKYPOS,d1
   sub.w                 YROLLINGOFFSET,d1
   jsr                   LOADIDENTITYANDTRANSLATE
+  NEXT_WALKING_ANGLE    ANGLE
   ROTATE                ANGLE
 
-  bsr.w                 decrease_angle_by_1
+  ;bsr.w                 decrease_angle_by_1
 
-  UPDATE_TRANSLATION    #240,XROLLINGOFFSET,#30
+  UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
 
   ; If got N revolutions and the angle is >= 360-30 SET the stage to 3 to start vertical descending for next frame
   cmpi.w                #STARTDXCLIMB,XROLLINGOFFSET
   bne.s                 walkingtriangle_no_vertical_descending
-  cmpi.w                #331,ANGLE
+  cmpi.w                #325,ANGLE
   bne.s                 walkingtriangle_no_vertical_descending
   move.w                #3,STAGEWALK
   sub.w                 #30,YROLLINGOFFSET
   move.w                #0,ANGLE
+  ;move.l                #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE
 walkingtriangle_no_vertical_descending:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
@@ -300,11 +284,12 @@ walkingtriangle_xwalk_right:
   add.w                 XROLLINGOFFSET,d0
   move.w                #STARTWALKYPOS,d1
   jsr                   LOADIDENTITYANDTRANSLATE
+  NEXT_WALKING_ANGLE    ANGLE
   ROTATE                ANGLE
 
-  bsr.w                 decrease_angle_by_1
+  ;bsr.w                 decrease_angle_by_1
 
-  UPDATE_TRANSLATION    #240,XROLLINGOFFSET,#30
+  UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
 
   ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
   cmpi.w                #STARTDXCLIMB,XROLLINGOFFSET
