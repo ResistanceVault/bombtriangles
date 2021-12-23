@@ -2,12 +2,55 @@ SET2BITPLANES MACRO
             move.w           #%0010001000000000,BPLCON0POINTER
             ENDM
 
+LADDER_RIGHT_MOVE:
+            dc.w             0
+ANGLESTEP:
+  dc.w 180
+drawtopstep:
+            RESETMATRIX
+            move.w           #286,d0
+            move.w           #42,d1
+            jsr              TRANSLATE
+            
+            ROTATE ANGLE
+            sub.w #1,ANGLESTEP
+            bpl.s drawtopstep_noreset
+            move.w #0,ANGLESTEP
+drawtopstep_noreset:
+            moveq           #-22,d0
+            moveq           #0,d1
+            moveq           #15,d5
+            moveq           #2,d6
+
+            STROKE #1
+
+            jsr            RECT
+            moveq #0,d0
+            moveq #0,d1
+            jsr POINT
+
+            ;moveq #-6,d0
+            ;moveq #0,d1
+            ;jsr POINT
+
+            ;moveq #6,d0
+            ;moveq #0,d1
+            ;jsr POINT
+            rts
+
 ammxmainloop3:
             movem.l          d0-d7/a0-a6,-(sp)    
   
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
+
+            ; move ladders
+            tst.w            LADDER_RIGHT_MOVE
+            beq.s            dontmoveladders
+            bsr.w            moveladders
+dontmoveladders
+            bsr.w            drawtopstep
 
             move.w           MUSICCOUNTER,d1
             cmpi.w           #64,d1
@@ -35,7 +78,7 @@ musicnoreset:
             nop
             ENDC
 musicaddcounter:
-            add.w            #1,MUSICCOUNTER
+            ;add.w            #1,MUSICCOUNTER comment to stay of the first effect
 
 
             lea              DRAWFUNCTARRAY_START(PC),a0
@@ -55,6 +98,30 @@ drawfunctcounternoreset:
                    
             movem.l          (sp)+,d0-d7/a0-a6
             move.l           SCREEN_PTR_0,d0
+
+            rts
+
+RIGHTLADDERCOUNTER:
+            dc.w             LADDERSPACING
+moveladders:
+            tst.w            RIGHTLADDERCOUNTER
+            bne.s            proceedmoving
+            rts
+proceedmoving;
+            sub.w            #1,RIGHTLADDERCOUNTER
+            sub.b            #1,LADDER_1_VSTART0
+            sub.b            #1,LADDER_1_VSTOP0
+            sub.b            #1,LADDER_1_VSTART1
+            sub.b            #1,LADDER_1_VSTOP1
+            sub.b            #1,LADDER_1_VSTART2
+            sub.b            #1,LADDER_1_VSTOP2
+       
+            add.b            #1,LADDER_2_VSTART0
+            add.b            #1,LADDER_2_VSTOP0
+            add.b            #1,LADDER_2_VSTART1
+            add.b            #1,LADDER_2_VSTOP1
+            add.b            #1,LADDER_2_VSTART2
+            add.b            #1,LADDER_2_VSTOP2
 
             rts
 
@@ -91,7 +158,7 @@ CLEAR_BPL_2_OTH:
             WAITBLITTER
             move.w           #$0100,$dff040
             move.w           #$0000,$dff042        
-            move.l           SCREEN_PTR_OTHER_1,$dff054                                                                   ; copy to d channel
+            move.l           SCREEN_PTR_OTHER_1,$dff054                                                             ; copy to d channel
             move.w           #$0000,$dff066                                                                         ;D mod
             move.w           #$4014,$dff058
             rts

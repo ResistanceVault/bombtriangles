@@ -2,7 +2,7 @@
 STARTWALKXPOS EQU 30                                                   ; Start triangle position X (signed value)
 STARTWALKYPOS EQU 128+30                                               ; Start triangle position Y (signed value)
 
-STARTDXCLIMB  EQU 300-30                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
+STARTDXCLIMB  EQU 300-60                                               ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB  EQU 150
 
 TIMEDELAY     EQU 360
@@ -60,7 +60,7 @@ TRIANGLE_4:
 WALKINGTRIANGLE:
   ; For each triangle
   lea                   TRIANGLES(PC),a0
-  moveq                 #4-1,d5
+  moveq                 #1-1,d5
 walkingtriangle_start:
   move.w                0(a0),ANGLE
   move.w                2(a0),XROLLINGOFFSET
@@ -128,6 +128,8 @@ WALKINGTRIANGLE_PROCESS:
   beq.w                 walkingtriangle_ywalk_desending
   cmpi.w                #4,d0
   beq.w                 walkingtriangle_xwalk_right
+  cmpi.w                #$FFFF,d0
+  beq.w                 walkingtriangle_sleep
 
   ; START OF FIRST HORIZONTAL WALKING
   ; Calculate the origin point which is the lower right vertex of the triangle
@@ -183,9 +185,14 @@ walkingtriangle_ywalk:
   move.w                #STARTWALKYPOS,d1
   sub.w                 YROLLINGOFFSET,d1
   jsr                   LOADIDENTITYANDTRANSLATE
-  ROTATE                ANGLE
+  ;ROTATE                ANGLE
 
-  bsr.w                 decrease_angle_by_1
+  ;bsr.w                 decrease_angle_by_1
+  ;tst.w LADDER_RIGHT_MOVE ; did i previously send the command to the ladder to move?
+  ;bne.s dontstartmovingladder
+  ; no
+  move.w #1,LADDER_RIGHT_MOVE
+  ;move.w                #$FFFF,STAGEWALK
 
   UPDATE_TRANSLATION    #240,YROLLINGOFFSET,#30
 
@@ -308,6 +315,10 @@ walkingtriangle_no_vertical_climbing_2:
 
   lea                   OFFBITPLANEMEM,a4
   jsr                   TRIANGLE_BLIT
+  movem.l               (sp)+,d5/a0
+  rts
+
+walkingtriangle_sleep:
   movem.l               (sp)+,d5/a0
   rts
 

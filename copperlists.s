@@ -8,7 +8,7 @@ COPPERLIST:
 
 	; Facciamo puntare gli sprite a ZERO, per eliminarli, o ce li troviamo
 	; in giro impazziti a disturbare!!!
-
+SpritePointers:
   dc.w       $120,$0000,$122,$0000,$124,$0000,$126,$0000,$128,$0000
   dc.w       $12a,$0000,$12c,$0000,$12e,$0000,$130,$0000,$132,$0000
   dc.w       $134,$0000,$136,$0000,$138,$0000,$13a,$0000,$13c,$0000
@@ -24,8 +24,8 @@ COPPERLIST:
   dc.w       $10a,0                                                    ; Bpl2Mod
 
   ; sprite fix
-  dc.w $144,0
-  dc.w $146,0
+  ;dc.w $144,0
+  ;dc.w $146,0
 
 ; Il BPLCON0 per uno schermo a 3 bitplanes: (8 colori)
 
