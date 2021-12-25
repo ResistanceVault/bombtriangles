@@ -6,12 +6,10 @@ LADDER_RIGHT_MOVE:
             dc.w             0
 ANGLESTEP:
             dc.w             0
-ANGLESTEP2:
-            dc.w             0
 drawtopstep:
             RESETMATRIX
             move.w           #286,d0
-            move.w           #27,d1
+            move.w           #26,d1
             jsr              TRANSLATE
             
             ROTATE           ANGLESTEP
@@ -38,14 +36,6 @@ drawtopstep:
             bne.s            drawtopstep_noreset
             move.w           #356,ANGLESTEP
 drawtopstep_noreset:
-            
-            
-
-            add.w            #4,ANGLESTEP2
-            cmpi.w           #184,ANGLESTEP2
-            bne.s            donotresetanglestep2
-            move.w           #0,ANGLESTEP2
-donotresetanglestep2:
 
             ;moveq            #0,d0
             ;moveq            #0,d1
@@ -67,6 +57,13 @@ donotresetanglestep2:
 
             jsr              RECT
 
+            MOVE.L           #LADDER_1_REAL_START,d0		
+            LEA              SpritePointers,a1                                                                      ; SpritePointers is in copperlist
+            move.w           d0,6(a1)
+            swap             d0
+            move.w           d0,2(a1)
+            move.l           #$00000000,LADDER_NO_VSTART2
+
             rts
 
 ammxmainloop3:
@@ -75,6 +72,24 @@ ammxmainloop3:
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
+
+            ; just for reference
+            RESETMATRIX
+            move.w           #286,d0
+            move.w           #26,d1
+            jsr              TRANSLATE
+            
+            ROTATE           ANGLESTEP
+            
+            moveq            #-22,d0
+            moveq            #0,d1
+            moveq            #15,d5
+            moveq            #2,d6
+
+            STROKE           #1
+
+            ;jsr              RECT
+            ; end of reference
 
             ; move ladders
             tst.w            LADDER_RIGHT_MOVE

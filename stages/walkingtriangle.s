@@ -192,16 +192,20 @@ walkingtriangle_ywalk:
   ;bne.s dontstartmovingladder
   ; no
   move.w #1,LADDER_RIGHT_MOVE
+  add.w #1,YROLLINGOFFSET
+  
   ;move.w                #$FFFF,STAGEWALK
 
-  UPDATE_TRANSLATION    #240,YROLLINGOFFSET,#30
+  ;UPDATE_TRANSLATION    #240,YROLLINGOFFSET,#30
 
   cmpi.w                #STARTDYCLIMB,YROLLINGOFFSET
+  ;cmpi.w #60,YROLLINGOFFSET
   bne.s                 walkingtriangle_no_horizontal_climbing
-  cmpi.w                #330,ANGLE
-  bne.s                 walkingtriangle_no_horizontal_climbing
+  ;cmpi.w                #330,ANGLE
+  ;bne.s                 walkingtriangle_no_horizontal_climbing
   move.w                #30,XROLLINGOFFSET                             ; next stage must start with this value to 30
   move.w                #0,ANGLE                                       ; next stage must start with this value to zero
+  move.w #0,LADDER_RIGHT_MOVE
   move.w                #2,STAGEWALK
 walkingtriangle_no_horizontal_climbing:
 
