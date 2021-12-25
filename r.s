@@ -325,7 +325,7 @@ Module1:
   incbin         "P61.chippy_nr.399"                                            ; usecode $945A
   even
 
-LADDERSPACING equ 40
+LADDERSPACING equ 45
 LADDERHEIGHT equ 3
 LADDERVERTICALPOSITION equ 208
 LADDERHORIZONTALPOSITION equ $C4
@@ -381,7 +381,7 @@ LADDER_2_VSTART1:
 LADDER_2_HSTART1:
   dc.b           LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
 LADDER_2_VSTOP1:
-  dc.b           LADDERVERTICALPOSITION-LADDERSPACING*2,$00
+  dc.b           LADDERVERTICALPOSITION-LADDERSPACING*2,$01
   dc.w           $FFFF,$FFFF                                                    ; line 1
   dc.w           $FFFF,$FFFF                                                    ; line 2
   dc.w           $FFFF,$FFFF                                                    ; line 3
@@ -391,7 +391,7 @@ LADDER_2_VSTART2:
 LADDER_2_HSTART2:
   dc.b           LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
 LADDER_2_VSTOP2:
-  dc.b           LADDERVERTICALPOSITION-LADDERSPACING*1,$00
+  dc.b           LADDERVERTICALPOSITION-LADDERSPACING*1,$01
   dc.w           $FFFF,$FFFF                                                    ; line 1
   dc.w           $FFFF,$FFFF                                                    ; line 2
   dc.w           $FFFF,$FFFF                                                    ; line 3

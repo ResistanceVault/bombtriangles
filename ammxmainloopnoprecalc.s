@@ -5,37 +5,68 @@ SET2BITPLANES MACRO
 LADDER_RIGHT_MOVE:
             dc.w             0
 ANGLESTEP:
-  dc.w 180
+            dc.w             0
+ANGLESTEP2:
+            dc.w             0
 drawtopstep:
             RESETMATRIX
             move.w           #286,d0
-            move.w           #42,d1
+            move.w           #27,d1
             jsr              TRANSLATE
             
-            ROTATE ANGLE
-            sub.w #1,ANGLESTEP
-            bpl.s drawtopstep_noreset
-            move.w #0,ANGLESTEP
+            ROTATE           ANGLESTEP
+            
+            moveq            #-22,d0
+            moveq            #0,d1
+            moveq            #15,d5
+            moveq            #2,d6
+
+            STROKE           #1
+
+            jsr              RECT
+
+            RESETMATRIX
+
+            move.w           #286,d0
+            move.w           #162,d1
+            jsr              TRANSLATE
+            ROTATE           ANGLESTEP
+
+
+            sub.w            #4,ANGLESTEP
+            cmp.w            #0-4,ANGLESTEP
+            bne.s            drawtopstep_noreset
+            move.w           #356,ANGLESTEP
 drawtopstep_noreset:
-            moveq           #-22,d0
-            moveq           #0,d1
-            moveq           #15,d5
-            moveq           #2,d6
+            
+            
 
-            STROKE #1
+            add.w            #4,ANGLESTEP2
+            cmpi.w           #184,ANGLESTEP2
+            bne.s            donotresetanglestep2
+            move.w           #0,ANGLESTEP2
+donotresetanglestep2:
 
-            jsr            RECT
-            moveq #0,d0
-            moveq #0,d1
-            jsr POINT
+            ;moveq            #0,d0
+            ;moveq            #0,d1
+            ;jsr              POINT
 
-            ;moveq #-6,d0
-            ;moveq #0,d1
-            ;jsr POINT
+            ;moveq            #-6,d0
+            ;moveq            #0,d1
+            ;jsr              POINT
 
-            ;moveq #6,d0
-            ;moveq #0,d1
-            ;jsr POINT
+            ;moveq            #6,d0
+            ;moveq            #0,d1
+            ;jsr              POINT
+            moveq            #7,d0
+            moveq            #-1,d1
+            moveq            #15,d5
+            moveq            #2,d6
+
+            STROKE           #1
+
+            jsr              RECT
+
             rts
 
 ammxmainloop3:
@@ -49,9 +80,8 @@ ammxmainloop3:
             tst.w            LADDER_RIGHT_MOVE
             beq.s            dontmoveladders
             bsr.w            moveladders
-dontmoveladders
             bsr.w            drawtopstep
-
+dontmoveladders
             move.w           MUSICCOUNTER,d1
             cmpi.w           #64,d1
             bne.s            musicnoreset
@@ -106,6 +136,29 @@ RIGHTLADDERCOUNTER:
 moveladders:
             tst.w            RIGHTLADDERCOUNTER
             bne.s            proceedmoving
+
+            ; reset ladder 1
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2,LADDER_1_VSTART0
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*2,LADDER_1_VSTOP0
+
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*1,LADDER_1_VSTART1
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_1_VSTOP1
+
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0,LADDER_1_VSTART2
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*0,LADDER_1_VSTOP2
+
+            ; reset ladder 2
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3,LADDER_2_VSTART0
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*3,LADDER_2_VSTOP0
+
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2,LADDER_2_VSTART1
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*2,LADDER_2_VSTOP1
+
+            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*1,LADDER_2_VSTART2
+            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_2_VSTOP2
+
+            move.w           #LADDERSPACING,RIGHTLADDERCOUNTER
+            move.w           #356,ANGLESTEP
             rts
 proceedmoving;
             sub.w            #1,RIGHTLADDERCOUNTER
