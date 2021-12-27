@@ -315,8 +315,22 @@ scrollcolors:
 
   include             "copperlists.s"
 
+  MACRO PRINT_CELING_ROW
+  dcb.b               11*1,$00
+  dcb.b               21*1,$FF
+  dcb.b               8*1,$00
+  ENDM
+
 SCREEN_2
-  dcb.b               40*256,$00
+  dcb.b               40*1,$FF
+  dcb.b               40*50,$00
+
+  ;ceiling start
+  PRINT_CELING_ROW
+  PRINT_CELING_ROW
+  PRINT_CELING_ROW
+  ;ceiling end
+  dcb.b               40*202,$00
 
 SCREEN_3
   dcb.b               40*256,$00
@@ -327,7 +341,7 @@ Module1:
 
 LADDERSPACING            equ 45
 LADDERHEIGHT             equ 3
-LADDERVERTICALPOSITION   equ 208
+LADDERVERTICALPOSITION   equ STARTWALKYPOS+49
 LADDERHORIZONTALPOSITION equ $C4
 LADDERHORIZONTALSPACING  equ 14
 

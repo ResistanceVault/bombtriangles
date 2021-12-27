@@ -7,11 +7,9 @@ LADDER_RIGHT_MOVE:
 ANGLESTEP:
             dc.w             0
 drawtopstep:
-            RESETMATRIX
             move.w           #286,d0
-            move.w           #26,d1
-            jsr              TRANSLATE
-            
+            move.w           #51,d1
+            jsr              LOADIDENTITYANDTRANSLATE
             ROTATE           ANGLESTEP
             
             moveq            #-22,d0
@@ -23,18 +21,16 @@ drawtopstep:
 
             jsr              RECT
 
-            RESETMATRIX
-
+            ; Second step starts here
             move.w           #286,d0
-            move.w           #162,d1
-            jsr              TRANSLATE
+            move.w           #187,d1
+            jsr              LOADIDENTITYANDTRANSLATE
             ROTATE           ANGLESTEP
 
-
-            sub.w            #4,ANGLESTEP
-            cmp.w            #0-4,ANGLESTEP
+            sub.w            #2,ANGLESTEP
+            cmp.w            #0-2,ANGLESTEP
             bne.s            drawtopstep_noreset
-            move.w           #356,ANGLESTEP
+            move.w           #358,ANGLESTEP
 drawtopstep_noreset:
 
             ;moveq            #0,d0
@@ -52,8 +48,6 @@ drawtopstep_noreset:
             moveq            #-1,d1
             moveq            #15,d5
             moveq            #2,d6
-
-            STROKE           #1
 
             jsr              RECT
 
@@ -147,8 +141,10 @@ drawfunctcounternoreset:
             rts
 
 RIGHTLADDERCOUNTER:
-            dc.w             LADDERSPACING
+            dc.w             LADDERSPACING-1
 moveladders:
+            cmpi.w #2,LADDER_RIGHT_MOVE
+            beq.w moveladders_end
             tst.w            RIGHTLADDERCOUNTER
             bne.s            proceedmoving
 
@@ -172,8 +168,8 @@ moveladders:
             move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*1,LADDER_2_VSTART2
             move.b           #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_2_VSTOP2
 
-            move.w           #LADDERSPACING,RIGHTLADDERCOUNTER
-            move.w           #356,ANGLESTEP
+            move.w           #LADDERSPACING-1,RIGHTLADDERCOUNTER
+            move.w           #358,ANGLESTEP
             rts
 proceedmoving;
             sub.w            #1,RIGHTLADDERCOUNTER
@@ -190,7 +186,7 @@ proceedmoving;
             add.b            #1,LADDER_2_VSTOP1
             add.b            #1,LADDER_2_VSTART2
             add.b            #1,LADDER_2_VSTOP2
-
+moveladders_end:
             rts
 
 CLEARFUNCTION:

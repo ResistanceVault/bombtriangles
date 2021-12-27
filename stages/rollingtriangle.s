@@ -1,8 +1,7 @@
 NUMROLLS equ 16
 
 ; Variables
-XROLLINGOFFSET:
-  dc.w                0
+
 
 XROLLINGANGLE:
   dc.l                ROTATIONS_ANGLES_64_180-2
