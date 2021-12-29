@@ -26,6 +26,7 @@ YPOSITIONVECTOR_OFFSET EQU 18
 VELOCITYVECTOR_OFFSET  EQU 20
 XVELOCITYVECTOR_OFFSET EQU 20
 YVELOCITYVECTOR_OFFSET EQU 22
+TRIANGLE_END_OFFSET    EQU 24
 
 ; VARIABLES
 ACCELLERATIONVECTOR:
@@ -136,21 +137,22 @@ UPDATE_TRANSLATION2  MACRO
 WALKINGTRIANGLE:
   ; For each triangle
   lea                    TRIANGLES(PC),a3
-  moveq                  #1-1,d5
+  moveq                  #4-1,d5
 walkingtriangle_start:
   tst.w                  SLEEP_OFFSET(a3)
   beq.s                  walkingtriangle_nodelay
-  sub.w                  #1,14(a3)
+  sub.w                  #1,SLEEP_OFFSET(a3)
   bra.s                  walkingtriangle_gotonext
 walkingtriangle_nodelay
   bsr.w                  WALKINGTRIANGLE_PROCESS
 walkingtriangle_gotonext:
+  adda.l #24,a3
   dbra                   d5,walkingtriangle_start
   rts
 
 ; Animation function
 WALKINGTRIANGLE_PROCESS:
-  movem.l                d5/a0,-(sp)
+  movem.l                d5/a3,-(sp)
 
   STROKE                 STROKE_OFFSET(a3)
   FILL                   FILL_OFFSET(a3)
@@ -218,7 +220,7 @@ walkingtriangle_no_vertical_climbing:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
   ; ***************************** END OF FIRST HORIZONTAL WALKING
 
@@ -273,7 +275,7 @@ walkingtriangle_no_horizontal_climbing:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
 
@@ -320,7 +322,7 @@ walkingtriangle_no_vertical_descending:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
 
 ; ***************************** END IMPLEMENTATION OF X REVERSE ------------------
@@ -332,14 +334,14 @@ walkingtriangle_ywalk_desending:
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   asr.w                   #6,d0
   asr.w                   #6,d1
+  sub.w #13,d0
+  sub.w #15,d1
       ; when hitting bottom border stop
-  cmpi.w #150,d1
+  cmpi.w #200,d1
   ble.s notdownborder
   move.w                 #4,STAGEWALK_OFFSET(a3)
 notdownborder;
   jsr                    LOADIDENTITYANDTRANSLATE
-
-
 
   ; Add 1 to angle
   add.w                  #2,ANGLE_OFFSET(a3)
@@ -369,14 +371,13 @@ notdownborder;
   move.w                 #4,STAGEWALK_OFFSET(a3)
 notleftborder;
 
-
   ; Draw triangle
-  VERTEX2D_INIT          1,#0,#0
-  VERTEX2D_INIT          2,#0,#-30
-  VERTEX2D_INIT          3,#-26,#-15
+  VERTEX2D_INIT          1,#13,#15
+  VERTEX2D_INIT          2,#13,#-15
+  VERTEX2D_INIT          3,#-13,#0
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
 
 
@@ -414,7 +415,7 @@ notleftborder;
 
   ; ---- START IMPLEMENTATION OF X WALKING TO RIGHT ------------------
 walkingtriangle_xwalk_right:
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
   ;moveq                  #STARTWALKXPOS,d0
   ;add.w                  XROLLINGOFFSET,d0
@@ -444,11 +445,11 @@ walkingtriangle_xwalk_right:
 
   ;lea                    OFFBITPLANEMEM,a4
   ;jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
 
 walkingtriangle_sleep:
-  movem.l                (sp)+,d5/a0
+  movem.l                (sp)+,d5/a3
   rts
 
 
