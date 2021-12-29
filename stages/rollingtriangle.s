@@ -9,7 +9,8 @@ XROLLINGANGLE:
 XDIFF:
   dc.w                0
 
-
+XROLLINGOFFSET:
+                    dc.w                  0
 
 ; Animation function
 ROLLINGTRIANGLE:
