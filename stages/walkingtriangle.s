@@ -1,7 +1,6 @@
 ;includes
     include              "AProcessing2/libs/vectors/operations.s"
 
-
 ; DEFINES
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
 STARTWALKYPOS          EQU 184                                                         ; Start triangle position Y (signed value)
@@ -24,10 +23,13 @@ SLEEP_OFFSET           EQU 14
 POSITIONVECTOR_OFFSET  EQU 16
 XPOSITIONVECTOR_OFFSET EQU 16
 YPOSITIONVECTOR_OFFSET EQU 18
+VELOCITYVECTOR_OFFSET  EQU 20
+XVELOCITYVECTOR_OFFSET EQU 20
+YVELOCITYVECTOR_OFFSET EQU 22
 
 ; VARIABLES
-VELOCITYVECTOR:
-  dc.l                   $FFFF0001
+ACCELLERATIONVECTOR:
+  dc.l                   $00000001
 
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 TRIANGLES:
@@ -37,11 +39,13 @@ TRIANGLE_1:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   0                                                             ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   1                                                             ; STROKE
+  dc.b                   2                                                             ; STROKE
   dc.b                   2                                                             ; FILL
   dc.w                   TIMEDELAY*0                                                   ; SLEEP
-  dc.w                   STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET              ; POSITIONVECTOR X
-  dc.w                   STARTWALKYPOS+15-STARTDYCLIMB                                 ; POSITIONVECTOR Y
+  dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
+  dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
+  dc.w                   0                                                             ; VELOCITYVECTOR X
+  dc.w                   0                                                             ; VELOCITYVECTOR Y
 TRIANGLE_2:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -51,7 +55,10 @@ TRIANGLE_2:
   dc.b                   2                                                             ; STROKE
   dc.b                   1                                                             ; FILL
   dc.w                   TIMEDELAY*1                                                   ; SLEEP
-  dc.l                   0                                                             ; POSITIONVECTOR
+  dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
+  dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
+  dc.w                   0                                                             ; VELOCITYVECTOR X
+  dc.w                   0                                                             ; VELOCITYVECTOR Y
 TRIANGLE_3:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -61,7 +68,10 @@ TRIANGLE_3:
   dc.b                   3                                                             ; STROKE
   dc.b                   1                                                             ; FILL
   dc.w                   TIMEDELAY*2                                                   ; SLEEP
-  dc.l                   0                                                             ; POSITIONVECTOR
+  dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
+  dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
+  dc.w                   0                                                             ; VELOCITYVECTOR X
+  dc.w                   0                                                             ; VELOCITYVECTOR Y
 TRIANGLE_4:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -71,7 +81,10 @@ TRIANGLE_4:
   dc.b                   1                                                             ; STROKE
   dc.b                   3                                                             ; FILL
   dc.w                   TIMEDELAY*3                                                   ; SLEEP
-  dc.l                   0                                                             ; POSITIONVECTOR
+  dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
+  dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
+  dc.w                   0                                                             ; VELOCITYVECTOR X
+  dc.w                   0                                                             ; VELOCITYVECTOR Y
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 
 
@@ -316,8 +329,17 @@ walkingtriangle_no_vertical_descending:
 ; ---- START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 walkingtriangle_ywalk_desending:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
-  move.w YPOSITIONVECTOR_OFFSET(a3),d1
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w                   #6,d0
+  asr.w                   #6,d1
+      ; when hitting bottom border stop
+  cmpi.w #150,d1
+  ble.s notdownborder
+  move.w                 #4,STAGEWALK_OFFSET(a3)
+notdownborder;
   jsr                    LOADIDENTITYANDTRANSLATE
+
+
 
   ; Add 1 to angle
   add.w                  #2,ANGLE_OFFSET(a3)
@@ -327,23 +349,31 @@ walkingtriangle_ywalk_desending:
 .increase_angle_by_1_exit:
 
   ROTATE                 ANGLE_OFFSET(a3)
-  VERTEX2D_INIT          1,#0,#0
-  VERTEX2D_INIT          2,#0,#-30
-  VERTEX2D_INIT          3,#-26,#-15
 
-  ; add velocity to location
-  lea                  VELOCITYVECTOR,a0
+  ; add accelleration to velocity
+  lea ACCELLERATIONVECTOR(PC),a0
   move.l                  a3,a1
-  adda.w #POSITIONVECTOR_OFFSET,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  ; add velocity to position
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.l                  a3,a1
+  adda.w                  #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; when hitting left border stop
-  cmp.w #30,XPOSITIONVECTOR_OFFSET(a3)
+  cmpi.w #30,XPOSITIONVECTOR_OFFSET(a3)
   bne.s notleftborder
   move.w                 #4,STAGEWALK_OFFSET(a3)
 notleftborder;
 
 
+  ; Draw triangle
+  VERTEX2D_INIT          1,#0,#0
+  VERTEX2D_INIT          2,#0,#-30
+  VERTEX2D_INIT          3,#-26,#-15
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
   movem.l                (sp)+,d5/a0
