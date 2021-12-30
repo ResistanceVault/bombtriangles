@@ -315,23 +315,23 @@ scrollcolors:
 
   include             "copperlists.s"
 
-  MACRO PRINT_CELING_ROW
+PRINT_CELING_ROW MACRO
   dcb.b               7*1,$00
   dcb.b               25*1,$FF
   dcb.b               8*1,$00
   ENDM
 
-  MACRO PRINT_LINE
+PRINT_LINE MACRO
   dcb.b               40*\1,\2     ; 1
   ENDM
 
-  MACRO PRINT_LEFT_LINE
+PRINT_LEFT_LINE MACRO
   dc.w 0
   dc.l $FFFFFFFF
   dcb.b 34,$00
   ENDM
 
-  MACRO PRINT_RIGHT_LINE
+PRINT_RIGHT_LINE MACRO
   dc.l 0
   dc.l 0
   dcb.b 20,$FF

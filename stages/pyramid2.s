@@ -1,19 +1,19 @@
 PYRAMID_VERTEX_TOP EQU 30
 
 ANGLE_PYR:
-  dc.w             181
+               dc.w             181
 
 PYRAMID_VERTEX_1:
-  dc.l             0
+               dc.l             0
 PYRAMID_VERTEX_2:
-  dc.l             0
+               dc.l             0
 PYRAMID_VERTEX_3:
-  dc.l             0
+               dc.l             0
 PYRAMID_VERTEX_4:
-  dc.l             0
+               dc.l             0
 
-PYRCOLOR0 : dc.b 1
-PYRCOLOR1 : dc.b 2
+PYRCOLOR0:     dc.b             1
+PYRCOLOR1:     dc.b             2
 
 OFFBITPLANEMEM:
                dcb.b            40*256,$00
@@ -82,25 +82,25 @@ PYRAMID2_END:
                rts
 
 PYRAMID_CLEAR:
-  move.w           #181,ANGLE_PYR
-  move.l           #CLEAR,CLEARFUNCTION
-  rts
+               move.w           #181,ANGLE_PYR
+               move.l           #CLEAR,CLEARFUNCTION
+               rts
 
 update_pyr_angle:
     ; increase angle by one
-  add.w            #1,ANGLE_PYR
-  cmpi.w           #270,ANGLE_PYR
-  bcs.s            increase_angle_by_1_exit_pyr
-  move.w           #181,ANGLE_PYR
-  move.b PYRCOLOR0,d0
-  move.b PYRCOLOR1,PYRCOLOR0
-  move.b d0,PYRCOLOR1
+               add.w            #1,ANGLE_PYR
+               cmpi.w           #270,ANGLE_PYR
+               bcs.s            increase_angle_by_1_exit_pyr
+               move.w           #181,ANGLE_PYR
+               move.b           PYRCOLOR0,d0
+               move.b           PYRCOLOR1,PYRCOLOR0
+               move.b           d0,PYRCOLOR1
 
 increase_angle_by_1_exit_pyr:
   
-  IFD              DEBUGCOLORS
-  move.w           #$0AAA,$dff180
-  ENDC
+               IFD              DEBUGCOLORS
+               move.w           #$0AAA,$dff180
+               ENDC
 
-  movem.l          (sp)+,d0-d2/a0-a1
-  rts
+               movem.l          (sp)+,d0-d2/a0-a1
+               rts
