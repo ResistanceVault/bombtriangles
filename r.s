@@ -316,21 +316,49 @@ scrollcolors:
   include             "copperlists.s"
 
   MACRO PRINT_CELING_ROW
-  dcb.b               11*1,$00
-  dcb.b               21*1,$FF
+  dcb.b               7*1,$00
+  dcb.b               25*1,$FF
   dcb.b               8*1,$00
   ENDM
 
+  MACRO PRINT_LINE
+  dcb.b               40*\1,\2     ; 1
+  ENDM
+
+  MACRO PRINT_LEFT_LINE
+  dc.w 0
+  dc.l $FFFFFFFF
+  dcb.b 34,$00
+  ENDM
+
+  MACRO PRINT_RIGHT_LINE
+  dc.l 0
+  dc.l 0
+  dcb.b 20,$FF
+  dc.l 0
+  dc.l 0
+  dc.l 0
+  ENDM
+
 SCREEN_2
-  dcb.b               40*1,$FF
-  dcb.b               40*50,$00
+  PRINT_LINE 1,$FF     ; 1
+  PRINT_LINE 50,$00    ; 51
 
   ;ceiling start
-  PRINT_CELING_ROW
-  PRINT_CELING_ROW
-  PRINT_CELING_ROW
+  PRINT_CELING_ROW ; 52
+  PRINT_CELING_ROW ; 53
+  PRINT_CELING_ROW ; 54
   ;ceiling end
-  dcb.b               40*202,$00
+  PRINT_LINE 45,$00   ; 99
+  PRINT_RIGHT_LINE    ; 106
+  PRINT_RIGHT_LINE ; 107
+  PRINT_RIGHT_LINE ; 108
+  PRINT_LINE 3,$00    ; 105
+  PRINT_LEFT_LINE     ; 102
+  PRINT_LEFT_LINE
+  PRINT_LEFT_LINE
+  PRINT_LINE 157,$00    ; 163
+
 
 SCREEN_3
   dcb.b               40*256,$00

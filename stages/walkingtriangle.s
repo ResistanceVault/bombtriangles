@@ -2,14 +2,16 @@
     include              "AProcessing2/libs/vectors/operations.s"
 
 ; DEFINES
+NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
 STARTWALKYPOS          EQU 184                                                         ; Start triangle position Y (signed value)
 
 STARTDXCLIMB           EQU 300-60                                                      ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB           EQU 150
 STARTDYCLIMBX2         EQU STARTDYCLIMB*2
-TIMEDELAY              EQU 360                                                         ; Number of frames before the triangle is rendered
-STARTDXDESCEND_OFFSET  EQU 180
+TIMEDELAY              EQU 720                                                         ; Number of frames before the triangle is rendered
+STARTDXDESCEND_OFFSET  EQU 210                                                         ; Offset where the triangles are expected to fall after xreverse walking (must be miltiple of 30)
+SECOND_FLOOR_Y         EQU 90                                                          ; Y coordinate of the second floor
 
 ; DEFINITION OF THE TRIANGLE STRUCTURE
 ANGLE_OFFSET           EQU 0
@@ -137,7 +139,7 @@ UPDATE_TRANSLATION2  MACRO
 WALKINGTRIANGLE:
   ; For each triangle
   lea                    TRIANGLES(PC),a3
-  moveq                  #4-1,d5
+  moveq                  #NUMTRIANGLES-1,d5
 walkingtriangle_start:
   tst.w                  SLEEP_OFFSET(a3)
   beq.s                  walkingtriangle_nodelay
@@ -169,6 +171,8 @@ WALKINGTRIANGLE_PROCESS:
   beq.w                  walkingtriangle_ywalk_desending
   cmpi.w                 #4,d0
   beq.w                  walkingtriangle_xwalk_right
+  cmpi.w                 #5,d0
+  beq.w                  walkingtriangle_xwalk_right_2
   cmpi.w                 #$FFFF,d0
   beq.w                  walkingtriangle_sleep
 
@@ -328,22 +332,30 @@ walkingtriangle_no_vertical_descending:
 ; ***************************** END IMPLEMENTATION OF X REVERSE ------------------
 
 
-; ---- START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
+; ***************************** START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 walkingtriangle_ywalk_desending:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   asr.w                   #6,d0
   asr.w                   #6,d1
-  sub.w #13,d0
-  sub.w #15,d1
-      ; when hitting bottom border stop
-  cmpi.w #200,d1
-  ble.s notdownborder
-  move.w                 #4,STAGEWALK_OFFSET(a3)
-notdownborder;
+  sub.w                   #13,d0
+  sub.w                   #15,d1
+
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ; Add 1 to angle
+  ; when hitting bottom border stop
+  cmpi.w #SECOND_FLOOR_Y,d1
+  ble.s notdownborder
+  move.w                 #4,STAGEWALK_OFFSET(a3)
+  ; new velocity
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.w #1*32,d0
+  move.w #-1*64,d1
+  CREATE2DVECTOR a0
+notdownborder;
+
+  ; Add 2 to angle
   add.w                  #2,ANGLE_OFFSET(a3)
   cmpi.w                 #360,ANGLE_OFFSET(a3)
   bcs.s                  .increase_angle_by_1_exit
@@ -379,74 +391,103 @@ notleftborder;
   jsr                    TRIANGLE_BLIT
   movem.l                (sp)+,d5/a3
   rts
+; ***************************** END IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 
 
-  ;moveq                  #STARTWALKXPOS,d0
-  ;add.w                  #STARTDXCLIMB,d0
-  ;sub.w                  XROLLINGOFFSET,d0
-  ;move.w                 #STARTWALKYPOS,d1
-  ;sub.w                  YROLLINGOFFSET,d1
-  ;jsr                    LOADIDENTITYANDTRANSLATE
-  ;ROTATE                 ANGLE
-
-  ;bsr.w                  decrease_angle_by_1
-
-  ;UPDATE_TRANSLATION     #240,YROLLINGOFFSET,#-30
-
-  ; If got N revolutions and the angle is >= 360-30 SET the stage to 0 to start horizontal for next frame
-  ;cmpi.w                 #0,YROLLINGOFFSET
-  ;bne.s                  walkingtriangle_no_vertical_left_descending
-  ;cmpi.w                 #330,ANGLE
-  ;bne.s                  walkingtriangle_no_vertical_left_descending
-  ;move.w                 #4,STAGEWALK
-  ;move.w                 #30,XROLLINGOFFSET
-  ;move.w                 #0,ANGLE
-;walkingtriangle_no_vertical_left_descending:
-
-  ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-;  VERTEX2D_INIT          1,#0,#0
-;  VERTEX2D_INIT          2,#0,#-30
-;  VERTEX2D_INIT          3,#26,#-15
-
-;  lea                    OFFBITPLANEMEM,a4
-;  jsr                    TRIANGLE_BLIT
-;  movem.l                (sp)+,d5/a0
-;  rts
-
-  ; ---- START IMPLEMENTATION OF X WALKING TO RIGHT ------------------
+  ; ***************************** START IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
 walkingtriangle_xwalk_right:
-  movem.l                (sp)+,d5/a3
-  rts
-  ;moveq                  #STARTWALKXPOS,d0
-  ;add.w                  XROLLINGOFFSET,d0
-  ;move.w                 #STARTWALKYPOS,d1
-  ;jsr                    LOADIDENTITYANDTRANSLATE
-  ;NEXT_WALKING_ANGLE     ANGLE
-  ;ROTATE                 ANGLE
-
-  ;bsr.w                 decrease_angle_by_1
-
-  ;UPDATE_TRANSLATION     #241,XROLLINGOFFSET,#30
-
-  ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
-  ;cmpi.w                 #STARTDXCLIMB,XROLLINGOFFSET
-  ;bne.s                  walkingtriangle_no_vertical_climbing_2
-  ;cmpi.w                 #325,ANGLE
-  ;bne.s                  walkingtriangle_no_vertical_climbing_2
-  ;move.w                 #1,STAGEWALK
-  ;move.w                 #30,YROLLINGOFFSET
-  ;move.w                 #359,ANGLE
-;walkingtriangle_no_vertical_climbing_2:
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w                   #6,d0
+  asr.w                   #6,d1
+  sub.w                   #13,d0
+  sub.w                   #15,d1
+  jsr                    LOADIDENTITYANDTRANSLATE
   
-  ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  ;VERTEX2D_INIT          1,#-15,#-26
-  ;VERTEX2D_INIT          2,#-30,#0
-  ;VERTEX2D_INIT          3,#0,#0
+  ; when hitting bottom border stop
+  cmpi.w #SECOND_FLOOR_Y,d1
+  ble.s notdownborder2
+  move.w                 #5,STAGEWALK_OFFSET(a3)
+notdownborder2;
 
-  ;lea                    OFFBITPLANEMEM,a4
-  ;jsr                    TRIANGLE_BLIT
+  ; Sub 3 to angle
+  sub.w                  #3,ANGLE_OFFSET(a3)
+  bpl.s                  .increase_angle_by_1_exit
+  move.w                 #357,ANGLE_OFFSET(a3)
+.increase_angle_by_1_exit:
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  ; add accelleration to velocity
+  lea ACCELLERATIONVECTOR(PC),a0
+  move.l                  a3,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  ; add velocity to position
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.l                  a3,a1
+  adda.w                  #POSITIONVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  ; Draw triangle
+  VERTEX2D_INIT          1,#13,#15
+  VERTEX2D_INIT          2,#13,#-15
+  VERTEX2D_INIT          3,#-13,#0
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
   movem.l                (sp)+,d5/a3
   rts
+  ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
+
+  ; ***************************** START IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
+walkingtriangle_xwalk_right_2:
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w                   #6,d0
+  asr.w                   #6,d1
+  sub.w                   #13,d0
+  sub.w                   #15,d1
+  jsr                    LOADIDENTITYANDTRANSLATE
+  
+  ; when hitting bottom border stop
+  ;cmpi.w #SECOND_FLOOR_Y,d1
+  ;ble.s notdownborder2
+  ;move.w                 #5,STAGEWALK_OFFSET(a3)
+;notdownborder2;
+
+  ; Sub 3 to angle
+  ;sub.w                  #3,ANGLE_OFFSET(a3)
+  ;bpl.s                  .increase_angle_by_1_exit
+  ;move.w                 #357,ANGLE_OFFSET(a3)
+;.increase_angle_by_1_exit:
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  ; add accelleration to velocity
+  ;lea ACCELLERATIONVECTOR(PC),a0
+  ;move.l                  a3,a1
+  ;adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ;ADD2DVECTOR
+
+  ; add velocity to position
+  ;move.l                  a3,a0
+  ;adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  ;move.l                  a3,a1
+  ;adda.w                  #POSITIONVECTOR_OFFSET,a1
+  ;ADD2DVECTOR
+
+  ; Draw triangle
+  VERTEX2D_INIT          1,#13,#15
+  VERTEX2D_INIT          2,#13,#-15
+  VERTEX2D_INIT          3,#-13,#0
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+  movem.l                (sp)+,d5/a3
+  rts
+  ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
+
 
 walkingtriangle_sleep:
   movem.l                (sp)+,d5/a3
