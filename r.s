@@ -450,11 +450,11 @@ LADDER_2_VSTOP2:
   dc.w                $FFFF,$FFFF                                                    ; line 2
   dc.w                $FFFF,$FFFF                                                    ; line 3
 
-  LADDER_NO_VSTART2    :
+  LADDER_NO_VSTART2:
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0
-  LADDER_NO_HSTART2    :
+  LADDER_NO_HSTART2:
   dc.b                LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
-  LADDER_NO_VSTOP2     :
+  LADDER_NO_VSTOP2:
   dc.b                LADDERVERTICALPOSITION-LADDERSPACING*0,$01
   dc.w                $FFFF,$FFFF                                                    ; line 1
   dc.w                $FFFF,$FFFF                                                    ; line 2
