@@ -293,6 +293,7 @@ scrollcolors:
   include             "AProcessing2/libs/rasterizers/globaloptions.s"
   include             "AProcessing2/libs/matrix/matrix.s"
   include             "AProcessing2/libs/matrix/shear.s"
+  include             "AProcessing2/libs/matrix/scale.s"
 
   include             "AProcessing2/libs/rasterizers/3dglobals.i"
   include             "AProcessing2/libs/rasterizers/processingfill.s"
@@ -334,8 +335,19 @@ PRINT_LEFT_LINE MACRO
 PRINT_RIGHT_LINE MACRO
   dc.l 0
   dc.l 0
-  dcb.b 20,$FF
+  dcb.b 19,$FF
+  dc.b 0
   dc.l 0
+  dc.l 0
+  dc.l 0
+  ENDM
+
+PRINT_RIGHT_LINE_1ST_FLOOR MACRO
+  dc.l 0
+  dc.l 0
+  dc.l 0
+  dcb.b 18,$00
+  dc.w $FF00
   dc.l 0
   dc.l 0
   ENDM
@@ -357,7 +369,13 @@ SCREEN_2
   PRINT_LEFT_LINE     ; 102
   PRINT_LEFT_LINE
   PRINT_LEFT_LINE
-  PRINT_LINE 157,$00    ; 163
+  
+  PRINT_LINE 37,$00    
+  PRINT_RIGHT_LINE_1ST_FLOOR 
+  PRINT_RIGHT_LINE_1ST_FLOOR
+  PRINT_RIGHT_LINE_1ST_FLOOR
+  
+  PRINT_LINE 117,$00    ; 163
 
 
 SCREEN_3

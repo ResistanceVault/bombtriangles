@@ -28,7 +28,8 @@ YPOSITIONVECTOR_OFFSET EQU 18
 VELOCITYVECTOR_OFFSET  EQU 20
 XVELOCITYVECTOR_OFFSET EQU 20
 YVELOCITYVECTOR_OFFSET EQU 22
-TRIANGLE_END_OFFSET    EQU 24
+SCALEFACTOR_OFFSET     EQU 24
+TRIANGLE_END_OFFSET    EQU 26
 
 ; VARIABLES
 ACCELLERATIONVECTOR:
@@ -49,6 +50,7 @@ TRIANGLE_1:
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
+  dc.w                   1*64                                                          ; SCALE_FACTOR
 TRIANGLE_2:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -62,6 +64,7 @@ TRIANGLE_2:
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
+  dc.w                   1*64                                                          ; SCALE_FACTOR
 TRIANGLE_3:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -75,6 +78,7 @@ TRIANGLE_3:
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
+  dc.w                   1*64                                                          ; SCALE_FACTOR
 TRIANGLE_4:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -88,6 +92,7 @@ TRIANGLE_4:
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
+  dc.w                   1*64                                                          ; SCALE_FACTOR
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 
 
@@ -148,7 +153,7 @@ walkingtriangle_start:
 walkingtriangle_nodelay
   bsr.w                  WALKINGTRIANGLE_PROCESS
 walkingtriangle_gotonext:
-  adda.l #24,a3
+  adda.l                 #TRIANGLE_END_OFFSET,a3
   dbra                   d5,walkingtriangle_start
   rts
 
@@ -175,6 +180,12 @@ WALKINGTRIANGLE_PROCESS:
   beq.w                  walkingtriangle_xwalk_right_2
   cmpi.w                 #6,d0
   beq.w                  walkingtriangle_reverse_dive
+  cmpi.w                 #7,d0
+  beq.w                  walkingfloor1
+  cmpi.w                 #8,d0
+  beq.w                  teletrasportationstart
+  cmpi.w                 #9,d0
+  beq.w                  teletrasportationend
   cmpi.w                 #$FFFF,d0
   beq.w                  walkingtriangle_sleep
 
@@ -209,7 +220,7 @@ WALKINGTRIANGLE_PROCESS:
   UPDATE_TRANSLATION2    #241,XROLLINGOFFSET_OFFSET(a3),#30
 
 ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
-  move.w                 XROLLINGOFFSET_OFFSET(a3),d0
+  ;move.w                 XROLLINGOFFSET_OFFSET(a3),d0
   cmpi.w                 #STARTDXCLIMB,XROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
   cmpi.w                 #325,ANGLE_OFFSET(a3)
@@ -457,12 +468,12 @@ walkingtriangle_xwalk_right_2:
 
   ROTATE                 ANGLE_OFFSET(a3)
 
-   ; Sub 1 to angle
+  ; Sub 1 to angle
   sub.w                  #1,ANGLE_OFFSET(a3)
   bpl.s                  .decrease_angle_by_1_noreset ; if we go negative reset to 359 degrees
   move.w                 #359,ANGLE_OFFSET(a3)
   bra.s                 .decrease_angle_by_1_exit
-.decrease_angle_by_1_noreset;
+.decrease_angle_by_1_noreset
 
   ; every 120 degrees of rotation move the center of the coordinates 30pix right to walk
   cmpi.w                 #240,ANGLE_OFFSET(a3)
@@ -472,6 +483,20 @@ walkingtriangle_xwalk_right_2:
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
   move.w                 #6,STAGEWALK_OFFSET(a3)
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  lsl.w                  #6,d0
+  move.w                 d0,XPOSITIONVECTOR_OFFSET(a3)
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d0
+  lsl.w                  #6,d0
+  move.w                 d0,YPOSITIONVECTOR_OFFSET(a3)
+
+  ; new velocity
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.w #1*15,d0
+  move.w #-1*90,d1
+  CREATE2DVECTOR a0
+
 .decrease_angle_by_1_exit:
 
   ; Draw triangle
@@ -489,16 +514,171 @@ walkingtriangle_xwalk_right_2:
 walkingtriangle_reverse_dive:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w #6,d0
+  asr.w #6,d1
+  sub.w #15,d0
+  sub.w #12,d1
+  move.w d1,d7
+  
+
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ROTATE                 ANGLE_OFFSET(a3)
 
+  ; Add 5 to angle
+  add.w                  #5,ANGLE_OFFSET(a3)
+  cmp.w                   #360,ANGLE_OFFSET(a3)
+  blt.s .increase_angle_by_5_noreset
+  sub.w                 #360,ANGLE_OFFSET(a3)
+.increase_angle_by_5_noreset
+
+  ; add accelleration to velocity
+  lea ACCELLERATIONVECTOR(PC),a0
+  move.l                  a3,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  ; add velocity to position
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.l                  a3,a1
+  adda.w                  #POSITIONVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  cmpi.w #124,d7
+  ble.s .noendoffall
+  move.w                 #7,STAGEWALK_OFFSET(a3)
+   ; new velocity
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.w #-1*94,d0
+  move.w #-1*32,d1
+  CREATE2DVECTOR a0
+.noendoffall:
+
   ; Draw triangle
+  VERTEX2D_INIT          1,#-15+15,#-26+12
+  VERTEX2D_INIT          2,#-30+15,#0+12
+  VERTEX2D_INIT          3,#0+15,#0+12
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+
+  movem.l                (sp)+,d5/a3
+  rts
+
+walkingfloor1:
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w #6,d0
+  asr.w #6,d1
+  sub.w #15,d0
+  sub.w #12,d1
+  move.w d0,d6
+  move.w d1,d7
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  ; Add 5 to angle
+  add.w                  #5,ANGLE_OFFSET(a3)
+  cmp.w                   #360,ANGLE_OFFSET(a3)
+  blt.s .increase_angle_by_5_noreset_2
+  sub.w                 #360,ANGLE_OFFSET(a3)
+.increase_angle_by_5_noreset_2
+
+  ; add accelleration to velocity
+  lea ACCELLERATIONVECTOR(PC),a0
+  move.l                  a3,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  ; add velocity to position
+  move.l                  a3,a0
+  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.l                  a3,a1
+  adda.w                  #POSITIONVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  cmpi.w #124,d7
+  ble.s .noendoffall2
+  cmpi.w #125,d6
+  bgt.s .noendoffall2
+  move.w                 #8,STAGEWALK_OFFSET(a3)
+.noendoffall2:
+
+  ; Draw triangle
+  VERTEX2D_INIT          1,#-15+15,#-26+12
+  VERTEX2D_INIT          2,#-30+15,#0+12
+  VERTEX2D_INIT          3,#0+15,#0+12
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+  movem.l                (sp)+,d5/a3
+  rts
+
+teletrasportationstart:
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  asr.w #6,d0
+  asr.w #6,d1
+  sub.w #15,d0
+  sub.w #12,d1
+  move.w d0,d6
+  move.w d1,d7
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  sub.w #1,SCALEFACTOR_OFFSET(a3)
+  move.w SCALEFACTOR_OFFSET(a3),d0
+  move.w d0,d1
+  tst.w d0
+  bne.w .noscale
+  move.w                 #9,STAGEWALK_OFFSET(a3)
+  move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
+  move.l                 #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
+.noscale
+  jsr SCALE
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  ; Draw triangle
+  VERTEX2D_INIT          1,#-15+15,#-26+12
+  VERTEX2D_INIT          2,#-30+15,#0+12
+  VERTEX2D_INIT          3,#0+15,#0+12
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+
+  movem.l                (sp)+,d5/a3
+  rts
+
+teletrasportationend:
+  moveq                  #STARTWALKXPOS,d0
+  add.w                  XROLLINGOFFSET_OFFSET(a3),d0
+  move.w                 #STARTWALKYPOS,d1
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  add.w #1,SCALEFACTOR_OFFSET(a3)
+  move.w SCALEFACTOR_OFFSET(a3),d0
+  move.w d0,d1
+  cmp.w #1*64,d0
+  bne.w .noscale2
+  move.w                 #0,STAGEWALK_OFFSET(a3)
+    ; reset initial values
+  move.w #30,YROLLINGOFFSET_OFFSET(a3)
+  ;move.l ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
+.noscale2
+  jsr SCALE
+
+  ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
   VERTEX2D_INIT          1,#-15,#-26
   VERTEX2D_INIT          2,#-30,#0
   VERTEX2D_INIT          3,#0,#0
+
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
+
+
+
 
   movem.l                (sp)+,d5/a3
   rts
