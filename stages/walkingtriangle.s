@@ -173,6 +173,8 @@ WALKINGTRIANGLE_PROCESS:
   beq.w                  walkingtriangle_xwalk_right
   cmpi.w                 #5,d0
   beq.w                  walkingtriangle_xwalk_right_2
+  cmpi.w                 #6,d0
+  beq.w                  walkingtriangle_reverse_dive
   cmpi.w                 #$FFFF,d0
   beq.w                  walkingtriangle_sleep
 
@@ -404,17 +406,14 @@ walkingtriangle_xwalk_right:
   sub.w                   #15,d1
   jsr                    LOADIDENTITYANDTRANSLATE
   
-  ; when hitting bottom border stop
-  cmpi.w #SECOND_FLOOR_Y,d1
-  ble.s notdownborder2
-  move.w                 #5,STAGEWALK_OFFSET(a3)
-notdownborder2;
-
+  ; save d1 for later comparison
+  move.w d1,d7
+  
   ; Sub 3 to angle
   sub.w                  #3,ANGLE_OFFSET(a3)
-  bpl.s                  .increase_angle_by_1_exit
+  bpl.s                  .decrease_angle_by_3_exit
   move.w                 #357,ANGLE_OFFSET(a3)
-.increase_angle_by_1_exit:
+.decrease_angle_by_3_exit:
 
   ROTATE                 ANGLE_OFFSET(a3)
 
@@ -431,6 +430,15 @@ notdownborder2;
   adda.w                  #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
+  ; when hitting bottom border stop
+  cmpi.w #SECOND_FLOOR_Y,d7
+  ble.s notdownborder2
+  move.w                 #5,STAGEWALK_OFFSET(a3)
+  move.w                 #122,XPOSITIONVECTOR_OFFSET(a3)
+  move.w                 #98,YPOSITIONVECTOR_OFFSET(a3)
+  move.w                 #0,ANGLE_OFFSET(a3)
+notdownborder2;
+
   ; Draw triangle
   VERTEX2D_INIT          1,#13,#15
   VERTEX2D_INIT          2,#13,#-15
@@ -445,49 +453,55 @@ notdownborder2;
 walkingtriangle_xwalk_right_2:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
-  asr.w                   #6,d0
-  asr.w                   #6,d1
-  sub.w                   #13,d0
-  sub.w                   #15,d1
   jsr                    LOADIDENTITYANDTRANSLATE
-  
-  ; when hitting bottom border stop
-  ;cmpi.w #SECOND_FLOOR_Y,d1
-  ;ble.s notdownborder2
-  ;move.w                 #5,STAGEWALK_OFFSET(a3)
-;notdownborder2;
-
-  ; Sub 3 to angle
-  ;sub.w                  #3,ANGLE_OFFSET(a3)
-  ;bpl.s                  .increase_angle_by_1_exit
-  ;move.w                 #357,ANGLE_OFFSET(a3)
-;.increase_angle_by_1_exit:
 
   ROTATE                 ANGLE_OFFSET(a3)
 
-  ; add accelleration to velocity
-  ;lea ACCELLERATIONVECTOR(PC),a0
-  ;move.l                  a3,a1
-  ;adda.w                  #VELOCITYVECTOR_OFFSET,a1
-  ;ADD2DVECTOR
+   ; Sub 1 to angle
+  sub.w                  #1,ANGLE_OFFSET(a3)
+  bpl.s                  .decrease_angle_by_1_noreset ; if we go negative reset to 359 degrees
+  move.w                 #359,ANGLE_OFFSET(a3)
+  bra.s                 .decrease_angle_by_1_exit
+.decrease_angle_by_1_noreset;
 
-  ; add velocity to position
-  ;move.l                  a3,a0
-  ;adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  ;move.l                  a3,a1
-  ;adda.w                  #POSITIONVECTOR_OFFSET,a1
-  ;ADD2DVECTOR
+  ; every 120 degrees of rotation move the center of the coordinates 30pix right to walk
+  cmpi.w                 #240,ANGLE_OFFSET(a3)
+  bne.s                  .decrease_angle_by_1_exit
+  move.w                 #0,ANGLE_OFFSET(a3)
+  add.w                  #30,XPOSITIONVECTOR_OFFSET(a3)
+  cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
+  bne.s                  .decrease_angle_by_1_exit
+  move.w                 #6,STAGEWALK_OFFSET(a3)
+.decrease_angle_by_1_exit:
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#13,#15
-  VERTEX2D_INIT          2,#13,#-15
-  VERTEX2D_INIT          3,#-13,#0
+  VERTEX2D_INIT          1,#-15,#-26
+  VERTEX2D_INIT          2,#-30,#0
+  VERTEX2D_INIT          3,#0,#0
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
+
   movem.l                (sp)+,d5/a3
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
 
+
+walkingtriangle_reverse_dive:
+  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  ROTATE                 ANGLE_OFFSET(a3)
+
+  ; Draw triangle
+  VERTEX2D_INIT          1,#-15,#-26
+  VERTEX2D_INIT          2,#-30,#0
+  VERTEX2D_INIT          3,#0,#0
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+
+  movem.l                (sp)+,d5/a3
+  rts
 
 walkingtriangle_sleep:
   movem.l                (sp)+,d5/a3
