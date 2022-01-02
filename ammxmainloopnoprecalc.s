@@ -25,13 +25,15 @@ drawtopstep:
             move.w           #286,d0
             move.w           #187,d1
             jsr              LOADIDENTITYANDTRANSLATE
-            ROTATE           ANGLESTEP
+            move.w           ANGLESTEP(PC),d6
+            ROTATE           d6
 
-            sub.w            #2,ANGLESTEP
-            cmp.w            #0-2,ANGLESTEP
+            subi.w           #2,d6
+            cmpi.w           #0-2,d6
             bne.s            drawtopstep_noreset
-            move.w           #358,ANGLESTEP
+            move.w           #358,d6
 drawtopstep_noreset:
+            move.w d6,ANGLESTEP
 
             ;moveq            #0,d0
             ;moveq            #0,d1
@@ -154,20 +156,20 @@ moveladders:
             move.w           #358,ANGLESTEP
             rts
 proceedmoving;
-            sub.w            #1,RIGHTLADDERCOUNTER
-            sub.b            #1,LADDER_1_VSTART0
-            sub.b            #1,LADDER_1_VSTOP0
-            sub.b            #1,LADDER_1_VSTART1
-            sub.b            #1,LADDER_1_VSTOP1
-            sub.b            #1,LADDER_1_VSTART2
-            sub.b            #1,LADDER_1_VSTOP2
+            subi.w            #1,RIGHTLADDERCOUNTER
+            subi.b            #1,LADDER_1_VSTART0
+            subi.b            #1,LADDER_1_VSTOP0
+            subi.b            #1,LADDER_1_VSTART1
+            subi.b            #1,LADDER_1_VSTOP1
+            subi.b            #1,LADDER_1_VSTART2
+            subi.b            #1,LADDER_1_VSTOP2
        
-            add.b            #1,LADDER_2_VSTART0
-            add.b            #1,LADDER_2_VSTOP0
-            add.b            #1,LADDER_2_VSTART1
-            add.b            #1,LADDER_2_VSTOP1
-            add.b            #1,LADDER_2_VSTART2
-            add.b            #1,LADDER_2_VSTOP2
+            addi.b            #1,LADDER_2_VSTART0
+            addi.b            #1,LADDER_2_VSTOP0
+            addi.b            #1,LADDER_2_VSTART1
+            addi.b            #1,LADDER_2_VSTOP1
+            addi.b            #1,LADDER_2_VSTART2
+            addi.b            #1,LADDER_2_VSTOP2
 moveladders_end:
             rts
 

@@ -273,6 +273,13 @@ walkingtriangle_no_horizontal_climbing:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
+  ;moveq #0,d0
+  ;moveq #0,d1
+  ;moveq #0,d6
+  ;moveq #30,d3
+  ;move.w #-26,d4
+  ;move.w #15,d5
+  ;jsr TRIANGLE
   movem.l                (sp)+,d5/a3
   rts
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
