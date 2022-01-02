@@ -67,24 +67,6 @@ ammxmainloop3:
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
 
-            ; just for reference
-            RESETMATRIX
-            move.w           #286,d0
-            move.w           #26,d1
-            jsr              TRANSLATE
-            
-            ROTATE           ANGLESTEP
-            
-            moveq            #-22,d0
-            moveq            #0,d1
-            moveq            #15,d5
-            moveq            #2,d6
-
-            STROKE           #1
-
-            ;jsr              RECT
-            ; end of reference
-
             ; move ladders
             tst.w            LADDER_RIGHT_MOVE
             beq.s            dontmoveladders
@@ -262,20 +244,6 @@ BEATDELAY:  dc.l             1
 LAST_ITERATION_FUNCTION_PTR:
             dc.l             LAST_ITERATION_FUNCTION_START
             
-TRANSITION1:
-            WAITBLITTER
-            move.w           #$09F0,$dff040
-            move.w           #$0000,$dff042   
-            move.l           #SCREEN_2,$dff050                                                                      ; a source
-            move.l           SCREEN_PTR_0,$dff054                                                                   ; d destination 
-            move.w           #0,$dff064                                                                             ; A MOD
-            move.w           #0,$dff066                                                                             ; D mod
-            move.w           #$8014,$dff058
-            move.l           #VOID,CLEARFUNCTION
-            SETBEATDELAY     #8
-            SET2BITPLANES
-            rts
-
             include          "stages/walkingtriangle.s"
 
 ROTATIONS_ANGLES_64:  
