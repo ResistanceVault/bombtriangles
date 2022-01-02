@@ -2,7 +2,6 @@ DOUBLETRIANGLEY:
   movem.l        d0-d7/a0-a6,-(sp)
   move.l         #CLEAR_BPL_1,CLEARFUNCTION
   move.w         #%0010001000000000,BPLCON0POINTER
-  move.l         #BIGTRIANGLE_Z_COORDS,BIGTRIANGLE_Z_COORDS_PTR
 
   move.l         ROTATION_ANGLES_512_PTR,a0
   move.w         (a0),d0

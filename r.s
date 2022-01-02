@@ -346,8 +346,20 @@ PRINT_RIGHT_LINE_1ST_FLOOR MACRO
   dc.l 0
   dc.l 0
   dc.l 0
-  dcb.b 18,$00
+  dc.l 0
+  dcb.b 14,$00
   dc.w $FF00
+  dc.l 0
+  dc.l 0
+  ENDM
+
+PRINT_RIGHT_LINE_1ST_FLOOR_2 MACRO
+  dc.l 0
+  dc.l 0
+  dc.l 0
+  dc.l $FFFF
+  dcb.b 14,$00
+  dc.w $0000
   dc.l 0
   dc.l 0
   ENDM
@@ -370,12 +382,15 @@ SCREEN_2
   PRINT_LEFT_LINE
   PRINT_LEFT_LINE
   
-  PRINT_LINE 37,$00    
+  PRINT_LINE 38,$00    
   PRINT_RIGHT_LINE_1ST_FLOOR 
   PRINT_RIGHT_LINE_1ST_FLOOR
   PRINT_RIGHT_LINE_1ST_FLOOR
+
+  PRINT_LINE 3,$00     ; 1
+  PRINT_RIGHT_LINE_1ST_FLOOR_2
   
-  PRINT_LINE 117,$00    ; 163
+  PRINT_LINE 112,$00    ; 163
 
 
 SCREEN_3
