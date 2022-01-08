@@ -3,6 +3,10 @@
   SECTION             CiriCop,CODE_C
 
   include             "AProcessing2/libs/ammxmacros.i"
+DEBUG MACRO
+  clr.w                  $100
+  move.w                 #$\1,d3
+  ENDM
 
 
 Inizio:
@@ -23,12 +27,6 @@ Inizio:
   swap                d0
   move.w              d0,2(a1)
 
-  MOVE.L              #SCREEN_3,d0
-  LEA                 BPLPOINTERS3,A1
-  move.w              d0,6(a1)
-  swap                d0
-  move.w              d0,2(a1)
-
 	; sprite 0 init
   MOVE.L              #LADDER_1,d0		
   LEA                 SpritePointers,a1                                              ; SpritePointers is in copperlist
@@ -41,9 +39,17 @@ Inizio:
   move.w              d0,6(a1)
   swap                d0
   move.w              d0,2(a1)
+
+   ; Sprite 2 init
+  jsr                 drawtopstep
+
   move.w              #$0888,$dff1a2                                                 ; ladder color 1
   move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
   move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
+
+   move.w              #$0888,$dff1a8                                                 ; ladder color 1
+  move.w              #$0AAA,$dff1aa                                                 ; ladder color 2
+  move.w              #$0BCD,$dff1ac                                                 ; ladder color 3
 
 
   lea                 $dff000,a6
@@ -76,6 +82,7 @@ Inizio:
 mouse:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   bne.s               mouse                                                          ; Se non ancora, non andare avanti
+   DEBUG 1238
 ;.loop; Wait for vblank
 ;	move.l $dff004,d0
 ;	and.l #$1ff00,d0
@@ -104,6 +111,7 @@ mouse:
   swap                d0
   move.w              d0,2(a0)
   swap                d0
+   DEBUG 1236
 
   IFD                 DEBUGCOLORS
   move                #$003,$180(a6)
@@ -390,31 +398,24 @@ SCREEN_2
   PRINT_LINE 112,$00    ; 163
 
 
-SCREEN_3
-  dcb.b               40*256,$00
-
 Module1:
   incbin              "P61.chippy_nr.399"                                            ; usecode $945A
   even
 
-LADDERSPACING            equ 45
-LADDERHEIGHT             equ 3
-LADDERVERTICALPOSITION   equ STARTWALKYPOS+49
-LADDERHORIZONTALPOSITION equ $C4
-LADDERHORIZONTALSPACING  equ 14
+
 
 LADDER_1:
 
-LADDER_NO_VSTART0:
-  dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3
-LADDER_NO_HSTART0;
-  dc.b                LADDERHORIZONTALPOSITION
-LADDER_NO_VSTOP0; 
-  dc.b                LADDERVERTICALPOSITION-LADDERSPACING*3,$00
-  dc.w                $FFFF,$FFFF                                                    ; line 1
-  dc.w                $FFFF,$FFFF                                                    ; line 2
-  dc.w                $FFFF,$FFFF                                                    ; line 3
-LADDER_1_REAL_START:
+;LADDER_NO_VSTART0:
+;  dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3
+;LADDER_NO_HSTART0;
+;  dc.b                LADDERHORIZONTALPOSITION
+;LADDER_NO_VSTOP0; 
+;  dc.b                LADDERVERTICALPOSITION-LADDERSPACING*3,$00
+;  dc.w                $FFFF,$FFFF                                                    ; line 1
+;  dc.w                $FFFF,$FFFF                                                    ; line 2
+;  dc.w                $FFFF,$FFFF                                                    ; line 3
+;LADDER_1_REAL_START:
 
 LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
@@ -480,17 +481,24 @@ LADDER_2_VSTOP2:
   dc.w                $FFFF,$FFFF                                                    ; line 2
   dc.w                $FFFF,$FFFF                                                    ; line 3
 
-  LADDER_NO_VSTART2:
-  dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0
-  LADDER_NO_HSTART2:
-  dc.b                LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
-  LADDER_NO_VSTOP2:
-  dc.b                LADDERVERTICALPOSITION-LADDERSPACING*0,$01
-  dc.w                $FFFF,$FFFF                                                    ; line 1
-  dc.w                $FFFF,$FFFF                                                    ; line 2
-  dc.w                $FFFF,$FFFF                                                    ; line 3
+  ;LADDER_NO_VSTART2:
+  ;dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0
+  ;LADDER_NO_HSTART2:
+  ;dc.b                LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
+  ;LADDER_NO_VSTOP2:
+  ;dc.b                LADDERVERTICALPOSITION-LADDERSPACING*0,$01
+  ;dc.w                $FFFF,$FFFF                                                    ; line 1
+  ;dc.w                $FFFF,$FFFF                                                    ; line 2
+  ;dc.w                $FFFF,$FFFF                                                    ; line 3
   ; END OF SPRITE
   dc.w                0,0
+
+
+
+
+
+
+
 
   end
 

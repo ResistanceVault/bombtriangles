@@ -100,11 +100,6 @@ TRIANGLE_4:
 
 ;MACROS
 
-DEBUG MACRO
-  clr.w                  $100
-  move.w                 #$\1,d3
-  ENDM
-
 ; Macro to get current angle and move the pointer to the next
 NEXT_WALKING_ANGLE2  MACRO
   move.l                 XROLLINGANGLE_OFFSET(a3),a0
@@ -208,6 +203,8 @@ WALKINGTRIANGLE_PROCESS:
   bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
   move.w                 #359,ANGLE_OFFSET(a3)
+  START_LADDERS
+  
 walkingtriangle_no_vertical_climbing:
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
@@ -233,15 +230,11 @@ walkingtriangle_ywalk:
   move.w                 #STARTWALKYPOS-15,d1
   move.w                 YROLLINGOFFSET_OFFSET(a3),d2
   lsr.w                  #1,d2
-  scs                    d3                                                            ; d3 will hold FF if 1 is shifted out otherwise 0
-  andi.w                 #1,d3
-  addq                   #1,d3
-  move.w                 d3,LADDER_RIGHT_MOVE
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
                     ; move triangle UP
-  add.w                  #1,YROLLINGOFFSET_OFFSET(a3)
+  addq                   #1,YROLLINGOFFSET_OFFSET(a3)
 
                     ; when the triangle reaches thetop, stop the ladder
   cmpi.w                 #STARTDYCLIMBX2,YROLLINGOFFSET_OFFSET(a3)
@@ -249,21 +242,10 @@ walkingtriangle_ywalk:
 
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)                                  ; next stage must start with this value to 30
   move.w                 #0,ANGLE_OFFSET(a3)                                           ; next stage must start with this value to zero
-  move.w                 #0,LADDER_RIGHT_MOVE
-  move.w                 #STARTDYCLIMB,YROLLINGOFFSET_OFFSET(a3)
+  move.w                 #STARTDYCLIMB-1,YROLLINGOFFSET_OFFSET(a3)
   move.w                 #2,STAGEWALK_OFFSET(a3)
+  STOP_LADDERS
 
-                    ; restore ladder sprites
-  MOVE.L                 #LADDER_1,d0		
-  LEA                    SpritePointers,a1                                             ; SpritePointers is in copperlist
-  move.w                 d0,6(a1)
-  swap                   d0
-  move.w                 d0,2(a1)
-  LEA                    LADDER_NO_VSTART2,a1 
-  move.b                 #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0,(a1)+
-  move.b                 #LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING,(a1)+
-  move.b                 #LADDERVERTICALPOSITION-LADDERSPACING*0,(a1)+
-  move.b                 #$01,(a1)
 walkingtriangle_no_horizontal_climbing:
 
                     ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
@@ -279,6 +261,7 @@ walkingtriangle_no_horizontal_climbing:
   ;moveq #30,d3
   ;move.w #-26,d4
   ;move.w #15,d5
+  ;STROKE #1
   ;jsr TRIANGLE
   movem.l                (sp)+,d5/a3
   rts
@@ -670,6 +653,7 @@ teletrasportationend:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
+  DEBUG 1235
 
   movem.l                (sp)+,d5/a3
   rts

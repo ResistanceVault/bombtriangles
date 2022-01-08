@@ -1,80 +1,26 @@
+       include "ladder.s"
+
 SET2BITPLANES MACRO
             move.w           #%0010001000000000,BPLCON0POINTER
             ENDM
 
-LADDER_RIGHT_MOVE:
-            dc.w             0
+
 ANGLESTEP:
             dc.w             0
-drawtopstep:
-            move.w           #286,d0
-            move.w           #51,d1
-            jsr              LOADIDENTITYANDTRANSLATE
-            ROTATE           ANGLESTEP
-            
-            moveq            #-22,d0
-            moveq            #0,d1
-            moveq            #15,d5
-            moveq            #2,d6
-
-            STROKE           #1
-
-            jsr              RECT
-
-            ; Second step starts here
-            move.w           #286,d0
-            move.w           #187,d1
-            jsr              LOADIDENTITYANDTRANSLATE
-            move.w           ANGLESTEP(PC),d6
-            ROTATE           d6
-
-            subi.w           #2,d6
-            cmpi.w           #0-2,d6
-            bne.s            drawtopstep_noreset
-            move.w           #358,d6
-drawtopstep_noreset:
-            move.w d6,ANGLESTEP
-
-            ;moveq            #0,d0
-            ;moveq            #0,d1
-            ;jsr              POINT
-
-            ;moveq            #-6,d0
-            ;moveq            #0,d1
-            ;jsr              POINT
-
-            ;moveq            #6,d0
-            ;moveq            #0,d1
-            ;jsr              POINT
-            moveq            #7,d0
-            moveq            #-1,d1
-            moveq            #15,d5
-            moveq            #2,d6
-
-            jsr              RECT
-
-            MOVE.L           #LADDER_1_REAL_START,d0		
-            LEA              SpritePointers,a1                                                                      ; SpritePointers is in copperlist
-            move.w           d0,6(a1)
-            swap             d0
-            move.w           d0,2(a1)
-            move.l           #$00000000,LADDER_NO_VSTART2
-
-            rts
 
 ammxmainloop3:
             movem.l          d0-d7/a0-a6,-(sp)    
   
+            
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
+           
 
             ; move ladders
-            tst.w            LADDER_RIGHT_MOVE
-            beq.s            dontmoveladders
             bsr.w            moveladders
-            bsr.w            drawtopstep
-dontmoveladders
+            IFD ASSS
+
             move.w           MUSICCOUNTER,d1
             cmpi.w           #64,d1
             bne.s            musicnoreset
@@ -84,10 +30,9 @@ dontmoveladders
             move.l           BEATDELAY,BEATCOUNTER
             ;add.l            #4,DRAWFUNCTCOUNTER comment to stay on first effect
             move.l           LAST_ITERATION_FUNCTION_PTR,a0
-            move.l           (a0),a0
-            jsr              (a0)
+            ;move.l           (a0),a0
+            ;jsr              (a0)
             add.l            #4,LAST_ITERATION_FUNCTION_PTR
-
 noresetbeatcounter:
             IFD              USE_MUSICCOUNTER
             move.w           #$0FF0,$dff180
@@ -103,7 +48,6 @@ musicnoreset:
 musicaddcounter:
             ;add.w            #1,MUSICCOUNTER comment to stay of the first effect
 
-
             lea              DRAWFUNCTARRAY_START(PC),a0
             add.l            DRAWFUNCTCOUNTER(PC),a0
             cmp.l            #DRAWFUNCTARRAY_END,a0
@@ -113,8 +57,10 @@ musicaddcounter:
             lea              DRAWFUNCTARRAY_START,a0
             move.l           #LAST_ITERATION_FUNCTION_START,LAST_ITERATION_FUNCTION_PTR
 drawfunctcounternoreset:
+              ENDC
 
                    ; execute the drawing routine
+            lea              DRAWFUNCTARRAY_START(PC),a0
             move.l           (a0),a0
             jsr              (a0)
                          
@@ -124,54 +70,8 @@ drawfunctcounternoreset:
 
             rts
 
-RIGHTLADDERCOUNTER:
-            dc.w             LADDERSPACING-1
-moveladders:
-            cmpi.w #2,LADDER_RIGHT_MOVE
-            beq.w moveladders_end
-            tst.w            RIGHTLADDERCOUNTER
-            bne.s            proceedmoving
 
-            ; reset ladder 1
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2,LADDER_1_VSTART0
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*2,LADDER_1_VSTOP0
 
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*1,LADDER_1_VSTART1
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_1_VSTOP1
-
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0,LADDER_1_VSTART2
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*0,LADDER_1_VSTOP2
-
-            ; reset ladder 2
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3,LADDER_2_VSTART0
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*3,LADDER_2_VSTOP0
-
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2,LADDER_2_VSTART1
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*2,LADDER_2_VSTOP1
-
-            move.b           #LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*1,LADDER_2_VSTART2
-            move.b           #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_2_VSTOP2
-
-            move.w           #LADDERSPACING-1,RIGHTLADDERCOUNTER
-            move.w           #358,ANGLESTEP
-            rts
-proceedmoving;
-            subi.w            #1,RIGHTLADDERCOUNTER
-            subi.b            #1,LADDER_1_VSTART0
-            subi.b            #1,LADDER_1_VSTOP0
-            subi.b            #1,LADDER_1_VSTART1
-            subi.b            #1,LADDER_1_VSTOP1
-            subi.b            #1,LADDER_1_VSTART2
-            subi.b            #1,LADDER_1_VSTOP2
-       
-            addi.b            #1,LADDER_2_VSTART0
-            addi.b            #1,LADDER_2_VSTOP0
-            addi.b            #1,LADDER_2_VSTART1
-            addi.b            #1,LADDER_2_VSTOP1
-            addi.b            #1,LADDER_2_VSTART2
-            addi.b            #1,LADDER_2_VSTOP2
-moveladders_end:
-            rts
 
 CLEARFUNCTION:
             dc.l             CLEAR
@@ -216,14 +116,6 @@ CLEAR_BPL_3:
             move.w           #$0100,$dff040
             move.w           #$0000,$dff042        
             move.l           #SCREEN_2,$dff054                                                                      ; copy to d channel
-            move.w           #$0000,$dff066                                                                         ;D mod
-            move.w           #$4014,$dff058
-            rts
-CLEAR_BPL_4: 
-            WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #$0000,$dff042        
-            move.l           #SCREEN_3,$dff054                                                                      ; copy to d channel
             move.w           #$0000,$dff066                                                                         ;D mod
             move.w           #$4014,$dff058
             rts

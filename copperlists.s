@@ -32,7 +32,7 @@ SpritePointers:
 		    ; 5432109876543210
   dc.w       $100
 BPLCON0POINTER:
-  dc.w       %0100001000000000                                         ; bits 13 e 12 accesi!! (3 = %011)
+  dc.w       %0011001000000000                                         ; bits 13 e 12 accesi!! (3 = %011)
 
 ;	Facciamo puntare i bitplanes direttamente mettendo nella copperlist
 ;	i registri $dff0e0 e seguenti qua di seguito con gli indirizzi
@@ -44,8 +44,6 @@ BPLPOINTERS1:
   dc.w       $e4,$0000,$e6,$0000                                       ;secondo bitplane - BPL1PT
 BPLPOINTERS2:
   dc.w       $e8,$0000,$ea,$0000                                       ;terzo	 bitplane - BPL2PT
-BPLPOINTERS3:
-  dc.w       $ec,$0000,$ee,$0000                                       ;terzo	 bitplane - BPL2PT
 
 
   IFD        EFFECTS
