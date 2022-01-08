@@ -1,6 +1,3 @@
-SETBEATDELAY MACRO
-  move.w     \1,BEATDELAY+2
-  ENDM
             
   include    endfunctions.s
 

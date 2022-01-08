@@ -1,65 +1,15 @@
-       include "ladder.s"
-
-SET2BITPLANES MACRO
-            move.w           #%0010001000000000,BPLCON0POINTER
-            ENDM
-
-
-ANGLESTEP:
-            dc.w             0
 
 ammxmainloop3:
             movem.l          d0-d7/a0-a6,-(sp)    
   
-            
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
-           
 
             ; move ladders
             bsr.w            moveladders
-            IFD ASSS
 
-            move.w           MUSICCOUNTER,d1
-            cmpi.w           #64,d1
-            bne.s            musicnoreset
-            move.w           #$0000,MUSICCOUNTER
-            subi.l           #1,BEATCOUNTER
-            bne.s            noresetbeatcounter
-            move.l           BEATDELAY,BEATCOUNTER
-            ;add.l            #4,DRAWFUNCTCOUNTER comment to stay on first effect
-            move.l           LAST_ITERATION_FUNCTION_PTR,a0
-            ;move.l           (a0),a0
-            ;jsr              (a0)
-            add.l            #4,LAST_ITERATION_FUNCTION_PTR
-noresetbeatcounter:
-            IFD              USE_MUSICCOUNTER
-            move.w           #$0FF0,$dff180
-            ENDC
-
-            bra.s            musicaddcounter
-musicnoreset:
-            IFD              USE_MUSICCOUNTER
-            move.w           #$0000,$dff180
-            ELSE
-            nop
-            ENDC
-musicaddcounter:
-            ;add.w            #1,MUSICCOUNTER comment to stay of the first effect
-
-            lea              DRAWFUNCTARRAY_START(PC),a0
-            add.l            DRAWFUNCTCOUNTER(PC),a0
-            cmp.l            #DRAWFUNCTARRAY_END,a0
-            bne.s            drawfunctcounternoreset
-
-            move.l           #0,DRAWFUNCTCOUNTER
-            lea              DRAWFUNCTARRAY_START,a0
-            move.l           #LAST_ITERATION_FUNCTION_START,LAST_ITERATION_FUNCTION_PTR
-drawfunctcounternoreset:
-              ENDC
-
-                   ; execute the drawing routine
+            ; execute the drawing routine
             lea              DRAWFUNCTARRAY_START(PC),a0
             move.l           (a0),a0
             jsr              (a0)
@@ -70,11 +20,23 @@ drawfunctcounternoreset:
 
             rts
 
-
-
-
 CLEARFUNCTION:
-            dc.l             CLEAR
+            dc.l             CLEARTOP
+CLEARTOP: 
+            WAITBLITTER
+            move.w           #$0100,$dff040
+            move.w           #$0000,$dff042        
+            move.l           SCREEN_PTR_0,$dff054                                                                   ; copy to d channel
+            move.w           #2,$DFF066 ;dmod                                                                        ;D mod
+            move.w           #$3013,$dff058
+            WAITBLITTER
+            move.w           #$0100,$dff040
+            move.w           #2,$DFF066
+            move.w           #$0000,$dff042
+                    
+            move.l           SCREEN_PTR_1,$dff054                                                                   ; copy to d channel
+            move.w           #$3013,$dff058
+            rts
 CLEAR: 
             WAITBLITTER
             move.w           #$0100,$dff040
@@ -111,34 +73,18 @@ CLEAR_BPL_2_OTH:
             move.w           #$4014,$dff058
             rts
 
-CLEAR_BPL_3: 
-            WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #$0000,$dff042        
-            move.l           #SCREEN_2,$dff054                                                                      ; copy to d channel
-            move.w           #$0000,$dff066                                                                         ;D mod
-            move.w           #$4014,$dff058
-            rts
-
 VOID:
             rts
 
-FRAMECOUNTER:  
-            dc.w             0 
-MUSICCOUNTER:  
-            dc.w             0
 
-DRAWFUNCTCOUNTER:  
-            dc.l             0
-BEATCOUNTER:   
-            dc.l             1
-BEATDELAY:  dc.l             1
 
 
 LAST_ITERATION_FUNCTION_PTR:
             dc.l             LAST_ITERATION_FUNCTION_START
             
+            include          "ladder.s"
             include          "stages/walkingtriangle.s"
+
 
 ROTATIONS_ANGLES_64:  
             dc.w             005,011,016,022,028,033,039,044,050,056
@@ -161,36 +107,3 @@ ROTATIONS_ANGLES_64_END:
 
 ROTATIONS_ANGLES_64_PTR: 
             dc.l             ROTATIONS_ANGLES_64
-
-
-
-
-
-ANGLE:      dc.w             0
-
-decrease_angle_by_1:
-            sub.w            #1,ANGLE
-            BPL.s            decrease_angle_by_1_exit
-            move.w           #359,ANGLE
-decrease_angle_by_1_exit:
-            rts
-
-increase_angle_by_1:
-            add.w            #1,ANGLE
-            cmpi.w           #360,ANGLE
-            bcs.s            increase_angle_by_1_exit
-            move.w           #0,ANGLE
-increase_angle_by_1_exit:
-            rts
-
-increase_angle_by_n:
-            add.w            d0,ANGLE
-            cmpi.w           #360,ANGLE
-            bcs.s            increase_angle_by_1_exit
-            move.w           #0,ANGLE
-increase_angle_by_n_exit:
-            rts
-
-
-
-            

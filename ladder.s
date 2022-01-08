@@ -6,7 +6,6 @@
 
 LADDERSPACING            equ 45
 LADDERHEIGHT             equ 3
-LADDERVERTICALPOSITION   equ STARTWALKYPOS+49
 LADDERHORIZONTALPOSITION equ $C4
 LADDERHORIZONTALSPACING  equ 14
 
@@ -27,10 +26,7 @@ LADDER_CTRL:
 RIGHTLADDERCOUNTER:
                 dc.w       LADDERSPACING-1
 moveladders:
-                DEBUG 1234
-
-
-                ROR       LADDER_CTRL
+                ROR        LADDER_CTRL
                 bcc.w      moveladders_end
                 bsr.w      drawtopstep
                 tst.w      RIGHTLADDERCOUNTER
@@ -57,7 +53,6 @@ moveladders:
                 move.b     #LADDERVERTICALPOSITION-LADDERSPACING*1,LADDER_2_VSTOP2
 
                 move.w     #LADDERSPACING-1,RIGHTLADDERCOUNTER
-                move.w     #358,ANGLESTEP
                 rts
 proceedmoving;
                 subi.w     #1,RIGHTLADDERCOUNTER

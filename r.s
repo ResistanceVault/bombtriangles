@@ -82,12 +82,6 @@ Inizio:
 mouse:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   bne.s               mouse                                                          ; Se non ancora, non andare avanti
-   DEBUG 1238
-;.loop; Wait for vblank
-;	move.l $dff004,d0
-;	and.l #$1ff00,d0
-;	cmp.l #303<<8,d0
-;	bne.b .loop
 
     ;move	#$00F0,$180(a6)
   jsr                 P61_Music                                                      ;and call the playroutine manually.
@@ -106,12 +100,10 @@ mouse:
   swap                d0
 
   lea                 BPLPOINTERS1,a0
-  add.l               #256*40,d0
+  add.w               #256*40,d0
   move.w              d0,6(a0)
   swap                d0
   move.w              d0,2(a0)
-  swap                d0
-   DEBUG 1236
 
   IFD                 DEBUGCOLORS
   move                #$003,$180(a6)
@@ -405,18 +397,6 @@ Module1:
 
 
 LADDER_1:
-
-;LADDER_NO_VSTART0:
-;  dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3
-;LADDER_NO_HSTART0;
-;  dc.b                LADDERHORIZONTALPOSITION
-;LADDER_NO_VSTOP0; 
-;  dc.b                LADDERVERTICALPOSITION-LADDERSPACING*3,$00
-;  dc.w                $FFFF,$FFFF                                                    ; line 1
-;  dc.w                $FFFF,$FFFF                                                    ; line 2
-;  dc.w                $FFFF,$FFFF                                                    ; line 3
-;LADDER_1_REAL_START:
-
 LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
 LADDER_1_HSTART0:

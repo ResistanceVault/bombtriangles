@@ -5,7 +5,8 @@
 ; DEFINES
 NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
-STARTWALKYPOS          EQU 184                                                         ; Start triangle position Y (signed value)
+STARTWALKYPOS          EQU 184
+LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                                         ; Start triangle position Y (signed value)
 
 STARTDXCLIMB           EQU 300-60                                                      ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB           EQU 150
@@ -280,7 +281,7 @@ walkingtriangle_xwalk_rev:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ; Add 1 to angle
-  add.w                  #1,ANGLE_OFFSET(a3)
+  addq                   #1,ANGLE_OFFSET(a3)
   cmpi.w                 #360,ANGLE_OFFSET(a3)
   bcs.s                  .increase_angle_by_1_exit
   move.w                 #0,ANGLE_OFFSET(a3)
@@ -318,24 +319,24 @@ walkingtriangle_no_vertical_descending:
 
 ; ***************************** START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 walkingtriangle_ywalk_desending:
-  move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
-  move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
+  move.w                  XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w                  YPOSITIONVECTOR_OFFSET(a3),d1
   asr.w                   #6,d0
   asr.w                   #6,d1
   sub.w                   #13,d0
   sub.w                   #15,d1
 
-  jsr                    LOADIDENTITYANDTRANSLATE
+  jsr                     LOADIDENTITYANDTRANSLATE
 
   ; when hitting bottom border stop
-  cmpi.w #SECOND_FLOOR_Y,d1
-  ble.s notdownborder
-  move.w                 #4,STAGEWALK_OFFSET(a3)
+  cmpi.w                  #SECOND_FLOOR_Y,d1
+  ble.s                   notdownborder
+  move.w                  #4,STAGEWALK_OFFSET(a3)
   ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  move.w #1*32,d0
-  move.w #-1*64,d1
+  move.w                  #1*32,d0
+  move.w                  #-1*64,d1
   CREATE2DVECTOR a0
 notdownborder;
 
@@ -382,14 +383,14 @@ notleftborder;
 walkingtriangle_xwalk_right:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
-  asr.w                   #6,d0
-  asr.w                   #6,d1
-  sub.w                   #13,d0
-  sub.w                   #15,d1
+  asr.w                  #6,d0
+  asr.w                  #6,d1
+  sub.w                  #13,d0
+  sub.w                  #15,d1
   jsr                    LOADIDENTITYANDTRANSLATE
   
   ; save d1 for later comparison
-  move.w d1,d7
+  move.w                 d1,d7
   
   ; Sub 3 to angle
   sub.w                  #3,ANGLE_OFFSET(a3)
@@ -400,21 +401,21 @@ walkingtriangle_xwalk_right:
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; add accelleration to velocity
-  lea ACCELLERATIONVECTOR(PC),a0
-  move.l                  a3,a1
-  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  lea                    ACCELLERATIONVECTOR(PC),a0
+  move.l                 a3,a1
+  adda.w                 #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; add velocity to position
-  move.l                  a3,a0
-  adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  move.l                  a3,a1
-  adda.w                  #POSITIONVECTOR_OFFSET,a1
+  move.l                 a3,a0
+  adda.w                 #VELOCITYVECTOR_OFFSET,a0
+  move.l                 a3,a1
+  adda.w                 #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; when hitting bottom border stop
-  cmpi.w #SECOND_FLOOR_Y,d7
-  ble.s notdownborder2
+  cmpi.w                 #SECOND_FLOOR_Y,d7
+  ble.s                  notdownborder2
   move.w                 #5,STAGEWALK_OFFSET(a3)
   move.w                 #122,XPOSITIONVECTOR_OFFSET(a3)
   move.w                 #98,YPOSITIONVECTOR_OFFSET(a3)
@@ -440,7 +441,7 @@ walkingtriangle_xwalk_right_2:
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; Sub 1 to angle
-  sub.w                  #1,ANGLE_OFFSET(a3)
+  subq                   #1,ANGLE_OFFSET(a3)
   bpl.s                  .decrease_angle_by_1_noreset ; if we go negative reset to 359 degrees
   move.w                 #359,ANGLE_OFFSET(a3)
   bra.s                 .decrease_angle_by_1_exit
@@ -462,8 +463,8 @@ walkingtriangle_xwalk_right_2:
   move.w                 d0,YPOSITIONVECTOR_OFFSET(a3)
 
   ; new velocity
-  move.l                  a3,a0
-  adda.w                  #VELOCITYVECTOR_OFFSET,a0
+  move.l                 a3,a0
+  adda.w                 #VELOCITYVECTOR_OFFSET,a0
   move.w #1*15,d0
   move.w #-1*90,d1
   CREATE2DVECTOR a0
@@ -485,21 +486,21 @@ walkingtriangle_xwalk_right_2:
 walkingtriangle_reverse_dive:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
-  asr.w #6,d0
-  asr.w #6,d1
-  sub.w #15,d0
-  sub.w #12,d1
-  move.w d1,d7
+  asr.w                  #6,d0
+  asr.w                  #6,d1
+  sub.w                  #15,d0
+  sub.w                  #12,d1
+  move.w                 d1,d7
   
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; Add 5 to angle
-  add.w                  #5,ANGLE_OFFSET(a3)
-  cmp.w                   #360,ANGLE_OFFSET(a3)
-  blt.s .increase_angle_by_5_noreset
-  sub.w                 #360,ANGLE_OFFSET(a3)
+  addq                    #5,ANGLE_OFFSET(a3)
+  cmpi.w                  #360,ANGLE_OFFSET(a3)
+  blt.s                   .increase_angle_by_5_noreset
+  sub.w                   #360,ANGLE_OFFSET(a3)
 .increase_angle_by_5_noreset
 
   ; add accelleration to velocity
@@ -515,9 +516,9 @@ walkingtriangle_reverse_dive:
   adda.w                  #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
-  cmpi.w #124,d7
-  ble.s .noendoffall
-  move.w                 #7,STAGEWALK_OFFSET(a3)
+  cmpi.w                  #124,d7
+  ble.s                   .noendoffall
+  move.w                  #7,STAGEWALK_OFFSET(a3)
    ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
@@ -550,8 +551,8 @@ walkingfloor1:
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; Add 5 to angle
-  add.w                  #5,ANGLE_OFFSET(a3)
-  cmp.w                   #360,ANGLE_OFFSET(a3)
+  addq                    #5,ANGLE_OFFSET(a3)
+  cmpi.w                  #360,ANGLE_OFFSET(a3)
   blt.s .increase_angle_by_5_noreset_2
   sub.w                 #360,ANGLE_OFFSET(a3)
 .increase_angle_by_5_noreset_2
@@ -635,10 +636,10 @@ teletrasportationend:
 
   ROTATE                 ANGLE_OFFSET(a3)
 
-  add.w                  #1,SCALEFACTOR_OFFSET(a3)
+  addq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
   move.w                 d0,d1
-  cmp.w                  #1*64,d0
+  cmpi.w                 #1*64,d0
   bne.w                  .noscale2
   move.w                 #0,STAGEWALK_OFFSET(a3)
     ; reset initial values
