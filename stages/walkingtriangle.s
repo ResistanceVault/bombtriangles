@@ -16,7 +16,6 @@ STARTDXDESCEND_OFFSET  EQU 210                                                  
 SECOND_FLOOR_Y         EQU 90                                                          ; Y coordinate of the second floor
 STARTSTAGE             EQU 9                                                           ; Number of the first stage
 START_SCALE_FACTOR     EQU 0*64                                                        ; Scaling of triangles at start
-FIRST_STAGE_FUNCTION   EQU teletrasportationend                                        ; Addr of the first function to be executed for each triangle
 
 ; DEFINITION OF THE TRIANGLE STRUCTURE
 ANGLE_OFFSET           EQU 0
@@ -57,7 +56,7 @@ TRIANGLE_1:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
-  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
+  dc.l                   teletrasportationend                                          ; STAGE_POINTER
 TRIANGLE_2:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -72,7 +71,7 @@ TRIANGLE_2:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
-  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
+  dc.l                   teletrasportationend                                          ; STAGE_POINTER
 TRIANGLE_3:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -87,7 +86,7 @@ TRIANGLE_3:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
-  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
+  dc.l                   teletrasportationend                                          ; STAGE_POINTER
 TRIANGLE_4:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -102,7 +101,7 @@ TRIANGLE_4:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
-  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
+  dc.l                   teletrasportationend                                          ; STAGE_POINTER
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 
 ;MACROS
@@ -408,6 +407,7 @@ walkingtriangle_xwalk_right:
   move.w                 #122,XPOSITIONVECTOR_OFFSET(a3)
   move.w                 #98,YPOSITIONVECTOR_OFFSET(a3)
   move.w                 #0,ANGLE_OFFSET(a3)
+
 notdownborder2;
 
   ; Draw triangle

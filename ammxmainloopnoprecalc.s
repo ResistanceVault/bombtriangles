@@ -1,3 +1,20 @@
+SET_TILES MACRO
+  move.w #0,BANNER_CURRENT_X
+  move.w #0,BANNER_CURRENT_Y
+  move.l \1,TILE_POINTER
+  ENDM
+TILES_TIMEOUT_SECONDS equ 10
+
+TILE_DATA:
+    dc.l TILEPATTERN2
+    dc.l TILEPATTERN1
+TILE_DATA_END:
+
+TILE_PTR:
+    dc.l TILE_DATA
+
+TILE_COUNTER:
+    dc.w TILES_TIMEOUT_SECONDS*50
 
 ammxmainloop3:
             movem.l          d0-d7/a0-a6,-(sp)    
@@ -7,6 +24,20 @@ ammxmainloop3:
             jsr              (a0)
 
             ; execute banner routine
+            subq #1,TILE_COUNTER
+            bne.s donoresettilecounter
+            move.w #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER
+            move.l TILE_PTR,a0
+            SET_TILES (a0)
+            addq #4,a0
+            move.l a0,d0
+            cmpi.l #TILE_DATA_END,d0
+            bne.s tiledatanoreset
+            move.l #TILE_DATA,a0
+tiledatanoreset:
+            move.l a0,TILE_PTR
+donoresettilecounter:
+
             bsr.w banner
 
             ; move ladders
@@ -66,21 +97,9 @@ CLEAR_BPL_2:
             move.w           #$4014,$dff058
             rts
 
-CLEAR_BPL_2_OTH: 
-            WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #$0000,$dff042        
-            move.l           SCREEN_PTR_OTHER_1,$dff054                                                             ; copy to d channel
-            move.w           #$0000,$dff066                                                                         ;D mod
-            move.w           #$4014,$dff058
-            rts
-
 VOID:
             rts
 
-LAST_ITERATION_FUNCTION_PTR:
-            dc.l             LAST_ITERATION_FUNCTION_START
-            
             include          "ladder.s"
             include          "stages/walkingtriangle.s"
 
@@ -109,6 +128,92 @@ ROTATIONS_ANGLES_64_PTR:
 
 WIDTHTILE equ 9
 
+TILEPATTERN2:
+TILEPATTERN2_1:
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+
+TILEPATTERN2_2:
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+
+TILEPATTERN2_3:
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+
+TILEPATTERN2_4:
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+
+TILEPATTERN2_5:
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+    dc.b 0
+
+;--------------------------------------------------
+TILEPATTERN1:
+TILEPATTERN_1:
+    dc.b %10110011
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+
+TILEPATTERN_2:
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+
+TILEPATTERN_3:
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+
+TILEPATTERN_4:
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+    dc.b %01010101
+
+TILEPATTERN_5:
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+    dc.b $FF
+
+tile_empty:
+    dc.b $0
+    ;dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $0
+    dc.b $00
+    even
+
 space_1:
     dc.b $FE
     ;dc.b $FC
@@ -120,6 +225,7 @@ space_1:
     dc.b $FC
     dc.b $FC
     dc.b $00
+    even
 
 space_2:
     dc.b $00
@@ -132,25 +238,56 @@ space_2:
     dc.b $7E
     dc.b $7E
     dc.b $FE
+    even
 
 BANNER_CURRENT_X:
     dc.w 0
 BANNER_CURRENT_Y:
     dc.w 0
+TILE_POINTER:
+    dc.l TILEPATTERN_1
 
 banner:
     cmpi.w #40*5*WIDTHTILE,BANNER_CURRENT_Y
     beq.s donotresetbannerx
+
+    ; before drawing tiles fetch the pattern and determine if the file
+    ; has to be drawn OR cleared
+    ;DEBUG 1235
+    move.w BANNER_CURRENT_X(PC),d0
+    move.w d0,d2
+    andi.w #7,d2
+    not.w d2
+    andi.w #7,d2
+
+    lsr.w #3,d0
+    move.l TILE_POINTER(PC),a0
+    move.b (a0,d0.w),d1
+    btst d2,d1
+    bne.s donotcleartile
+    lea tile_empty,a1
+    lea tile_empty,a2
+    bra.s drawtile
+donotcleartile:
+    ; Draw (or clear) the tile
+    lea space_1,a1
+    lea space_2,a2
+drawtile:
     bsr.w blittilecpu
     
+    ; Go to the next X location for next frame
     addq #1,BANNER_CURRENT_X
-    cmpi.w #40,BANNER_CURRENT_X
+    cmpi.w #40,BANNER_CURRENT_X ; check if raw is done, in this case reset X and go to next Y
     bne.s donotresetbannerx
     move.w #0,BANNER_CURRENT_X
     add.w  #40*WIDTHTILE,BANNER_CURRENT_Y
+    ;DEBUG 1234
+    add.l #5,TILE_POINTER
 
 donotresetbannerx:
     rts
+
+
 blittilecpu:
     ;move.l SCREEN_PTR_0,a0
     ;move.l SCREEN_PTR_OTHER_0,a3
@@ -164,8 +301,7 @@ blittilecpu:
     adda.w d7,a3
     adda.w BANNER_CURRENT_X,a3
 
-    lea space_1,a1
-    lea space_2,a2
+    
     moveq #WIDTHTILE-1,d0
 blittilecpu_startcycle:
     move.b (a1),(a3)

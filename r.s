@@ -8,15 +8,15 @@ DEBUG MACRO
   move.w                 #$\1,d3
   ENDM
 
+DEBUG2 MACRO
+  clr.w                  $101
+  move.w                 #$\1,d3
+  ENDM
+
 
 Inizio:
 
-.loop; Wait for vblank
-  move.l              $dff004,d0
-  and.l               #$1ff00,d0
-  cmp.l               #303<<8,d0
-  bne.b               .loop
-  bsr                 Save_all
+  bsr.w                 Save_all
 
 ;*****************************************************************************
 ;	FACCIAMO PUNTARE I BPLPOINTERS NELLA COPPELIST AI NOSTRI BITPLANES
