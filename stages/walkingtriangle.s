@@ -6,7 +6,7 @@
 NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
 STARTWALKYPOS          EQU 184
-LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                                         ; Start triangle position Y (signed value)
+LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                          ; Start triangle position Y (signed value)
 
 STARTDXCLIMB           EQU 300-60                                                      ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB           EQU 150
@@ -16,6 +16,7 @@ STARTDXDESCEND_OFFSET  EQU 210                                                  
 SECOND_FLOOR_Y         EQU 90                                                          ; Y coordinate of the second floor
 STARTSTAGE             EQU 9                                                           ; Number of the first stage
 START_SCALE_FACTOR     EQU 0*64                                                        ; Scaling of triangles at start
+FIRST_STAGE_FUNCTION   EQU teletrasportationend                                        ; Addr of the first function to be executed for each triangle
 
 ; DEFINITION OF THE TRIANGLE STRUCTURE
 ANGLE_OFFSET           EQU 0
@@ -33,7 +34,8 @@ VELOCITYVECTOR_OFFSET  EQU 20
 XVELOCITYVECTOR_OFFSET EQU 20
 YVELOCITYVECTOR_OFFSET EQU 22
 SCALEFACTOR_OFFSET     EQU 24
-TRIANGLE_END_OFFSET    EQU 26
+STAGEPOINTER_OFFSET    EQU 26
+TRIANGLE_END_OFFSET    EQU 30
 
 ; VARIABLES
 ACCELLERATIONVECTOR:
@@ -55,6 +57,7 @@ TRIANGLE_1:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
+  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
 TRIANGLE_2:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -69,6 +72,7 @@ TRIANGLE_2:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
+  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
 TRIANGLE_3:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -83,6 +87,7 @@ TRIANGLE_3:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
+  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
 TRIANGLE_4:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -97,6 +102,7 @@ TRIANGLE_4:
   dc.w                   0                                                             ; VELOCITYVECTOR X
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
+  dc.l                   FIRST_STAGE_FUNCTION                                          ; STAGE_POINTER
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 
 ;MACROS
@@ -116,6 +122,10 @@ UPDATE_TRANSLATION2  MACRO
   add.w                  \3,\2
   move.l                 #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
 .walkingtriangle_no_reset_angle:
+  ENDM
+
+SETSTAGE MACRO
+  move.l #\1,STAGEPOINTER_OFFSET(a3)
   ENDM
 
 ; Entry function
@@ -142,31 +152,11 @@ WALKINGTRIANGLE_PROCESS:
   STROKE                 STROKE_OFFSET(a3)
   FILL                   FILL_OFFSET(a3)
 
-  ;DEBUG                  1234
+  move.l STAGEPOINTER_OFFSET(a3),a0
+  jsr (a0)
 
-    ; call the appropriate routine according to stage
-  move.w                 STAGEWALK_OFFSET(a3),d0
-  cmpi.w                 #1,d0
-  beq.w                  walkingtriangle_ywalk
-  cmpi.w                 #2,d0
-  beq.w                  walkingtriangle_xwalk_rev
-  cmpi.w                 #3,d0
-  beq.w                  walkingtriangle_ywalk_desending
-  cmpi.w                 #4,d0
-  beq.w                  walkingtriangle_xwalk_right
-  cmpi.w                 #5,d0
-  beq.w                  walkingtriangle_xwalk_right_2
-  cmpi.w                 #6,d0
-  beq.w                  walkingtriangle_reverse_dive
-  cmpi.w                 #7,d0
-  beq.w                  walkingfloor1
-  cmpi.w                 #8,d0
-  beq.w                  teletrasportationstart
-  cmpi.w                 #9,d0
-  beq.w                  teletrasportationend
-  cmpi.w                 #$FFFF,d0
-  beq.w                  walkingtriangle_sleep
-
+  movem.l                (sp)+,d5/a3
+  rts
 
   ; START OF WALKING ROUTINES
 
@@ -179,6 +169,7 @@ WALKINGTRIANGLE_PROCESS:
   ; Pseudocode:
   ; - resetMatrix();
   ; - translate(STARTWALKXPOS+XROLLINGOFFSET,STARTWALKYPOS)
+walkingtriangle_xwalk:
   moveq                  #STARTWALKXPOS,d0
   add.w                  XROLLINGOFFSET_OFFSET(a3),d0
   move.w                 #STARTWALKYPOS,d1
@@ -203,6 +194,7 @@ WALKINGTRIANGLE_PROCESS:
   cmpi.w                 #325,ANGLE_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_ywalk
   move.w                 #359,ANGLE_OFFSET(a3)
   START_LADDERS
   
@@ -216,7 +208,6 @@ walkingtriangle_no_vertical_climbing:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  movem.l                (sp)+,d5/a3
   rts
   ; ***************************** END OF FIRST HORIZONTAL WALKING
 
@@ -244,7 +235,7 @@ walkingtriangle_ywalk:
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)                                  ; next stage must start with this value to 30
   move.w                 #0,ANGLE_OFFSET(a3)                                           ; next stage must start with this value to zero
   move.w                 #STARTDYCLIMB-1,YROLLINGOFFSET_OFFSET(a3)
-  move.w                 #2,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_xwalk_rev
   STOP_LADDERS
 
 walkingtriangle_no_horizontal_climbing:
@@ -264,7 +255,6 @@ walkingtriangle_no_horizontal_climbing:
   ;move.w #15,d5
   ;STROKE #1
   ;jsr TRIANGLE
-  movem.l                (sp)+,d5/a3
   rts
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
 
@@ -301,7 +291,7 @@ walkingtriangle_xwalk_rev:
   bne.s                  walkingtriangle_no_vertical_descending
   tst.w                  ANGLE_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_descending
-  move.w                 #3,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_ywalk_desending
 walkingtriangle_no_vertical_descending:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
@@ -311,7 +301,6 @@ walkingtriangle_no_vertical_descending:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a3
   rts
 
 ; ***************************** END IMPLEMENTATION OF X REVERSE ------------------
@@ -331,17 +320,17 @@ walkingtriangle_ywalk_desending:
   ; when hitting bottom border stop
   cmpi.w                  #SECOND_FLOOR_Y,d1
   ble.s                   notdownborder
-  move.w                  #4,STAGEWALK_OFFSET(a3)
+  SETSTAGE                walkingtriangle_xwalk_right
   ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  move.w                  #1*32,d0
+  moveq                   #1*32,d0
   move.w                  #-1*64,d1
-  CREATE2DVECTOR a0
+  CREATE2DVECTOR          a0
 notdownborder;
 
   ; Add 2 to angle
-  add.w                  #2,ANGLE_OFFSET(a3)
+  addq                   #2,ANGLE_OFFSET(a3)
   cmpi.w                 #360,ANGLE_OFFSET(a3)
   bcs.s                  .increase_angle_by_1_exit
   move.w                 #0,ANGLE_OFFSET(a3)
@@ -351,14 +340,14 @@ notdownborder;
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
-  move.l                 a3,a1
+  movea.l                a3,a1
   adda.w                 #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; add velocity to position
-  move.l                 a3,a0
+  movea.l                a3,a0
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
-  move.l                 a3,a1
+  movea.l                a3,a1
   adda.w                 #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
@@ -374,7 +363,6 @@ notleftborder;
   VERTEX2D_INIT          3,#-13,#0
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a3
   rts
 ; ***************************** END IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 
@@ -402,12 +390,12 @@ walkingtriangle_xwalk_right:
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
-  move.l                 a3,a1
+  movea.l                 a3,a1
   adda.w                 #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; add velocity to position
-  move.l                 a3,a0
+  movea.l                 a3,a0
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
   move.l                 a3,a1
   adda.w                 #POSITIONVECTOR_OFFSET,a1
@@ -416,7 +404,7 @@ walkingtriangle_xwalk_right:
   ; when hitting bottom border stop
   cmpi.w                 #SECOND_FLOOR_Y,d7
   ble.s                  notdownborder2
-  move.w                 #5,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_xwalk_right_2
   move.w                 #122,XPOSITIONVECTOR_OFFSET(a3)
   move.w                 #98,YPOSITIONVECTOR_OFFSET(a3)
   move.w                 #0,ANGLE_OFFSET(a3)
@@ -428,7 +416,6 @@ notdownborder2;
   VERTEX2D_INIT          3,#-13,#0
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a3
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
 
@@ -454,7 +441,7 @@ walkingtriangle_xwalk_right_2:
   add.w                  #30,XPOSITIONVECTOR_OFFSET(a3)
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
-  move.w                 #6,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_reverse_dive
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   lsl.w                  #6,d0
   move.w                 d0,XPOSITIONVECTOR_OFFSET(a3)
@@ -465,8 +452,8 @@ walkingtriangle_xwalk_right_2:
   ; new velocity
   move.l                 a3,a0
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
-  move.w #1*15,d0
-  move.w #-1*90,d1
+  moveq                  #1*15,d0
+  move.w                 #-1*90,d1
   CREATE2DVECTOR a0
 
 .decrease_angle_by_1_exit:
@@ -478,7 +465,6 @@ walkingtriangle_xwalk_right_2:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  movem.l                (sp)+,d5/a3
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
 
@@ -504,7 +490,7 @@ walkingtriangle_reverse_dive:
 .increase_angle_by_5_noreset
 
   ; add accelleration to velocity
-  lea ACCELLERATIONVECTOR(PC),a0
+  lea                     ACCELLERATIONVECTOR(PC),a0
   move.l                  a3,a1
   adda.w                  #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
@@ -518,7 +504,7 @@ walkingtriangle_reverse_dive:
 
   cmpi.w                  #124,d7
   ble.s                   .noendoffall
-  move.w                  #7,STAGEWALK_OFFSET(a3)
+  SETSTAGE                walkingfloor1
    ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
@@ -534,47 +520,49 @@ walkingtriangle_reverse_dive:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  movem.l                (sp)+,d5/a3
   rts
+
+
+
 
 walkingfloor1:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
-  asr.w #6,d0
-  asr.w #6,d1
-  sub.w #15,d0
-  sub.w #12,d1
-  move.w d0,d6
-  move.w d1,d7
+  asr.w                  #6,d0
+  asr.w                  #6,d1
+  sub.w                  #15,d0
+  sub.w                  #12,d1
+  move.w                 d0,d6
+  move.w                 d1,d7
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; Add 5 to angle
-  addq                    #5,ANGLE_OFFSET(a3)
-  cmpi.w                  #360,ANGLE_OFFSET(a3)
-  blt.s .increase_angle_by_5_noreset_2
-  sub.w                 #360,ANGLE_OFFSET(a3)
+  addq                   #5,ANGLE_OFFSET(a3)
+  cmpi.w                 #360,ANGLE_OFFSET(a3)
+  blt.s                  .increase_angle_by_5_noreset_2
+  sub.w                  #360,ANGLE_OFFSET(a3)
 .increase_angle_by_5_noreset_2
 
   ; add accelleration to velocity
-  lea ACCELLERATIONVECTOR(PC),a0
-  move.l                  a3,a1
-  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  lea                    ACCELLERATIONVECTOR(PC),a0
+  move.l                 a3,a1
+  adda.w                 #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; add velocity to position
-  move.l                  a3,a0
-  adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  move.l                  a3,a1
-  adda.w                  #POSITIONVECTOR_OFFSET,a1
+  move.l                 a3,a0
+  adda.w                 #VELOCITYVECTOR_OFFSET,a0
+  move.l                 a3,a1
+  adda.w                 #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
-  cmpi.w #124,d7
-  ble.s .noendoffall2
-  cmpi.w #125,d6
-  bgt.s .noendoffall2
-  move.w                 #8,STAGEWALK_OFFSET(a3)
+  cmpi.w                 #124,d7
+  ble.s                  .noendoffall2
+  cmpi.w                 #125,d6
+  bgt.s                  .noendoffall2
+  SETSTAGE               teletrasportationstart
 .noendoffall2:
 
   ; Draw triangle
@@ -583,8 +571,10 @@ walkingfloor1:
   VERTEX2D_INIT          3,#0+15,#0+12
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  movem.l                (sp)+,d5/a3
   rts
+
+
+
 
   ; ***************************** START IMPLEMENTATION OF TELETRANSPORTATION START ------------------
 teletrasportationstart:
@@ -603,7 +593,7 @@ teletrasportationstart:
   move.w                 d0,d1
   tst.w                  d0
   bne.w                  .noscale
-  move.w                 #9,STAGEWALK_OFFSET(a3)
+  SETSTAGE               teletrasportationend
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
   move.l                 #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
   move.w                 #64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET),XPOSITIONVECTOR_OFFSET(a3)
@@ -622,7 +612,6 @@ teletrasportationstart:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  movem.l                (sp)+,d5/a3
   rts
 
   ; ***************************** END IMPLEMENTATION OF TELETRANSPORTATION START ------------------
@@ -641,7 +630,7 @@ teletrasportationend:
   move.w                 d0,d1
   cmpi.w                 #1*64,d0
   bne.w                  .noscale2
-  move.w                 #0,STAGEWALK_OFFSET(a3)
+  SETSTAGE               walkingtriangle_xwalk
     ; reset initial values
   move.w                 #30,YROLLINGOFFSET_OFFSET(a3)
 .noscale2
@@ -654,14 +643,9 @@ teletrasportationend:
 
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
-  DEBUG 1235
 
-  movem.l                (sp)+,d5/a3
   rts
 
 walkingtriangle_sleep:
   movem.l                (sp)+,d5/a3
   rts
-
-
-

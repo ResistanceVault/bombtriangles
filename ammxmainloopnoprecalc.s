@@ -6,14 +6,16 @@ ammxmainloop3:
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
 
+            ; execute banner routine
+            bsr.w banner
+
             ; move ladders
             bsr.w            moveladders
 
             ; execute the drawing routine
             lea              DRAWFUNCTARRAY_START(PC),a0
             move.l           (a0),a0
-            jsr              (a0)
-                         
+            jsr              (a0)          
                    
             movem.l          (sp)+,d0-d7/a0-a6
             move.l           SCREEN_PTR_0,d0
@@ -76,9 +78,6 @@ CLEAR_BPL_2_OTH:
 VOID:
             rts
 
-
-
-
 LAST_ITERATION_FUNCTION_PTR:
             dc.l             LAST_ITERATION_FUNCTION_START
             
@@ -107,3 +106,73 @@ ROTATIONS_ANGLES_64_END:
 
 ROTATIONS_ANGLES_64_PTR: 
             dc.l             ROTATIONS_ANGLES_64
+
+WIDTHTILE equ 9
+
+space_1:
+    dc.b $FE
+    ;dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $FC
+    dc.b $00
+
+space_2:
+    dc.b $00
+    ;dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $7E
+    dc.b $FE
+
+BANNER_CURRENT_X:
+    dc.w 0
+BANNER_CURRENT_Y:
+    dc.w 0
+
+banner:
+    cmpi.w #40*5*WIDTHTILE,BANNER_CURRENT_Y
+    beq.s donotresetbannerx
+    bsr.w blittilecpu
+    
+    addq #1,BANNER_CURRENT_X
+    cmpi.w #40,BANNER_CURRENT_X
+    bne.s donotresetbannerx
+    move.w #0,BANNER_CURRENT_X
+    add.w  #40*WIDTHTILE,BANNER_CURRENT_Y
+
+donotresetbannerx:
+    rts
+blittilecpu:
+    ;move.l SCREEN_PTR_0,a0
+    ;move.l SCREEN_PTR_OTHER_0,a3
+    lea SCREEN_0,a0
+    lea SCREEN_00,a3
+    move.w  #40*(256-5*WIDTHTILE),d7
+    add.w BANNER_CURRENT_Y,d7
+    adda.w d7,a0
+    adda.w BANNER_CURRENT_X,a0
+
+    adda.w d7,a3
+    adda.w BANNER_CURRENT_X,a3
+
+    lea space_1,a1
+    lea space_2,a2
+    moveq #WIDTHTILE-1,d0
+blittilecpu_startcycle:
+    move.b (a1),(a3)
+    move.b (a2),256*40(a3)
+    move.b (a1)+,(a0)
+    move.b (a2)+,256*40(a0)
+    adda.w #40,a0
+    adda.w #40,a3
+    dbra d0,blittilecpu_startcycle
+    rts
