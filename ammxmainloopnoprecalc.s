@@ -6,8 +6,10 @@ SET_TILES MACRO
 TILES_TIMEOUT_SECONDS equ 10
 
 TILE_DATA:
+    dc.l PA2022
     dc.l TILEPATTERN2
-    dc.l TILEPATTERN1
+    dc.l SPOLETO
+    dc.l TILEPATTERN2
 TILE_DATA_END:
 
 TILE_PTR:
@@ -29,6 +31,7 @@ ammxmainloop3:
             move.w #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER
             move.l TILE_PTR,a0
             SET_TILES (a0)
+            DEBUG 1237
             addq #4,a0
             move.l a0,d0
             cmpi.l #TILE_DATA_END,d0
@@ -165,41 +168,78 @@ TILEPATTERN2_5:
     dc.b 0
 
 ;--------------------------------------------------
-TILEPATTERN1:
-TILEPATTERN_1:
-    dc.b %10110011
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
+PA2022:
+PA2022_1:
+    dc.b %11110001
+    dc.b %10000000
+    dc.b %00111100
+    dc.b %01100011
+    dc.b %11001111
 
-TILEPATTERN_2:
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
+PA2022_2:
+    dc.b %10010010
+    dc.b %01000000
+    dc.b %00000100
+    dc.b %10010000
+    dc.b %01000001
 
-TILEPATTERN_3:
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
+PA2022_3:
+    dc.b %11110010
+    dc.b %01000000
+    dc.b %00001000
+    dc.b %10010000
+    dc.b %10000010
 
-TILEPATTERN_4:
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
-    dc.b %01010101
+PA2022_4:
+    dc.b %10000011
+    dc.b %11000000
+    dc.b %00010000
+    dc.b %10010001
+    dc.b %00000100
 
-TILEPATTERN_5:
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
-    dc.b $FF
+PA2022_5:
+    dc.b %10000010
+    dc.b %01000000
+    dc.b %00111100
+    dc.b %01100011
+    dc.b %11001111
+
+
+SPOLETO:
+SPOLETO_1:
+    dc.b %11110011
+    dc.b %11001111
+    dc.b %00100000
+    dc.b %11110011
+    dc.b %11001111
+
+SPOLETO_2:
+    dc.b %10000010
+    dc.b %01001001
+    dc.b %00100000
+    dc.b %10000011
+    dc.b %11001001
+
+SPOLETO_3:
+    dc.b %01100011
+    dc.b %11001001
+    dc.b %00100000
+    dc.b %11110001
+    dc.b %10001001
+
+SPOLETO_4:
+    dc.b %00110010
+    dc.b %00001001
+    dc.b %00100000
+    dc.b %10000001
+    dc.b %10001001
+
+SPOLETO_5:
+    dc.b %11110010
+    dc.b %00001111
+    dc.b %00111100
+    dc.b %11110001
+    dc.b %10001111
 
 tile_empty:
     dc.b $0
@@ -245,7 +285,7 @@ BANNER_CURRENT_X:
 BANNER_CURRENT_Y:
     dc.w 0
 TILE_POINTER:
-    dc.l TILEPATTERN_1
+    dc.l SPOLETO
 
 banner:
     cmpi.w #40*5*WIDTHTILE,BANNER_CURRENT_Y
