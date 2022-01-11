@@ -300,8 +300,8 @@ scrollcolors:
   ;include             "AProcessing2/libs/rasterizers/clipping.s"
   include             "AProcessing2/libs/trigtables.i"
   include             "AProcessing2/libs/rasterizers/point.s"
-  include             "AProcessing2/libs/rasterizers/triangle.s"
-  include             "AProcessing2/libs/rasterizers/rectangle.s"
+  ;include             "AProcessing2/libs/rasterizers/triangle.s"
+  ;include             "AProcessing2/libs/rasterizers/rectangle.s"
   include             "AProcessing2/libs/rasterizers/processing_bitplanes_fast.s"
   include             "AProcessing2/libs/blitter/lines.s"
   include             "AProcessing2/libs/blitter/triangle.s"
@@ -395,7 +395,6 @@ Module1:
   even
 
 
-
 LADDER_1:
 LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
@@ -461,15 +460,6 @@ LADDER_2_VSTOP2:
   dc.w                $FFFF,$FFFF                                                    ; line 2
   dc.w                $FFFF,$FFFF                                                    ; line 3
 
-  ;LADDER_NO_VSTART2:
-  ;dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*0
-  ;LADDER_NO_HSTART2:
-  ;dc.b                LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
-  ;LADDER_NO_VSTOP2:
-  ;dc.b                LADDERVERTICALPOSITION-LADDERSPACING*0,$01
-  ;dc.w                $FFFF,$FFFF                                                    ; line 1
-  ;dc.w                $FFFF,$FFFF                                                    ; line 2
-  ;dc.w                $FFFF,$FFFF                                                    ; line 3
   ; END OF SPRITE
   dc.w                0,0
 
