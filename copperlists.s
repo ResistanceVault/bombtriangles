@@ -225,6 +225,11 @@ CopBar:
   dc.w       $0807,$FFFE
   dc.w       $180,$000
 
+  ;dc.w       $188,$630
+  dc.w       $182,$FF4
+  dc.w       $184,$420
+  dc.w       $186,$C80
+
 BARRA:
   dc.w       $0907,$FFFE                                               ; aspetto la linea $79
   dc.w       $180,$300                                                 ; inizio la barra rossa: rosso a 3

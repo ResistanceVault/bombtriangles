@@ -10,6 +10,7 @@ TILE_DATA:
     dc.l TILEPATTERN2
     dc.l SPOLETO
     dc.l TILEPATTERN2
+    dc.l PATTERN_FULL
 TILE_DATA_END:
 
 TILE_PTR:
@@ -93,6 +94,37 @@ PA2022_5:
   dc.b      %01100011
   dc.b      %11001111
 
+PATTERN_FULL:
+PATTERN_FULL_1:
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+PATTERN_FULL_2:
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+PATTERN_FULL_3:
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+PATTERN_FULL_4:
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+PATTERN_FULL_5:
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
+  dc.b      %11111111
 
 SPOLETO:
 SPOLETO_1:
@@ -172,7 +204,7 @@ BANNER_CURRENT_X:
 BANNER_CURRENT_Y:
   dc.w      0
 TILE_POINTER:
-  dc.l      SPOLETO
+  dc.l      PATTERN_FULL
 
 banner:
   cmpi.w    #40*5*WIDTHTILE,BANNER_CURRENT_Y
@@ -217,6 +249,31 @@ donotresetbannerx:
 
 blittilecpu:
 
+  ; Load address of current text into a0
+  ;DEBUG 1234
+  movea.l    TILETXT_PTR,a0
+
+  ; which character we want to print? Read the ascii code
+  ; at addr in a5, then we increment and update the pointer
+  adda.w    BANNER_CURRENT_X,a0
+
+  ; If the text is finished print AFONT (fallback)
+  cmp.l     TILETXT_PTR_END,a0
+  bcs.s     tiletextnoreset
+  lea       WFONT,a4
+  bra.s     tilestartdrawingprocess
+tiletextnoreset:
+
+  move.b    (a0),d0
+  sub.b     #65,d0
+
+  ; a4 will hold the pointer to the font, each font is 3 bytes so we multiply d0 by 3
+  mulu      #3,d0
+  lea       AFONT,a4
+  adda.w    d0,a4
+  
+tilestartdrawingprocess:
+  ; Load bitplane pointers and point them to the font location
   lea       SCREEN_0,a0
   lea       SCREEN_00,a3
   move.w    #40*(256-5*WIDTHTILE),d7
@@ -227,14 +284,170 @@ blittilecpu:
   adda.w    d7,a3
   adda.w    BANNER_CURRENT_X,a3
 
-    
+  ; Start drawing the font with the CPU (cmooooon m68k I know you can do it)
   moveq     #WIDTHTILE-1,d0
 blittilecpu_startcycle:
+  cmp.w #WIDTHTILE-2,d0
+  bge.w blitwithnoletters
+  tst.w d0
+  beq.w blitwithnoletters
+
+  move.b (a1),d7
+  move.b (a4),d6
+
+  btst #0,d0
+
+  beq.s donotincrementfont
+  addq #1,a4
+  lsl.b #2,d6
+  bra.s blittilecpu_elaborate
+donotincrementfont
+  lsr.b #2,d6
+blittilecpu_elaborate:
+  andi.b #%00111100,d6
+  not.b d6
+  and.b d6,d7
+  move.b d7,(a3)
+  move.b d7,(a0)
+  
+  move.b (a2),d7
+ ;   move.b AFONT,d6
+  ;lsr.b #2,d6
+  ;andi.b #$C,d6
+  ;not.b d6
+  and.b d6,d7
+  move.b d7,256*40(a3)
+  move.b d7,256*40(a0)
+  addq #1,a1
+  addq #1,a2
+  bra.w blitwithnolettersend
+blitwithnoletters:
   move.b    (a1),(a3)
   move.b    (a2),256*40(a3)
   move.b    (a1)+,(a0)
   move.b    (a2)+,256*40(a0)
+blitwithnolettersend:
   adda.w    #40,a0
   adda.w    #40,a3
   dbra      d0,blittilecpu_startcycle
   rts
+
+TILETXT_PTR:
+  dc.l TILETXT1
+TILETXT_PTR_END:
+  dc.l TILETXT1_END
+
+TILETXT1:
+  DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+TILETXT1_END:
+
+TILETXT2:
+  DC.B "IA"
+TILETXT2_END:
+even
+
+AFONT:
+  dc.b %11101010
+  dc.b %10101110
+  dc.b %10101010
+BFONT:
+  dc.b %11101010
+  dc.b %11001010
+  dc.b %10101110
+CFONT:
+  dc.b %11101000
+  dc.b %10001000
+  dc.b %10001110
+DFONT:
+  dc.b %11001010
+  dc.b %10011001
+  dc.b %10101100
+EFONT:
+  dc.b %11101000
+  dc.b %11101000
+  dc.b %10001110
+FFONT:
+  dc.b %11101000
+  dc.b %11101000
+  dc.b %10001000
+GFONT:
+  dc.b %11101000
+  dc.b %10001010
+  dc.b %10101110
+HFONT:
+  dc.b %10101010
+  dc.b %11101010
+  dc.b %10101010
+IFONT:
+  dc.b %00100010
+  dc.b %00100010
+  dc.b %00100010
+JFONT:
+  dc.b %00100010
+  dc.b %00100010
+  dc.b %10100110
+KFONT:
+  dc.b %10101100
+  dc.b %10001100
+  dc.b %10101010
+LFONT:
+  dc.b %10001000
+  dc.b %10001000
+  dc.b %10001110
+MFONT:
+  dc.b %10101110
+  dc.b %11101010
+  dc.b %10101010
+NFONT:
+  dc.b %10101010
+  dc.b %11101110
+  dc.b %10101010
+OFONT:
+  dc.b %10101010
+  dc.b %10101010
+  dc.b %10101110
+PFONT:
+  dc.b %11101010
+  dc.b %10101100
+  dc.b %10001000
+QFONT:
+  dc.b %11101010
+  dc.b %10101010
+  dc.b %11100100
+RFONT:
+  dc.b %11101010
+  dc.b %10101100
+  dc.b %10101010
+SFONT:
+  dc.b %11101000
+  dc.b %10001110
+  dc.b %00101110
+TFONT:
+  dc.b %11100100
+  dc.b %01000100
+  dc.b %01000100
+UFONT:
+  dc.b %10101010
+  dc.b %10101010
+  dc.b %10101110
+VFONT:
+  dc.b %10101010
+  dc.b %10101010
+  dc.b %10100100
+WFONT: ; empty font , real W not representable with such low bits
+  dc.b 0
+  dc.b 0
+  dc.b 0
+XFONT:
+  dc.b %10101010
+  dc.b %11101010
+  dc.b %10101010
+YFONT:
+  dc.b %10101010
+  dc.b %01000100
+  dc.b %01000100
+ZFONT:
+  dc.b %11100010
+  dc.b %00100100
+  dc.b %10001110
+  even

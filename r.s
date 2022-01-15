@@ -76,7 +76,7 @@ Inizio:
   jsr                 P61_Init
 
   jsr                 _ammxmainloop3_init
-  move                #%1000011111100000,$96(a6)                                     ;Master,Copper,Blitter,Bitplanes
+  ;move                #%1000011111100000,$96(a6)                                     ;Master,Copper,Blitter,Bitplanes
 
 
 mouse:
@@ -117,13 +117,6 @@ mouse:
 Aspetta:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   beq.s               Aspetta                                                        ; Se si, non andare avanti, aspetta la linea
-				; seguente, altrimenti MuoviCopper viene
-				; rieseguito
-;.loopend ; Wait to exit vblank row (for faster processors like 68040)
-;	move.l $dff004,d0
-;	and.l #$1ff00,d0
-;	cmp.l #303<<8,d0
-;	beq.b .loopend
 
   btst                #6,$bfe001                                                     ; tasto sinistro del mouse premuto?
   bne.s               mouse                                                          ; se no, torna a mouse:
@@ -387,13 +380,8 @@ SCREEN_2
   PRINT_LINE 3,$00     ; 1
   PRINT_RIGHT_LINE_1ST_FLOOR_2
   
-  PRINT_LINE 112,$00    ; 163
-
-
-Module1:
-  incbin              "P61.chippy_nr.399"                                            ; usecode $945A
-  even
-
+  PRINT_LINE 50,$00    ; 163
+  PRINT_LINE 62,$00    ; 163
 
 LADDER_1:
 LADDER_1_VSTART0;
@@ -463,10 +451,9 @@ LADDER_2_VSTOP2:
   ; END OF SPRITE
   dc.w                0,0
 
-
-
-
-
+Module1:
+  incbin              "P61.chippy_nr.399"                                            ; usecode $945A
+  even
 
 
 

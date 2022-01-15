@@ -1,29 +1,28 @@
     include "tiles.s"
 
 ammxmainloop3:
-            movem.l          d0-d7/a0-a6,-(sp)    
+            ;movem.l          d1-d7/a0-a6,-(sp)    
   
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
 
             ; execute banner routine
-            subq #1,TILE_COUNTER
-            bne.s donoresettilecounter
-            move.w #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER
-            move.l TILE_PTR(PC),a0
-            SET_TILES (a0)
-            ;DEBUG 1237
-            addq #4,a0
-            move.l a0,d0
-            cmpi.l #TILE_DATA_END,d0
-            bne.s tiledatanoreset
-            move.l #TILE_DATA,a0
+            subq             #1,TILE_COUNTER
+            bne.s            donoresettilecounter
+            move.w           #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER
+            move.l           TILE_PTR(PC),a0
+            SET_TILES        (a0)
+            addq             #4,a0
+            move.l           a0,d0
+            cmpi.l           #TILE_DATA_END,d0
+            bne.s            tiledatanoreset
+            move.l           #TILE_DATA,a0
 tiledatanoreset:
-            move.l a0,TILE_PTR
+            move.l           a0,TILE_PTR
 donoresettilecounter:
 
-            bsr.w banner
+            bsr.w            banner
 
             ; move ladders
             bsr.w            moveladders
@@ -33,7 +32,7 @@ donoresettilecounter:
             move.l           (a0),a0
             jsr              (a0)          
                    
-            movem.l          (sp)+,d0-d7/a0-a6
+           ; movem.l          (sp)+,d1-d7/a0-a6
             move.l           SCREEN_PTR_0,d0
 
             rts
@@ -46,14 +45,14 @@ CLEARTOP:
             move.w           #$0000,$dff042        
             move.l           SCREEN_PTR_0,$dff054                                                                   ; copy to d channel
             move.w           #2,$DFF066 ;dmod                                                                        ;D mod
-            move.w           #$3013,$dff058
+            move.w           #$2E53,$dff058
             WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #2,$DFF066
-            move.w           #$0000,$dff042
+            ;move.w           #$0100,$dff040
+            ;move.w           #2,$DFF066
+            ;move.w           #$0000,$dff042
                     
             move.l           SCREEN_PTR_1,$dff054                                                                   ; copy to d channel
-            move.w           #$3013,$dff058
+            move.w           #$2E53,$dff058
             rts
 CLEAR: 
             WAITBLITTER
@@ -62,9 +61,6 @@ CLEAR:
             move.l           SCREEN_PTR_0,$dff054                                                                   ; copy to d channel
             move.w           #$0000,$dff066                                                                         ;D mod
             move.w           #$8014,$dff058
-            rts
-
-VOID:
             rts
 
             include          "ladder.s"
