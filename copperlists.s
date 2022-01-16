@@ -202,28 +202,30 @@ CopBar:
   dc.w       $e807,$FFFE                                               ; salto 16 linee
   dc.w       $180,$22F                                                 ; schiarisco...
 
+  dc.w       $eA07,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
+  dc.w       $180,$010
+  dc.w       $eB07,$FFFE
+  dc.w       $180,$020
+  dc.w       $eC07,$FFFE
+  dc.w       $180,$030
+  dc.w       $ED07,$FFFE
+  dc.w       $180,$040
+  dc.w       $EE07,$FFFE
+  dc.w       $180,$030
+  dc.w       $EF07,$FFFE
+  dc.w       $180,$020
+  dc.w       $F007,$FFFE
+  dc.w       $180,$010
+  dc.w       $F107,$FFFE
+  dc.w       $180,$000
+
 ;	Effetto della lezione3f.s
 
   dc.w       $ffdf,$fffe                                               ; ATTENZIONE! WAIT ALLA FINE LINEA $FF!
 				; i wait dopo questo sono sotto la linea
 				; $FF e ripartono da $00!!
 
-  dc.w       $0107,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
-  dc.w       $180,$010
-  dc.w       $0207,$FFFE
-  dc.w       $180,$020
-  dc.w       $0307,$FFFE
-  dc.w       $180,$030
-  dc.w       $0407,$FFFE
-  dc.w       $180,$040
-  dc.w       $0507,$FFFE
-  dc.w       $180,$030
-  dc.w       $0607,$FFFE
-  dc.w       $180,$020
-  dc.w       $0707,$FFFE
-  dc.w       $180,$010
-  dc.w       $0807,$FFFE
-  dc.w       $180,$000
+ 
 
   ;dc.w       $188,$630
   dc.w       $182,$FF4

@@ -10,10 +10,11 @@ ammxmainloop3:
             ; execute banner routine
             subq             #1,TILE_COUNTER
             bne.s            donoresettilecounter
-            move.w           #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER
+            move.w           #TILES_TIMEOUT_SECONDS*50,TILE_COUNTER ; reset the timer
             move.l           TILE_PTR(PC),a0
             SET_TILES        (a0)
-            addq             #4,a0
+            move.l           4(a0),TILETXT_PTR
+            addq             #8,a0
             move.l           a0,d0
             cmpi.l           #TILE_DATA_END,d0
             bne.s            tiledatanoreset

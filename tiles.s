@@ -6,11 +6,26 @@ SET_TILES MACRO
 TILES_TIMEOUT_SECONDS equ 10
 
 TILE_DATA:
-    dc.l PA2022
-    dc.l TILEPATTERN2
-    dc.l SPOLETO
-    dc.l TILEPATTERN2
+    dc.l EMPTYTILEPATTERN
+    dc.l TILETXT_EMPTY
+
     dc.l PATTERN_FULL
+    dc.l TILETXT1
+    
+    dc.l PA2022
+    dc.l TILETXT_EMPTY
+
+    dc.l EMPTYTILEPATTERN
+    dc.l TILETXT_EMPTY
+
+    dc.l SPOLETO
+    dc.l TILETXT_EMPTY
+
+    dc.l EMPTYTILEPATTERN
+    dc.l TILETXT_EMPTY
+
+    dc.l PATTERN_FULL
+    dc.l TILETXT2
 TILE_DATA_END:
 
 TILE_PTR:
@@ -21,36 +36,36 @@ TILE_COUNTER:
     
 WIDTHTILE equ 9
 
-TILEPATTERN2:
-TILEPATTERN2_1:
+EMPTYTILEPATTERN:
+EMPTYTILEPATTERN_1:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-TILEPATTERN2_2:
+EMPTYTILEPATTERN_2:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-TILEPATTERN2_3:
+EMPTYTILEPATTERN_3:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-TILEPATTERN2_4:
+EMPTYTILEPATTERN_4:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-TILEPATTERN2_5:
+EMPTYTILEPATTERN_5:
   dc.b      0
   dc.b      0
   dc.b      0
@@ -248,6 +263,14 @@ donotresetbannerx:
 
 
 blittilecpu:
+  ;DEBUG 1234
+  ; if we are in NOP mode just print an empty character
+  tst.w TILETEXT_NOP
+  beq.s notiletextnop
+  subq #1,TILETEXT_NOP
+  lea       WFONT,a4
+  bra.s     tilestartdrawingprocess
+notiletextnop
 
   ; Load address of current text into a0
   ;DEBUG 1234
@@ -255,22 +278,35 @@ blittilecpu:
 
   ; which character we want to print? Read the ascii code
   ; at addr in a5, then we increment and update the pointer
-  adda.w    BANNER_CURRENT_X,a0
+  ;adda.w    BANNER_CURRENT_X,a0
 
   ; If the text is finished print AFONT (fallback)
-  cmp.l     TILETXT_PTR_END,a0
-  bcs.s     tiletextnoreset
-  lea       WFONT,a4
-  bra.s     tilestartdrawingprocess
-tiletextnoreset:
+  ;cmp.l     TILETXT_PTR_END,a0
+  ;bcs.s     tiletextnoreset
+  ;lea       WFONT,a4
+  ;bra.s     tilestartdrawingprocess
+;tiletextnoreset:
 
-  move.b    (a0),d0
-  sub.b     #65,d0
+  move.b    (a0),d0 ; fetch the letter
+
+  ; go to next letter
+  addq      #1,a0
+  move.l    a0,TILETXT_PTR
+
+  sub.b     #65,d0 ; normalize it according to ascii table (A=65, B=66 ... and so on)
+  bpl.s     tilevalidfont ; if we got a negative number it means we are at the end of the line, in this case just nop the amount indicated
+  lea       WFONT,a4      ; end of line, force print W (which is an empty font)
+  add.b     #64,d0
+  move.b    d0,TILETEXT_NOP+1
+  bra.s     tilestartdrawingprocess
+tilevalidfont
 
   ; a4 will hold the pointer to the font, each font is 3 bytes so we multiply d0 by 3
   mulu      #3,d0
   lea       AFONT,a4
   adda.w    d0,a4
+
+  ; here a4 must hold the address of the letter to print
   
 tilestartdrawingprocess:
   ; Load bitplane pointers and point them to the font location
@@ -334,16 +370,36 @@ blitwithnolettersend:
 
 TILETXT_PTR:
   dc.l TILETXT1
-TILETXT_PTR_END:
-  dc.l TILETXT1_END
+ ; dc.l TILETXT2
+;TILETXT_PTR_END:
+;  dc.l TILETXT1_END
+TILETEXT_NOP:
+  dc.w 0
 
+
+; TEXT ON TILES, USE THE W AS SPACES!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 TILETXT1:
-  DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-TILETXT1_END:
+  dc.b  40
+  DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ",14
+  DC.B "ALESSIO",33
+  DC.B "GARZI",35
+  DC.B "A",39
 
 TILETXT2:
-  DC.B "IA"
-TILETXT2_END:
+  dc.b  13,"PASSIONEWAMIGA",13
+  dc.b  17,"OPPURE",17
+  dc.b  15,"FLASHPARTY",15
+  dc.b  40
+  dc.b  "QUESTOWEWUNWBELWDILEMMA",17
+
+
+TILETXT_EMPTY:
+  dc.b 40
+  dc.b 40
+  dc.b 40
+  dc.b 40
+  dc.b 40
+  
 even
 
 AFONT:
@@ -403,7 +459,7 @@ NFONT:
   dc.b %11101110
   dc.b %10101010
 OFONT:
-  dc.b %10101010
+  dc.b %11101010
   dc.b %10101010
   dc.b %10101110
 PFONT:
