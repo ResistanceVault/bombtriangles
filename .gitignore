@@ -3,3 +3,4 @@ rcompresso
 reffect
 rliscio
 build/*.o
+*.adf

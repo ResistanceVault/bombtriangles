@@ -23,10 +23,6 @@ SpritePointers:
   dc.w       $108,0                                                    ; Bpl1Mod
   dc.w       $10a,0                                                    ; Bpl2Mod
 
-  ; sprite fix
-  ;dc.w $144,0
-  ;dc.w $146,0
-
 ; Il BPLCON0 per uno schermo a 3 bitplanes: (8 colori)
 
 		    ; 5432109876543210

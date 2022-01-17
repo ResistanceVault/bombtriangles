@@ -47,10 +47,9 @@ Inizio:
   move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
   move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
 
-   move.w              #$0888,$dff1a8                                                 ; ladder color 1
+  move.w              #$0888,$dff1a8                                                 ; ladder color 1
   move.w              #$0AAA,$dff1aa                                                 ; ladder color 2
   move.w              #$0BCD,$dff1ac                                                 ; ladder color 3
-
 
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
@@ -100,7 +99,7 @@ mouse:
   swap                d0
 
   lea                 BPLPOINTERS1,a0
-  add.w               #256*40,d0
+  add.l               #256*40,d0
   move.w              d0,6(a0)
   swap                d0
   move.w              d0,2(a0)
@@ -172,44 +171,7 @@ Playrtn:
 ; *		BARRA A SCORRIMENTO ORIZZONTALE (Lezione3h.s)		   *
 ; **************************************************************************
   IFD                 EFFECTS
-CopperDestSin:
-  CMPI.W              #85,DestraFlag                                                 ; VAIDESTRA eseguita 85 volte?
-  BNE.S               VAIDESTRA                                                      ; se non ancora, rieseguila
-  CMPI.W              #85,SinistraFlag                                               ; VAISINISTRA eseguita 85 volte?
-  BNE.S               VAISINISTRA                                                    ; se non ancora, rieseguila
-  CLR.W               DestraFlag                                                     ; la routine VAISINISTRA e' stata eseguita
-  CLR.W               SinistraFlag                                                   ; 85 volte, riparti
-  RTS                                                                                ; TORNIAMO AL LOOP mouse
-
-
-VAIDESTRA:			; questa routine sposta la barra verso DESTRA
-  lea                 CopBar+1,A0                                                    ; Mettiamo in A0 l'indirizzo del primo XX
-  move.w              #29-1,D2                                                       ; dobbiamo cambiare 29 wait (usiamo un DBRA)
-DestraLoop:
-  addq.b              #2,(a0)                                                        ; aggiungiamo 2 alla coordinata X del wait
-  ADD.W               #16,a0                                                         ; andiamo al prossimo wait da cambiare
-  dbra                D2,DestraLoop                                                  ; ciclo eseguito d2 volte
-  addq.w              #1,DestraFlag                                                  ; segnamo che abbiamo eseguito VAIDESTRA
-  RTS                                                                                ; TORNIAMO AL LOOP mouse
-
-
-VAISINISTRA:			; questa routine sposta la barra verso SINISTRA
-  lea                 CopBar+1,A0
-  move.w              #29-1,D2                                                       ; dobbiamo cambiare 29 wait
-SinistraLoop:
-  subq.b              #2,(a0)                                                        ; sottraiamo 2 alla coordinata X del wait
-  ADD.W               #16,a0                                                         ; andiamo al prossimo wait da cambiare
-  dbra                D2,SinistraLoop                                                ; ciclo eseguito d2 volte
-  addq.w              #1,SinistraFlag                                                ; Annotiamo lo spostamento
-  RTS                                                                                ; TORNIAMO AL LOOP mouse
-
-
-DestraFlag:		; In questa word viene tenuto il conto delle volte
-  dc.w                0                                                              ; che e' stata eseguita VAIDESTRA
-
-SinistraFlag:		; In questa word viene tenuto il conto delle volte
-  dc.w                0                                                              ; che e' stata eseguita VAISINISTRA
-
+                                                                       ; TORNIAMO AL LOOP mouse
 ; **************************************************************************
 ; *		BARRA ROSSA SOTTO LA LINEA $FF (Lezione3f.s)		   *
 ; **************************************************************************
@@ -287,8 +249,8 @@ scrollcolors:
   include             "AProcessing2/libs/matrix/matrix.s"
   include             "AProcessing2/libs/matrix/scale.s"
 
-  include             "AProcessing2/libs/rasterizers/3dglobals.i"
-  include             "AProcessing2/libs/rasterizers/processingfill.s"
+  ;include             "AProcessing2/libs/rasterizers/3dglobals.i"
+  ;include             "AProcessing2/libs/rasterizers/processingfill.s"
   include             "AProcessing2/libs/rasterizers/processing_table_plotrefs.s"
   ;include             "AProcessing2/libs/rasterizers/clipping.s"
   include             "AProcessing2/libs/trigtables.i"
@@ -355,7 +317,7 @@ PRINT_RIGHT_LINE_1ST_FLOOR_2 MACRO
   ENDM
 
 SCREEN_2
-  PRINT_LINE 1,$FF     ; 1
+  PRINT_LINE 1,$00     ; 1
   PRINT_LINE 50,$00    ; 51
 
   ;ceiling start

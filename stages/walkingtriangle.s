@@ -1,6 +1,5 @@
 ;includes
     include              "AProcessing2/libs/vectors/operations.s"
-    include              "AProcessing2/libs/blitter/offbitplanemem.i"
 
 ; DEFINES
 NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
@@ -37,6 +36,9 @@ STAGEPOINTER_OFFSET    EQU 26
 TRIANGLE_END_OFFSET    EQU 30
 
 ; VARIABLES
+OFFBITPLANEMEM:
+  dcb.b                  40*190,$00
+
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
 
@@ -135,7 +137,7 @@ WALKINGTRIANGLE:
 walkingtriangle_start:
   tst.w                  SLEEP_OFFSET(a3)
   beq.s                  walkingtriangle_nodelay
-  sub.w                  #1,SLEEP_OFFSET(a3)
+  subq                   #1,SLEEP_OFFSET(a3)
   bra.s                  walkingtriangle_gotonext
 walkingtriangle_nodelay
   bsr.w                  WALKINGTRIANGLE_PROCESS
@@ -324,7 +326,7 @@ walkingtriangle_ywalk_desending:
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
   moveq                   #1*32,d0
-  move.w                  #-1*64,d1
+  moveq                   #-1*64,d1
   CREATE2DVECTOR          a0
 notdownborder;
 
@@ -389,14 +391,14 @@ walkingtriangle_xwalk_right:
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
-  movea.l                 a3,a1
+  movea.l                a3,a1
   adda.w                 #VELOCITYVECTOR_OFFSET,a1
   ADD2DVECTOR
 
   ; add velocity to position
-  movea.l                 a3,a0
+  movea.l                a3,a0
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
-  move.l                 a3,a1
+  movea.l                a3,a1
   adda.w                 #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
 
@@ -454,7 +456,7 @@ walkingtriangle_xwalk_right_2:
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
   moveq                  #1*15,d0
   move.w                 #-1*90,d1
-  CREATE2DVECTOR a0
+  CREATE2DVECTOR         a0
 
 .decrease_angle_by_1_exit:
 
@@ -588,10 +590,10 @@ teletrasportationstart:
   move.w                 d1,d7
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  sub.w                  #1,SCALEFACTOR_OFFSET(a3)
+  subq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
   move.w                 d0,d1
-  tst.w                  d0
+  ;tst.w                  d0
   bne.w                  .noscale
   SETSTAGE               teletrasportationend
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
