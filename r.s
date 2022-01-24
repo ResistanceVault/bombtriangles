@@ -2,7 +2,7 @@
 
   SECTION             CiriCop,CODE_C
 
-  include             "AProcessing2/libs/ammxmacros.i"
+  include             "AProcessing/libs/ammxmacros.i"
 DEBUG MACRO
   clr.w                  $100
   move.w                 #$\1,d3
@@ -245,21 +245,21 @@ scrollcolors:
   ENDC
 
 
-  include             "AProcessing2/libs/rasterizers/globaloptions.s"
-  include             "AProcessing2/libs/matrix/matrix.s"
-  include             "AProcessing2/libs/matrix/scale.s"
+  include             "AProcessing/libs/rasterizers/globaloptions.s"
+  include             "AProcessing/libs/matrix/matrix.s"
+  include             "AProcessing/libs/matrix/scale.s"
 
-  ;include             "AProcessing2/libs/rasterizers/3dglobals.i"
-  ;include             "AProcessing2/libs/rasterizers/processingfill.s"
-  include             "AProcessing2/libs/rasterizers/processing_table_plotrefs.s"
-  ;include             "AProcessing2/libs/rasterizers/clipping.s"
-  include             "AProcessing2/libs/trigtables.i"
-  include             "AProcessing2/libs/rasterizers/point.s"
-  ;include             "AProcessing2/libs/rasterizers/triangle.s"
-  ;include             "AProcessing2/libs/rasterizers/rectangle.s"
-  include             "AProcessing2/libs/rasterizers/processing_bitplanes_fast.s"
-  include             "AProcessing2/libs/blitter/lines.s"
-  include             "AProcessing2/libs/blitter/triangle.s"
+  ;include             "AProcessing/libs/rasterizers/3dglobals.i"
+  ;include             "AProcessing/libs/rasterizers/processingfill.s"
+  include             "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
+  ;include             "AProcessing/libs/rasterizers/clipping.s"
+  include             "AProcessing/libs/trigtables.i"
+  include             "AProcessing/libs/rasterizers/point.s"
+  ;include             "AProcessing/libs/rasterizers/triangle.s"
+  ;include             "AProcessing/libs/rasterizers/rectangle.s"
+  include             "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
+  include             "AProcessing/libs/blitter/lines.s"
+  include             "AProcessing/libs/blitter/triangle.s"
 
   include             "initnoprecalc.s"
   include             "schedule.s"

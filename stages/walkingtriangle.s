@@ -1,5 +1,5 @@
 ;includes
-    include              "AProcessing2/libs/vectors/operations.s"
+    include              "AProcessing/libs/vectors/operations.s"
 
 ; DEFINES
 NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
@@ -37,7 +37,16 @@ TRIANGLE_END_OFFSET    EQU 30
 
 ; VARIABLES
 OFFBITPLANEMEM:
-  dcb.b                  40*190,$00
+  dcb.b                  40*256,$00
+
+OFFBITPLANEMEM2:
+  dcb.b                  40*256,$00
+
+OFFBITPLANEMEM3:
+  dcb.b                  40*256,$00
+
+OFFBITPLANEMEM4:
+  dcb.b                  40*256,$00
 
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
@@ -50,7 +59,7 @@ TRIANGLE_1:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   2                                                             ; STROKE
+  dc.b                   1                                                             ; STROKE
   dc.b                   2                                                             ; FILL
   dc.w                   TIMEDELAY*0                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
@@ -80,8 +89,8 @@ TRIANGLE_3:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   3                                                             ; STROKE
-  dc.b                   1                                                             ; FILL
+  dc.b                   2                                                             ; STROKE
+  dc.b                   3                                                             ; FILL
   dc.w                   TIMEDELAY*2                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
@@ -95,8 +104,8 @@ TRIANGLE_4:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   1                                                             ; STROKE
-  dc.b                   3                                                             ; FILL
+  dc.b                   3                                                             ; STROKE
+  dc.b                   2                                                             ; FILL
   dc.w                   TIMEDELAY*3                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
