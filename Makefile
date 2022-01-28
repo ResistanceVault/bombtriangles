@@ -1,7 +1,7 @@
 all:
-		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000  -DUSE_BPL_SECTION -DUSE_DBLBUF   -DUSE_MUSICCOUNTER ./r.s  -o ./rliscio -I/usr/local/amiga/os-include && chmod 777 ./rliscio
-		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000  -DUSE_BPL_SECTION -DUSE_DBLBUF -DDEBUGCOLORS   ./r.s  -o ./r -I/usr/local/amiga/os-include && chmod 777 ./r
-		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000  -DUSE_BPL_SECTION -DUSE_DBLBUF -DEFFECTS   ./r.s  -o ./reffect -I/usr/local/amiga/os-include && chmod 777 ./reffect
+		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000 -DUSE_OR_BLIT -DUSE_BPL_SECTION -DUSE_DBLBUF   -DUSE_MUSICCOUNTER ./r.s  -o ./rliscio -I/usr/local/amiga/os-include && chmod 777 ./rliscio
+		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000 -DUSE_OR_BLIT -DUSE_BPL_SECTION -DUSE_DBLBUF -DDEBUGCOLORS   ./r.s  -o ./r -I/usr/local/amiga/os-include && chmod 777 ./r
+		vasmm68k_mot -devpac -Fhunkexe -quiet -esc  -m68000 -DUSE_OR_BLIT -DUSE_BPL_SECTION -DUSE_DBLBUF -DEFFECTS   ./r.s  -o ./reffect -I/usr/local/amiga/os-include && chmod 777 ./reffect
 	./comprimi.sh
 
 

@@ -3,16 +3,6 @@
   SECTION             CiriCop,CODE_C
 
   include             "AProcessing/libs/ammxmacros.i"
-DEBUG MACRO
-  clr.w                  $100
-  move.w                 #$\1,d3
-  ENDM
-
-DEBUG2 MACRO
-  clr.w                  $101
-  move.w                 #$\1,d3
-  ENDM
-
 
 Inizio:
 
@@ -92,17 +82,7 @@ mouse:
 
   jsr                 ammxmainloop3
 	
-  lea                 BPLPOINTERS,a0
-  move.w              d0,6(a0)
-  swap                d0
-  move.w              d0,2(a0)
-  swap                d0
-
-  lea                 BPLPOINTERS1,a0
-  add.l               #256*40,d0
-  move.w              d0,6(a0)
-  swap                d0
-  move.w              d0,2(a0)
+  
 
   IFD                 DEBUGCOLORS
   move                #$003,$180(a6)
@@ -116,6 +96,18 @@ mouse:
 Aspetta:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   beq.s               Aspetta                                                        ; Se si, non andare avanti, aspetta la linea
+
+  lea                 BPLPOINTERS,a0
+  move.w              d0,6(a0)
+  swap                d0
+  move.w              d0,2(a0)
+  swap                d0
+
+  lea                 BPLPOINTERS1,a0
+  add.l               #256*40,d0
+  move.w              d0,6(a0)
+  swap                d0
+  move.w              d0,2(a0)
 
   btst                #6,$bfe001                                                     ; tasto sinistro del mouse premuto?
   bne.s               mouse                                                          ; se no, torna a mouse:
