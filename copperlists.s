@@ -2,6 +2,23 @@
 ; *				SUPER COPPERLIST			   *
 ; **************************************************************************
 
+; Single playfield mode
+COPSET2BPL MACRO
+  dc.w       $100
+  dc.w       %0010001000000000
+  ENDM
+
+COPSET3BPL MACRO
+  dc.w       $100
+  dc.w       %0011001000000000
+  ENDM
+
+; Double playfield modes
+COPSET23BPL MACRO
+  dc.w       $100
+  dc.w       $5600
+  ENDM
+
   SECTION    GRAPHIC,DATA_C
 
 COPPERLIST:
@@ -19,27 +36,25 @@ SpritePointers:
   dc.w       $92,$0038                                                 ; DdfStart
   dc.w       $94,$00d0                                                 ; DdfStop
   dc.w       $102,0                                                    ; BplCon1
-  dc.w       $104,0                                                    ; BplCon2
+  dc.w       $104,$0040 ; Playfield 2 priority over Playfield 1 ON                                                    ; BplCon2
   dc.w       $108,0                                                    ; Bpl1Mod
   dc.w       $10a,0                                                    ; Bpl2Mod
 
-; Il BPLCON0 per uno schermo a 3 bitplanes: (8 colori)
+; Set dual playfield mode, activating PLAYFIELD 1 with bitplanes 1 3 5 and PLAYFIELD 2 with bitplanes 2 4
+; Bitplanes 2 4 are double buffered and will be used to paint stuff, PLAYFIELD 1 will contain static image.
+  COPSET23BPL
 
-		    ; 5432109876543210
-  dc.w       $100
-BPLCON0POINTER:
-  dc.w       %0011001000000000                                         ; bits 13 e 12 accesi!! (3 = %011)
-
-;	Facciamo puntare i bitplanes direttamente mettendo nella copperlist
-;	i registri $dff0e0 e seguenti qua di seguito con gli indirizzi
-;	dei bitplanes che saranno messi dalla routine POINTBP
-
-BPLPOINTERS:
-  dc.w       $e0,$0000,$e2,$0000                                       ;primo	 bitplane - BPL0PT
-BPLPOINTERS1:
-  dc.w       $e4,$0000,$e6,$0000                                       ;secondo bitplane - BPL1PT
-BPLPOINTERS2:
-  dc.w       $e8,$0000,$ea,$0000                                       ;terzo	 bitplane - BPL2PT
+; Bitplanes Pointers
+BPLPTR1:
+  dc.w       $e0,$0000,$e2,$0000                                       ;first	 bitplane - BPL0PT
+BPLPTR2:
+  dc.w       $e4,$0000,$e6,$0000                                       ;second bitplane - BPL1PT
+BPLPTR3:
+  dc.w       $e8,$0000,$ea,$0000                                       ;third	 bitplane - BPL2PT
+BPLPTR4:
+  dc.w       $ec,$0000,$ee,$0000                                       ;fourth bitplane - BPL3PT
+BPLPTR5:
+  dc.w       $f0,$0000,$f2,$0000                                       ;fifth	 bitplane - BPL4PT
 
 
   IFD        EFFECTS
@@ -109,13 +124,7 @@ col14:
 
   dc.w       $0180,$000                                                ; color0
   ENDC
-	;dc.w	$0182,$550	; color1	; ridefiniamo il colore della
-	;dc.w	$0184,$0F00	; color2	; scritta COMMODORE! GIALLA!
-	;dc.w	$0186,$00F0	; color3
-	;dc.w	$0188,$990	; color4
-	;dc.w	$018a,$220	; color5
-	;dc.w	$018c,$770	; color6
-	;dc.w	$018e,$440	; color7
+	
 
   IFD        EFFECTS
   dc.w       $7007,$fffe                                               ; Aspettiamo la fine della scritta COMMODORE
@@ -214,20 +223,27 @@ CopBar:
   dc.w       $180,$010
   dc.w       $F107,$FFFE
   dc.w       $180,$000
+  ENDC
 
-;	Effetto della lezione3f.s
-
-  dc.w       $ffdf,$fffe                                               ; ATTENZIONE! WAIT ALLA FINE LINEA $FF!
-				; i wait dopo questo sono sotto la linea
-				; $FF e ripartono da $00!!
-
- 
+  ; Bitplanes Tile Pointers
+  dc.w       $fddf,$FFFE                                               ; aspetto la linea $79
+  COPSET2BPL
 
   ;dc.w       $188,$630
+  ; dc.w $180,$0FFF
   dc.w       $182,$FF4
   dc.w       $184,$420
   dc.w       $186,$C80
+BPLPTR1_TILE:
+  dc.w       $e0,$0000,$e2,$0000                                       ;first	 bitplane - BPL0PT
+BPLPTR2_TILE:
+  dc.w       $e4,$0000,$e6,$0000  
 
+  dc.w       $ffdf,$fffe    ; wait line 255
+
+   
+  
+  IFD        EFFECTS
 BARRA:
   dc.w       $0907,$FFFE                                               ; aspetto la linea $79
   dc.w       $180,$300                                                 ; inizio la barra rossa: rosso a 3

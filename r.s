@@ -1,3 +1,10 @@
+  ; Place addr in d0 and the copperlist pointer addr in a1 before calling
+  MACRO POINTINCOPPERLIST
+  move.w              d0,6(a1)
+  swap                d0
+  move.w              d0,2(a1)
+  ENDM
+
   include             "P6112-options.i"
 
   SECTION             CiriCop,CODE_C
@@ -9,30 +16,52 @@ Inizio:
   bsr.w                 Save_all
 
 ;*****************************************************************************
-;	FACCIAMO PUNTARE I BPLPOINTERS NELLA COPPELIST AI NOSTRI BITPLANES
+;	Init bitplane pointers in copperlist
 ;*****************************************************************************
-  MOVE.L              #SCREEN_2,d0
-  LEA                 BPLPOINTERS2,A1
-  move.w              d0,6(a1)
-  swap                d0
-  move.w              d0,2(a1)
+  move.l              #SCREEN_2,d0
+  lea                 BPLPTR1,A1
+  bsr.w               POINTINCOPPERLIST_FUNCT
 
-	; sprite 0 init
+  move.l              #SCREEN_3,d0
+  lea                 BPLPTR3,A1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  move.l              #SCREEN_4,d0
+  lea                 BPLPTR5,A1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Init active playfield with same data, we will change this later in gameloop
+  move.l              #SCREEN_3,d0
+  lea                 BPLPTR2,A1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  move.l              #SCREEN_4,d0
+  lea                 BPLPTR2,A1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Init tiles bitplanes
+  move.l              #SCREEN_0+40*(255-9*5),d0
+  lea                 BPLPTR1_TILE,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  move.l              #SCREEN_1+40*(255-9*5),d0
+  lea                 BPLPTR2_TILE,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+	; Sprite 0 init
   MOVE.L              #LADDER_1,d0		
   LEA                 SpritePointers,a1                                              ; SpritePointers is in copperlist
-  move.w              d0,6(a1)
-  swap                d0
-  move.w              d0,2(a1)
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
   ; Sprite 1 init
   MOVE.L              #LADDER_2,d0		
   addq.w              #8,a1
-  move.w              d0,6(a1)
-  swap                d0
-  move.w              d0,2(a1)
+  bsr.w               POINTINCOPPERLIST_FUNCT
 
-   ; Sprite 2 init
+  ; Sprite 2 init
   jsr                 drawtopstep
 
+  ; Sprite colors
   move.w              #$0888,$dff1a2                                                 ; ladder color 1
   move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
   move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
@@ -65,16 +94,12 @@ Inizio:
   jsr                 P61_Init
 
   jsr                 _ammxmainloop3_init
-  ;move                #%1000011111100000,$96(a6)                                     ;Master,Copper,Blitter,Bitplanes
-
 
 mouse:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   bne.s               mouse                                                          ; Se non ancora, non andare avanti
 
-    ;move	#$00F0,$180(a6)
   jsr                 P61_Music                                                      ;and call the playroutine manually.
-	;move	#$003,$180(a6)
 
   IFD                 DEBUGCOLORS
   move.w              #$0F00,$dff180
@@ -82,8 +107,6 @@ mouse:
 
   jsr                 ammxmainloop3
 	
-  
-
   IFD                 DEBUGCOLORS
   move                #$003,$180(a6)
   ENDC
@@ -97,17 +120,13 @@ Aspetta:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   beq.s               Aspetta                                                        ; Se si, non andare avanti, aspetta la linea
 
-  lea                 BPLPOINTERS,a0
-  move.w              d0,6(a0)
-  swap                d0
-  move.w              d0,2(a0)
-  swap                d0
+  lea                 BPLPTR2,a1
+  move.l              SCREEN_PTR_0,d0
+  POINTINCOPPERLIST
 
-  lea                 BPLPOINTERS1,a0
-  add.l               #256*40,d0
-  move.w              d0,6(a0)
-  swap                d0
-  move.w              d0,2(a0)
+  lea                 BPLPTR4,a1
+  move.l              SCREEN_PTR_1,d0
+  POINTINCOPPERLIST
 
   btst                #6,$bfe001                                                     ; tasto sinistro del mouse premuto?
   bne.s               mouse                                                          ; se no, torna a mouse:
@@ -117,6 +136,10 @@ exit_demo:
   bsr                 Restore_all
   clr.l               d0
   rts                                                                                ; USCITA DAL PROGRAMMA
+
+POINTINCOPPERLIST_FUNCT:
+  POINTINCOPPERLIST
+  rts
 
 ;---------------------------------------------------------------
 Save_all
@@ -157,16 +180,7 @@ Name:DC.B "graphics.library",0
 Playrtn:
   include             "P6112-Play.i"
 
-
-
-; **************************************************************************
-; *		BARRA A SCORRIMENTO ORIZZONTALE (Lezione3h.s)		   *
-; **************************************************************************
   IFD                 EFFECTS
-                                                                       ; TORNIAMO AL LOOP mouse
-; **************************************************************************
-; *		BARRA ROSSA SOTTO LA LINEA $FF (Lezione3f.s)		   *
-; **************************************************************************
 
 muovicopper:
   LEA                 BARRA,a0
@@ -189,7 +203,6 @@ muovicopper:
 MettiGiu:
   clr.b               SuGiu                                                          ; Azzerando SuGiu, al TST.B SuGiu il BEQ
   rts                                                                                ; fara' saltare alla routine VAIGIU, e
-				; la barra scedera'
 
 VAIGIU:
   cmpi.b              #$2c,8*9(a0)                                                   ; siamo arrivati alla linea $2c?
@@ -210,14 +223,12 @@ MettiSu:
   move.b              #$ff,SuGiu                                                     ; Quando la label SuGiu non e' a zero,
   rts                                                                                ; significa che dobbiamo risalire.
 
-
 SuGiu:
   dc.b                0,0
 
 ; **************************************************************************
 ; *		SCORRIMENTO CICLICO DEI COLORI (Lezione3E.s)		   *
 ; **************************************************************************
-
 scrollcolors:	
   move.w              col2,col1                                                      ; col2 copiato in col1
   move.w              col3,col2                                                      ; col3 copiato in col2
@@ -256,7 +267,6 @@ scrollcolors:
   include             "initnoprecalc.s"
   include             "schedule.s"
   include             "ammxmainloopnoprecalc.s"
-
 
   include             "copperlists.s"
 
@@ -337,6 +347,12 @@ SCREEN_2
   PRINT_LINE 50,$00    ; 163
   PRINT_LINE 62,$00    ; 163
 
+SCREEN_3:
+  dcb.b                  40*256,$00
+
+SCREEN_4:
+  dcb.b                  40*256,$00
+
 LADDER_1:
 LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
@@ -408,8 +424,5 @@ LADDER_2_VSTOP2:
 Module1:
   incbin              "P61.chippy_nr.399"                                            ; usecode $945A
   even
-
-
-
   end
 

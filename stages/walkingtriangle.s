@@ -42,12 +42,6 @@ OFFBITPLANEMEM:
 OFFBITPLANEMEM2:
   dcb.b                  40*256,$00
 
-OFFBITPLANEMEM3:
-  dcb.b                  40*256,$00
-
-OFFBITPLANEMEM4:
-  dcb.b                  40*256,$00
-
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
 

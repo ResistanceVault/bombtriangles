@@ -263,7 +263,6 @@ donotresetbannerx:
 
 
 blittilecpu:
-  ;DEBUG 1234
   ; if we are in NOP mode just print an empty character
   tst.w TILETEXT_NOP
   beq.s notiletextnop
@@ -273,19 +272,7 @@ blittilecpu:
 notiletextnop
 
   ; Load address of current text into a0
-  ;DEBUG 1234
   movea.l    TILETXT_PTR,a0
-
-  ; which character we want to print? Read the ascii code
-  ; at addr in a5, then we increment and update the pointer
-  ;adda.w    BANNER_CURRENT_X,a0
-
-  ; If the text is finished print AFONT (fallback)
-  ;cmp.l     TILETXT_PTR_END,a0
-  ;bcs.s     tiletextnoreset
-  ;lea       WFONT,a4
-  ;bra.s     tilestartdrawingprocess
-;tiletextnoreset:
 
   move.b    (a0),d0 ; fetch the letter
 
@@ -311,14 +298,14 @@ tilevalidfont
 tilestartdrawingprocess:
   ; Load bitplane pointers and point them to the font location
   lea       SCREEN_0,a0
-  lea       SCREEN_00,a3
+  ;lea       SCREEN_00,a3
   move.w    #40*(256-5*WIDTHTILE),d7
   add.w     BANNER_CURRENT_Y,d7
   adda.w    d7,a0
   adda.w    BANNER_CURRENT_X,a0
 
-  adda.w    d7,a3
-  adda.w    BANNER_CURRENT_X,a3
+  ;adda.w    d7,a3
+  ;adda.w    BANNER_CURRENT_X,a3
 
   ; Start drawing the font with the CPU (cmooooon m68k I know you can do it)
   moveq     #WIDTHTILE-1,d0
@@ -352,30 +339,26 @@ blittilecpu_elaborate:
   ;andi.b #$C,d6
   ;not.b d6
   and.b d6,d7
-  move.b d7,256*40(a3)
+  ;move.b d7,256*40(a3)
   move.b d7,256*40(a0)
   addq #1,a1
   addq #1,a2
   bra.w blitwithnolettersend
 blitwithnoletters:
-  move.b    (a1),(a3)
-  move.b    (a2),256*40(a3)
+  ;move.b    (a1),(a3)
+  ;move.b    (a2),256*40(a3)
   move.b    (a1)+,(a0)
   move.b    (a2)+,256*40(a0)
 blitwithnolettersend:
   adda.w    #40,a0
-  adda.w    #40,a3
+  ;adda.w    #40,a3
   dbra      d0,blittilecpu_startcycle
   rts
 
 TILETXT_PTR:
   dc.l TILETXT1
- ; dc.l TILETXT2
-;TILETXT_PTR_END:
-;  dc.l TILETXT1_END
 TILETEXT_NOP:
   dc.w 0
-
 
 ; TEXT ON TILES, USE THE W AS SPACES!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 TILETXT1:

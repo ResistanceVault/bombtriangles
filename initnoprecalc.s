@@ -1,6 +1,6 @@
-COLOR1 = $0FF0
-COLOR2 = $00A0
-COLOR3 = $000F
+COLOR1 = $0FF4
+COLOR2 = $0420
+COLOR3 = $0C80
 
 
 _ammxmainloop3_init:

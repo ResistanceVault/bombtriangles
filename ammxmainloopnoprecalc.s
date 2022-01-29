@@ -1,8 +1,6 @@
     include "tiles.s"
 
-ammxmainloop3:
-            ;movem.l          d1-d7/a0-a6,-(sp)    
-  
+ammxmainloop3:  
             SWAP_BPL
             move.l           CLEARFUNCTION,a0
             jsr              (a0)
@@ -32,9 +30,6 @@ donoresettilecounter:
             lea              DRAWFUNCTARRAY_START(PC),a0
             move.l           (a0),a0
             jsr              (a0)          
-                   
-           ; movem.l          (sp)+,d1-d7/a0-a6
-            move.l           SCREEN_PTR_0,d0
 
             rts
 
