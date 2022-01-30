@@ -1,5 +1,5 @@
   ; Place addr in d0 and the copperlist pointer addr in a1 before calling
-  MACRO POINTINCOPPERLIST
+POINTINCOPPERLIST MACRO
   move.w              d0,6(a1)
   swap                d0
   move.w              d0,2(a1)
