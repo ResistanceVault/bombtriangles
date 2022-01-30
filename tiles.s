@@ -330,7 +330,7 @@ blittilecpu_elaborate:
   andi.b #%00111100,d6
   not.b d6
   and.b d6,d7
-  move.b d7,(a3)
+;  move.b d7,(a3)
   move.b d7,(a0)
   
   move.b (a2),d7
@@ -339,19 +339,19 @@ blittilecpu_elaborate:
   ;andi.b #$C,d6
   ;not.b d6
   and.b d6,d7
-  ;move.b d7,256*40(a3)
+;  move.b d7,256*40(a3)
   move.b d7,256*40(a0)
   addq #1,a1
   addq #1,a2
   bra.w blitwithnolettersend
 blitwithnoletters:
-  ;move.b    (a1),(a3)
-  ;move.b    (a2),256*40(a3)
+;  move.b    (a1),(a3)
+;  move.b    (a2),256*40(a3)
   move.b    (a1)+,(a0)
   move.b    (a2)+,256*40(a0)
 blitwithnolettersend:
   adda.w    #40,a0
-  ;adda.w    #40,a3
+;  adda.w    #40,a3
   dbra      d0,blittilecpu_startcycle
   rts
 
