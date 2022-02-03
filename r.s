@@ -13,7 +13,7 @@ POINTINCOPPERLIST MACRO
 
 Inizio:
 
-  bsr.w                 Save_all
+  bsr.w               Save_all
 
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
@@ -254,10 +254,10 @@ scrollcolors:
 
   ;include             "AProcessing/libs/rasterizers/3dglobals.i"
   ;include             "AProcessing/libs/rasterizers/processingfill.s"
-  include             "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
+  ;include             "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
   ;include             "AProcessing/libs/rasterizers/clipping.s"
   include             "AProcessing/libs/trigtables.i"
-  include             "AProcessing/libs/rasterizers/point.s"
+  include             "AProcessing/libs/matrix/point.s"
   ;include             "AProcessing/libs/rasterizers/triangle.s"
   ;include             "AProcessing/libs/rasterizers/rectangle.s"
   include             "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
