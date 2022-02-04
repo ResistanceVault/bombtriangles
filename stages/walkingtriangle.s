@@ -37,10 +37,10 @@ TRIANGLE_END_OFFSET    EQU 30
 
 ; VARIABLES
 OFFBITPLANEMEM:
-  dcb.b                  40*256,$00
+  dcb.b                  40*190,$00
 
 OFFBITPLANEMEM2:
-  dcb.b                  40*256,$00
+  dcb.b                  40*190,$00
 
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
@@ -649,8 +649,4 @@ teletrasportationend:
   lea                    OFFBITPLANEMEM,a4
   jsr                    TRIANGLE_BLIT
 
-  rts
-
-walkingtriangle_sleep:
-  movem.l                (sp)+,d5/a3
   rts

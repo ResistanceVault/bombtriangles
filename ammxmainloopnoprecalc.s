@@ -2,8 +2,7 @@
 
 ammxmainloop3:  
             SWAP_BPL
-            move.l           CLEARFUNCTION,a0
-            jsr              (a0)
+            bsr.w            CLEARTOP
 
             ; execute banner routine
             subq             #1,TILE_COUNTER
@@ -16,7 +15,7 @@ ammxmainloop3:
             move.l           a0,d0
             cmpi.l           #TILE_DATA_END,d0
             bne.s            tiledatanoreset
-            move.l           #TILE_DATA,a0
+            lea              TILE_DATA(PC),a0
 tiledatanoreset:
             move.l           a0,TILE_PTR
 donoresettilecounter:
@@ -33,8 +32,6 @@ donoresettilecounter:
 
             rts
 
-CLEARFUNCTION:
-            dc.l             CLEARTOP
 CLEARTOP: 
             WAITBLITTER
             move.w           #$0100,$dff040
@@ -46,14 +43,6 @@ CLEARTOP:
                     
             move.l           SCREEN_PTR_1,$dff054                                                                   ; copy to d channel
             move.w           #$2E52,$dff058
-            rts
-CLEAR: 
-            WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #$0000,$dff042        
-            move.l           SCREEN_PTR_0,$dff054                                                                   ; copy to d channel
-            move.w           #$0000,$dff066                                                                         ;D mod
-            move.w           #$8014,$dff058
             rts
 
             include          "ladder.s"
@@ -79,6 +68,4 @@ ROTATIONS_ANGLES_64_180:
             dc.w             163,168,174,180
 ROTATIONS_ANGLES_64_END:
 
-ROTATIONS_ANGLES_64_PTR: 
-            dc.l             ROTATIONS_ANGLES_64
 

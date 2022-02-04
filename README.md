@@ -29,6 +29,10 @@ The makefile will produce this files:
 2. reffect (color debug is turned off and copper effects are in place)
 3. rcompressed (just reffect compressed with shrinkler)
 
+### Size matters
+Compressed with shrinkler: 15624 bytes
+Compressed with shrinkler: 127024 bytes
+
 Looking for Resistance members willing to help me
 
 
