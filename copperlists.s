@@ -149,38 +149,39 @@ CopBar:
   dc.w       $9107,$fffe                                               ; wait che non cambiamo (Inizio linea)
   dc.w       $180,$111                                                 ; colore GRIGIO (parte dall'inizio linea fino
   dc.w       $9131,$fffe                                               ; a questo WAIT, che noi cambiaremo...
-  dc.w       $180,$200                                                 ; dopo il quale comincia il ROSSO
+  dc.w       $180,$000                                                 ; dopo il quale comincia il ROSSO
 
 ;	    WAIT FISSI (poi grigio) - WAIT DA CAMBIARE (seguiti dal rosso)
-
-  dc.w       $9207,$fffe,$180,$222,$9231,$fffe,$180,$300               ; linea 3
-  dc.w       $9307,$fffe,$180,$333,$9331,$fffe,$180,$400               ; linea 4
-  dc.w       $9407,$fffe,$180,$444,$9431,$fffe,$180,$500               ; linea 5
-  dc.w       $9507,$fffe,$180,$555,$9531,$fffe,$180,$600               ; ....
-  dc.w       $9607,$fffe,$180,$666,$9631,$fffe,$180,$700
-  dc.w       $9707,$fffe,$180,$777,$9731,$fffe,$180,$800
-  dc.w       $9807,$fffe,$180,$888,$9831,$fffe,$180,$900
-  dc.w       $9907,$fffe,$180,$999,$9931,$fffe,$180,$a00
-  dc.w       $9a07,$fffe,$180,$aaa,$9a31,$fffe,$180,$b00
-  dc.w       $9b07,$fffe,$180,$bbb,$9b31,$fffe,$180,$c00
-  dc.w       $9c07,$fffe,$180,$ccc,$9c31,$fffe,$180,$d00
-  dc.w       $9d07,$fffe,$180,$ddd,$9d31,$fffe,$180,$e00
-  dc.w       $9e07,$fffe,$180,$eee,$9e31,$fffe,$180,$f00
-  dc.w       $9f07,$fffe,$180,$fff,$9f31,$fffe,$180,$e00
-  dc.w       $a007,$fffe,$180,$eee,$a031,$fffe,$180,$d00
-  dc.w       $a107,$fffe,$180,$ddd,$a131,$fffe,$180,$c00
-  dc.w       $a207,$fffe,$180,$ccc,$a231,$fffe,$180,$b00
-  dc.w       $a307,$fffe,$180,$bbb,$a331,$fffe,$180,$a00
-  dc.w       $a407,$fffe,$180,$aaa,$a431,$fffe,$180,$900
-  dc.w       $a507,$fffe,$180,$999,$a531,$fffe,$180,$800
-  dc.w       $a607,$fffe,$180,$888,$a631,$fffe,$180,$700
-  dc.w       $a707,$fffe,$180,$777,$a731,$fffe,$180,$600
-  dc.w       $a807,$fffe,$180,$666,$a831,$fffe,$180,$500
-  dc.w       $a907,$fffe,$180,$555,$a931,$fffe,$180,$400
-  dc.w       $aa07,$fffe,$180,$444,$aa31,$fffe,$180,$301
-  dc.w       $ab07,$fffe,$180,$333,$ab31,$fffe,$180,$202
-  dc.w       $ac07,$fffe,$180,$222,$ac31,$fffe,$180,$103
-  dc.w       $ad07,$fffe,$180,$113,$ad31,$fffe,$180,$004
+  IFD LOL
+  dc.w       $9231,$fffe,$196,$300               ; linea 3
+  dc.w       $9331,$fffe,$196,$400               ; linea 4
+  dc.w       $9431,$fffe,$196,$500               ; linea 5
+  dc.w       $9531,$fffe,$196,$600               ; ....
+  dc.w       $9631,$fffe,$196,$700
+  dc.w       $9731,$fffe,$196,$800
+  dc.w       $9831,$fffe,$196,$900
+  dc.w       $9931,$fffe,$196,$a00
+  dc.w       $9a31,$fffe,$196,$b00
+  dc.w       $9b31,$fffe,$196,$c00
+  dc.w       $9c31,$fffe,$196,$d00
+  dc.w       $9d31,$fffe,$196,$e00
+  dc.w       $9e31,$fffe,$196,$f00
+  dc.w       $9f31,$fffe,$196,$e00
+  dc.w       $a031,$fffe,$196,$d00
+  dc.w       $a131,$fffe,$196,$c00
+  dc.w       $a231,$fffe,$196,$b00
+  dc.w       $a331,$fffe,$196,$a00
+  dc.w       $a431,$fffe,$196,$900
+  dc.w       $a531,$fffe,$196,$800
+  dc.w       $a631,$fffe,$196,$700
+  dc.w       $a731,$fffe,$196,$600
+  dc.w       $a831,$fffe,$196,$500
+  dc.w       $a931,$fffe,$196,$400
+  dc.w       $aa31,$fffe,$196,$301
+  dc.w       $ab31,$fffe,$196,$202
+  dc.w       $ac31,$fffe,$196,$103
+  dc.w       $ad31,$fffe,$196,COLOR2
+  ENDIF
 
   dc.w       $ae07,$FFFE                                               ; prossima linea
   dc.w       $180,$006                                                 ; blu a 6
