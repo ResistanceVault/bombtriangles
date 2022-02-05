@@ -14,7 +14,9 @@ Right now the music it's reported to do not work on my friend's A1000 but works 
 What I need now
 
 - [x] fix the exit problem (THX Kristoff)
-- [ ] fix the music problem
+- [x] fix the music problem
+- [ ] migrate to pretracker
+- [ ] tiles at 3 playfields?
 - [ ] ideas on how to syncronize rotation with the music
 - [ ] ideas on general how to proceed
 
