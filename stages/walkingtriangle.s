@@ -37,10 +37,10 @@ TRIANGLE_END_OFFSET    EQU 30
 
 ; VARIABLES
 OFFBITPLANEMEM:
-  dcb.b                  40*190,$00
+  dcb.b                  40*185,$00
 
 OFFBITPLANEMEM2:
-  dcb.b                  40*190,$00
+  dcb.b                  40*185,$00
 
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
@@ -143,23 +143,16 @@ walkingtriangle_start:
   subq                   #1,SLEEP_OFFSET(a3)
   bra.s                  walkingtriangle_gotonext
 walkingtriangle_nodelay
-  bsr.w                  WALKINGTRIANGLE_PROCESS
+  ;bsr.s                  WALKINGTRIANGLE_PROCESS
+  movem.l                d5/a3,-(sp)
+  STROKE                 STROKE_OFFSET(a3)
+  FILL                   FILL_OFFSET(a3)
+  move.l                 STAGEPOINTER_OFFSET(a3),a0
+  jsr                    (a0)
+  movem.l                (sp)+,d5/a3
 walkingtriangle_gotonext:
   adda.l                 #TRIANGLE_END_OFFSET,a3
   dbra                   d5,walkingtriangle_start
-  rts
-
-; Animation function
-WALKINGTRIANGLE_PROCESS:
-  movem.l                d5/a3,-(sp)
-
-  STROKE                 STROKE_OFFSET(a3)
-  FILL                   FILL_OFFSET(a3)
-
-  move.l STAGEPOINTER_OFFSET(a3),a0
-  jsr (a0)
-
-  movem.l                (sp)+,d5/a3
   rts
 
   ; START OF WALKING ROUTINES
@@ -205,11 +198,11 @@ walkingtriangle_xwalk:
 walkingtriangle_no_vertical_climbing:
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT          1,#-15,#-26
-  VERTEX2D_INIT          2,#-30,#0
-  VERTEX2D_INIT          3,#0,#0
+  VERTEX2D_INIT_I        1,FFF1,FFE6  ; -15,-26
+  VERTEX2D_INIT_I        2,FFE2,0000  ; -30,0
+  VERTEX2D_INIT_I        3,0000,0000  ;   0,0
 
-  lea                    OFFBITPLANEMEM,a4
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -229,10 +222,10 @@ walkingtriangle_ywalk:
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-                    ; move triangle UP
+  ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
 
-                    ; when the triangle reaches thetop, stop the ladder
+  ; when the triangle reaches thetop, stop the ladder
   cmpi.w                 #STARTDYCLIMBX2,YROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_horizontal_climbing
 
@@ -244,21 +237,14 @@ walkingtriangle_ywalk:
 
 walkingtriangle_no_horizontal_climbing:
 
-                    ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT          1,#0,#0
-  VERTEX2D_INIT          2,#0,#30
-  VERTEX2D_INIT          3,#-26,#15
+  ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
+  VERTEX2D_INIT_I        1,0000,0000 ;   0,0
+  VERTEX2D_INIT_I        2,0000,001E ;   0,30
+  VERTEX2D_INIT_I        3,FFE6,000F ; -26,30
 
-  lea                    OFFBITPLANEMEM,a4
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
-  ;moveq #0,d0
-  ;moveq #0,d1
-  ;moveq #0,d6
-  ;moveq #30,d3
-  ;move.w #-26,d4
-  ;move.w #15,d5
-  ;STROKE #1
-  ;jsr TRIANGLE
+  
   rts
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
 
@@ -299,11 +285,11 @@ walkingtriangle_xwalk_rev:
 walkingtriangle_no_vertical_descending:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT          1,#0,#0
-  VERTEX2D_INIT          2,#0,#-30
-  VERTEX2D_INIT          3,#-26,#-15
+  VERTEX2D_INIT_I         1,0000,0000
+  VERTEX2D_INIT_I         2,0000,FFE2
+  VERTEX2D_INIT_I         3,FFE6,FFF1
 
-  lea                    OFFBITPLANEMEM,a4
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 
@@ -362,10 +348,11 @@ notdownborder;
 notleftborder;
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#13,#15
-  VERTEX2D_INIT          2,#13,#-15
-  VERTEX2D_INIT          3,#-13,#0
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,000D,000F  ; 13,15
+  VERTEX2D_INIT_I        2,000D,FFF1  ; 13,-15
+  VERTEX2D_INIT_I        3,FFF3,0000  ; -13,0
+
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 ; ***************************** END IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
@@ -416,10 +403,10 @@ walkingtriangle_xwalk_right:
 notdownborder2;
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#13,#15
-  VERTEX2D_INIT          2,#13,#-15
-  VERTEX2D_INIT          3,#-13,#0
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,000D,000F     ; 13,15
+  VERTEX2D_INIT_I        2,000D,FFF1     ; 13,-15
+  VERTEX2D_INIT_I        3,FFF3,0000     ; -13,0
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
@@ -458,16 +445,16 @@ walkingtriangle_xwalk_right_2:
   move.l                 a3,a0
   adda.w                 #VELOCITYVECTOR_OFFSET,a0
   moveq                  #1*15,d0
-  move.w                 #-1*90,d1
+  moveq                  #-1*90,d1
   CREATE2DVECTOR         a0
 
 .decrease_angle_by_1_exit:
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#-15,#-26
-  VERTEX2D_INIT          2,#-30,#0
-  VERTEX2D_INIT          3,#0,#0
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,FFF1,FFE6 ;#-15,#-26
+  VERTEX2D_INIT_I        2,FFE2,0000 ;#-30,#0
+  VERTEX2D_INIT_I        3,0000,0000 ; #0,#0
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -513,22 +500,18 @@ walkingtriangle_reverse_dive:
    ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
-  move.w #-1*94,d0
-  move.w #-1*32,d1
+  moveq                   #-1*94,d0
+  moveq                   #-1*32,d1
   CREATE2DVECTOR a0
 .noendoffall:
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#-15+15,#-26+12
-  VERTEX2D_INIT          2,#-30+15,#0+12
-  VERTEX2D_INIT          3,#0+15,#0+12
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,0000,FFF2 ; #-15+15,#-26+12
+  VERTEX2D_INIT_I        2,FFF1,000C ; #-30+15,#0+12
+  VERTEX2D_INIT_I        3,000F,000C ;  #0+15,#0+12
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
-
   rts
-
-
-
 
 walkingfloor1:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
@@ -571,10 +554,10 @@ walkingfloor1:
 .noendoffall2:
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#-15+15,#-26+12
-  VERTEX2D_INIT          2,#-30+15,#0+12
-  VERTEX2D_INIT          3,#0+15,#0+12
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,0000,FFF2  ; #-15+15,#-26+12
+  VERTEX2D_INIT_I        2,FFF1,000C  ; #-30+15,#0+12
+  VERTEX2D_INIT_I        3,000F,000C  ; #0+15,#0+12
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 
@@ -596,7 +579,6 @@ teletrasportationstart:
   subq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
   move.w                 d0,d1
-  ;tst.w                  d0
   bne.w                  .noscale
   SETSTAGE               teletrasportationend
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
@@ -611,10 +593,10 @@ teletrasportationstart:
   ROTATE                 ANGLE_OFFSET(a3)
 
   ; Draw triangle
-  VERTEX2D_INIT          1,#-15+15,#-26+12
-  VERTEX2D_INIT          2,#-30+15,#0+12
-  VERTEX2D_INIT          3,#0+15,#0+12
-  lea                    OFFBITPLANEMEM,a4
+  VERTEX2D_INIT_I        1,0000,FFF2   ;#-15+15,#-26+12
+  VERTEX2D_INIT_I        2,FFF1,000C   ;#-30+15,#0+12
+  VERTEX2D_INIT_I        3,000F,000C   ;#0+15,#0+12
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -642,11 +624,11 @@ teletrasportationend:
   jsr                    SCALE
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT          1,#-15,#-26
-  VERTEX2D_INIT          2,#-30,#0
-  VERTEX2D_INIT          3,#0,#0
+  VERTEX2D_INIT_I          1,FFF1,FFE6  ;#-15,#-26
+  VERTEX2D_INIT_I          2,FFE2,0000  ;#-30,#0
+  VERTEX2D_INIT_I          3,0000,0000  ;#0,#0
 
-  lea                    OFFBITPLANEMEM,a4
+  lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
