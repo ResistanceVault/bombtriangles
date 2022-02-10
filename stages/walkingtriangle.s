@@ -177,7 +177,8 @@ walkingtriangle_xwalk:
   NEXT_WALKING_ANGLE2    ANGLE_OFFSET(a3)
 
   ; Rotate around right-bottom vertex
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
   
   ; each time angle is 241 I have a full revolution aroung the vertex, in this case:
   ; - reset the angle
@@ -266,7 +267,8 @@ walkingtriangle_xwalk_rev:
   bcs.s                  .increase_angle_by_1_exit
   move.w                 #0,ANGLE_OFFSET(a3)
   .increase_angle_by_1_exit:
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
 
   ;,UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
@@ -326,7 +328,8 @@ notdownborder;
   move.w                 #0,ANGLE_OFFSET(a3)
 .increase_angle_by_1_exit:
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -377,7 +380,8 @@ walkingtriangle_xwalk_right:
   move.w                 #357,ANGLE_OFFSET(a3)
 .decrease_angle_by_3_exit:
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -417,7 +421,8 @@ walkingtriangle_xwalk_right_2:
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; Sub 1 to angle
   subq                   #1,ANGLE_OFFSET(a3)
@@ -472,7 +477,8 @@ walkingtriangle_reverse_dive:
   
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; Add 5 to angle
   addq                    #5,ANGLE_OFFSET(a3)
@@ -524,7 +530,8 @@ walkingfloor1:
   move.w                 d1,d7
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; Add 5 to angle
   addq                   #5,ANGLE_OFFSET(a3)
@@ -590,7 +597,8 @@ teletrasportationstart:
 .noscale
   jsr                    SCALE
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   ; Draw triangle
   VERTEX2D_INIT_I        1,0000,FFF2   ;#-15+15,#-26+12
@@ -610,7 +618,8 @@ teletrasportationend:
   move.w                 #STARTWALKYPOS,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ROTATE                 ANGLE_OFFSET(a3)
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
 
   addq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
