@@ -181,7 +181,7 @@ CopBar:
   dc.w       $ab31,$fffe,$196,$202
   dc.w       $ac31,$fffe,$196,$103
   dc.w       $ad31,$fffe,$196,COLOR2
-  ENDIF
+  ENDC
 
   dc.w       $ae07,$FFFE                                               ; prossima linea
   dc.w       $180,$006                                                 ; blu a 6
