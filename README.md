@@ -32,8 +32,8 @@ The makefile will produce this files:
 3. rcompressed (just reffect compressed with shrinkler)
 
 ### Size matters
-Compressed with shrinkler: 15376 bytes
-Uncompressed with shrinkler: 125472 bytes
+Compressed with shrinkler: 15260 bytes
+Uncompressed with shrinkler: 116536 bytes
 
 Looking for Resistance members willing to help me
 
