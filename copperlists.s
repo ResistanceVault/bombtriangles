@@ -56,80 +56,81 @@ BPLPTR4:
 BPLPTR5:
   dc.w       $f0,$0000,$f2,$0000                                       ;fifth	 bitplane - BPL4PT
 
-
+  ;dc.w       $180,$0000
+COLORTEST EQU $194
+;COLORTEST EQU $180
+OFFSETTEST EQU $1000
   IFD        EFFECTS
 ;	L'effetto di Lezione3e.s spostato piu' in ALTO
 
-  dc.w       $3a07,$fffe                                               ; aspettiamo la linea 154 ($9a in esadecimale)
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $3a07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 154 ($9a in esadecimale)
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col1:
   dc.w       $0f0                                                      ; VALORE DEL COLOR 0 (che sara' modificato)
-  dc.w       $3b07,$fffe                                               ; aspettiamo la linea 155 (non sara' modificata)
-  dc.w       $180                                                      ; REGISTRO COLOR0 (non sara' modificato)
+  dc.w       $3b07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 155 (non sara' modificata)
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0 (non sara' modificato)
 col2:
   dc.w       $0d0                                                      ; VALORE DEL COLOR 0 (sara' modificato)
-  dc.w       $3c07,$fffe                                               ; aspettiamo la linea 156 (non modificato,ecc.)
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $3c07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 156 (non modificato,ecc.)
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col3:
   dc.w       $0b0                                                      ; VALORE DEL COLOR 0
-  dc.w       $3d07,$fffe                                               ; aspettiamo la linea 157
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $3d07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 157
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col4:
   dc.w       $090                                                      ; VALORE DEL COLOR 0
-  dc.w       $3e07,$fffe                                               ; aspettiamo la linea 158
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $3e07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 158
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col5:
   dc.w       $070                                                      ; VALORE DEL COLOR 0
-  dc.w       $3f07,$fffe                                               ; aspettiamo la linea 159
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $3f07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 159
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col6:
   dc.w       $050                                                      ; VALORE DEL COLOR 0
-  dc.w       $4007,$fffe                                               ; aspettiamo la linea 160
-  dc.w       $180                                                      ; REGISTRO COLOR0
+  dc.w       $4007+OFFSETTEST,$fffe                                               ; aspettiamo la linea 160
+  dc.w       COLORTEST                                                      ; REGISTRO COLOR0
 col7:
   dc.w       $030                                                      ; VALORE DEL COLOR 0
-  dc.w       $4107,$fffe                                               ; aspettiamo la linea 161
-  dc.w       $180                                                      ; color0... (ora avete capito i commenti,
+  dc.w       $4107+OFFSETTEST,$fffe                                               ; aspettiamo la linea 161
+  dc.w       COLORTEST                                                      ; color0... (ora avete capito i commenti,
 col8:				; posso anche smettere di metterli da qua!)
   dc.w       $030
-  dc.w       $4207,$fffe                                               ; linea 162
-  dc.w       $180
+  dc.w       $4207+OFFSETTEST,$fffe                                               ; linea 162
+  dc.w       COLORTEST
 col9:
   dc.w       $050
-  dc.w       $4307,$fffe                                               ;  linea 163
-  dc.w       $180
+  dc.w       $4307+OFFSETTEST,$fffe                                               ;  linea 163
+  dc.w       COLORTEST
 col10:
   dc.w       $070
-  dc.w       $4407,$fffe                                               ;  linea 164
-  dc.w       $180
+  dc.w       $4407+OFFSETTEST,$fffe                                               ;  linea 164
+  dc.w       COLORTEST
 col11:
   dc.w       $090
-  dc.w       $4507,$fffe                                               ;  linea 165
-  dc.w       $180
+  dc.w       $4507+OFFSETTEST,$fffe                                               ;  linea 165
+  dc.w       COLORTEST
 col12:
   dc.w       $0b0
-  dc.w       $4607,$fffe                                               ;  linea 166
-  dc.w       $180
+  dc.w       $4607+OFFSETTEST,$fffe                                               ;  linea 166
+  dc.w       COLORTEST
 col13:
   dc.w       $0d0
-  dc.w       $4707,$fffe                                               ;  linea 167
-  dc.w       $180
+  dc.w       $4707+OFFSETTEST,$fffe                                               ;  linea 167
+  dc.w       COLORTEST
 col14:
   dc.w       $0f0
   dc.w       $4807,$fffe                                               ;  linea 168
 
-  dc.w       $180,$0000                                                ; Decidiamo il colore NERO per la parte
+  dc.w       COLORTEST,COLOR2                                                ; Decidiamo il colore NERO per la parte
 				; di schermo sotto l'effetto
 
 
   dc.w       $0180,$000                                                ; color0
   ENDC
-	
+
 
   IFD        EFFECTS
   dc.w       $7007,$fffe                                               ; Aspettiamo la fine della scritta COMMODORE
-
-;	Gli 8 colori della figura sono definiti qui:
 
   dc.w       $0180,$000                                                ; color0
 	;dc.w	$0182,$475	; color1
@@ -230,11 +231,6 @@ CopBar:
   dc.w       $fddf,$FFFE                                               ; aspetto la linea $79
   COPSET2BPL
 
-  ;dc.w       $188,$630
-  ; dc.w $180,$0FFF
-  dc.w       $182,$FF4
-  dc.w       $184,$420
-  dc.w       $186,$C80
 BPLPTR1_TILE:
   dc.w       $e0,$0000,$e2,$0000                                       ;first	 bitplane - BPL0PT
 BPLPTR2_TILE:
@@ -242,8 +238,6 @@ BPLPTR2_TILE:
 
   dc.w       $ffdf,$fffe    ; wait line 255
 
-   
-  
   IFD        EFFECTS
 BARRA:
   dc.w       $0907,$FFFE                                               ; aspetto la linea $79

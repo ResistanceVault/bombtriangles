@@ -1,6 +1,6 @@
     include "tiles.s"
 
-ammxmainloop3:  
+ammxmainloop3:
             SWAP_BPL
             bsr.w            CLEARTOP
 
@@ -26,22 +26,23 @@ donoresettilecounter:
             bsr.w            moveladders
 
             ; execute the drawing routine
-            lea              DRAWFUNCTARRAY_START(PC),a0
-            move.l           (a0),a0
-            jsr              (a0)          
+            ;lea              DRAWFUNCTARRAY_START(PC),a0
+            ;move.l           (a0),a0
+            ;jsr              (a0)
+            jsr               WALKINGTRIANGLE
 
             rts
 
-CLEARTOP: 
+CLEARTOP:
             WAITBLITTER
             move.w           #$0100,$dff040
-            move.w           #$0000,$dff042        
-            move.l           SCREEN_PTR_0,$dff054                                                                   ; copy to d channel
-            move.w           #4,$DFF066 ;dmod                                                                        ;D mod
+            move.w           #$0000,$dff042
+            move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
+            move.w           #4,$DFF066           ; D mod
             move.w           #$2E52,$dff058
+
             WAITBLITTER
-                    
-            move.l           SCREEN_PTR_1,$dff054                                                                   ; copy to d channel
+            move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
             move.w           #$2E52,$dff058
             rts
 
@@ -49,7 +50,7 @@ CLEARTOP:
             include          "stages/walkingtriangle.s"
 
 
-ROTATIONS_ANGLES_64:  
+ROTATIONS_ANGLES_64:
             dc.w             005,011,016,022,028,033,039,044,050,056
             dc.w             061,067,072,078,084,089,095,100,106,112
             dc.w             117,123,129,134,140,145,151,157,162,168

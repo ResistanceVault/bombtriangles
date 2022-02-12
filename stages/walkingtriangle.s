@@ -53,8 +53,8 @@ TRIANGLE_1:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   1                                                             ; STROKE
-  dc.b                   2                                                             ; FILL
+  dc.b                   2                                                             ; STROKE
+  dc.b                   1                                                             ; FILL
   dc.w                   TIMEDELAY*0                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
@@ -98,8 +98,8 @@ TRIANGLE_4:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   3                                                             ; STROKE
-  dc.b                   2                                                             ; FILL
+  dc.b                   2                                                             ; STROKE
+  dc.b                   3                                                             ; FILL
   dc.w                   TIMEDELAY*3                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
@@ -179,7 +179,7 @@ walkingtriangle_xwalk:
   ; Rotate around right-bottom vertex
   move.w                 ANGLE_OFFSET(a3),d0
   jsr                    ROTATE_INV_Q_5_11_F
-  
+
   ; each time angle is 241 I have a full revolution aroung the vertex, in this case:
   ; - reset the angle
   ; - reset the angle pointer
@@ -195,7 +195,7 @@ walkingtriangle_xwalk:
   SETSTAGE               walkingtriangle_ywalk
   move.w                 #359,ANGLE_OFFSET(a3)
   START_LADDERS
-  
+
 walkingtriangle_no_vertical_climbing:
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
@@ -245,7 +245,7 @@ walkingtriangle_no_horizontal_climbing:
 
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
-  
+
   rts
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
 
@@ -370,10 +370,10 @@ walkingtriangle_xwalk_right:
   sub.w                  #13,d0
   sub.w                  #15,d1
   jsr                    LOADIDENTITYANDTRANSLATE
-  
+
   ; save d1 for later comparison
   move.w                 d1,d7
-  
+
   ; Sub 3 to angle
   sub.w                  #3,ANGLE_OFFSET(a3)
   bpl.s                  .decrease_angle_by_3_exit
@@ -474,7 +474,7 @@ walkingtriangle_reverse_dive:
   sub.w                  #15,d0
   sub.w                  #12,d1
   move.w                 d1,d7
-  
+
   jsr                    LOADIDENTITYANDTRANSLATE
 
   move.w                 ANGLE_OFFSET(a3),d0

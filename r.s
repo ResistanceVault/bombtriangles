@@ -49,12 +49,12 @@ Inizio:
   bsr.w               POINTINCOPPERLIST_FUNCT
 
 	; Sprite 0 init
-  MOVE.L              #LADDER_1,d0		
+  MOVE.L              #LADDER_1,d0
   LEA                 SpritePointers,a1                                              ; SpritePointers is in copperlist
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; Sprite 1 init
-  MOVE.L              #LADDER_2,d0		
+  MOVE.L              #LADDER_2,d0
   addq.w              #8,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
@@ -106,14 +106,13 @@ mouse:
   ENDC
 
   jsr                 ammxmainloop3
-	
+
   IFD                 DEBUGCOLORS
   move                #$003,$180(a6)
   ENDC
 
   IFD                 EFFECTS
   jsr                 muovicopper                                                    ; barra rossa sotto linea $ff
-	;jsr	CopperDestSin	; Routine di scorrimento destra/sinistra
   jsr                 scrollcolors                                                   ; scorrimento ciclico dei colori
   ENDC
 Aspetta:
@@ -132,8 +131,8 @@ Aspetta:
   bne.s               mouse                                                          ; se no, torna a mouse:
 exit_demo:
   WAITBLITTER
-  bsr                 P61_End
-  bsr                 Restore_all
+  bsr.w               P61_End
+  bsr.w               Restore_all
   clr.l               d0
   rts                                                                                ; USCITA DAL PROGRAMMA
 
@@ -142,39 +141,39 @@ POINTINCOPPERLIST_FUNCT:
   rts
 
 ;---------------------------------------------------------------
-Save_all
-  Move.b              #$87,$bfd100                                                   ; stop drive
-  Move.l              $00000004,a6
-  Jsr                 -132(a6)
-  Move.l              $6c,SaveIRQ
-  Move.w              $dff01c,Saveint
-  Or.w                #$c000,Saveint
-  Move.w              $dff002,SaveDMA
-  Or.w                #$8100,SaveDMA
-  Rts
+Save_all:
+  move.b              #$87,$bfd100                                                   ; stop drive
+  move.l              $00000004,a6
+  jsr                 -132(a6)
+  move.l              $6c,SaveIRQ
+  move.w              $dff01c,Saveint
+  or.w                #$c000,Saveint
+  move.w              $dff002,SaveDMA
+  or.w                #$8100,SaveDMA
+  rts
 Restore_all:
-  Move.l              SaveIRQ,$6c
-  Move.w              #$7fff,$dff09a	
-  Move.w              Saveint,$dff09a
-  Move.w              #$7fff,$dff096
-  Move.w              SaveDMA,$dff096
-  Move.l              $00000004,a6
-  Lea                 Name,a1
-  Moveq               #0,d0
-  Jsr                 -552(a6)
-  Move.l              d0,a0
-  Move.l              38(a0),$dff080
-  Clr.w               $dff088
-  Move.l              d0,a1
-  Jsr                 -414(a6)
-  Jsr                 -138(a6)
-  Rts
+  move.l              SaveIRQ,$6c
+  move.w              #$7fff,$dff09a	
+  move.w              Saveint,$dff09a
+  move.w              #$7fff,$dff096
+  move.w              SaveDMA,$dff096
+  move.l              $00000004,a6
+  lea                 Name,a1
+  moveq               #0,d0
+  jsr                 -552(a6)
+  move.l              d0,a0
+  move.l              38(a0),$dff080
+  clr.w               $dff088
+  move.l              d0,a1
+  jsr                 -414(a6)
+  jsr                 -138(a6)
+  rts
 ;---------------------------------------------------------------
-Saveint:Dc.w 0
-SaveDMA:Dc.w 0
-SaveIRQ:Dc.l 0
-Name:DC.B "graphics.library",0
-  Even
+Saveint:              dc.w 0
+SaveDMA:              dc.w 0
+SaveIRQ:              dc.l 0
+Name:                 dc.b "graphics.library",0
+  even
 ;----------------------------------------------------------------  
 
 Playrtn:
@@ -229,7 +228,7 @@ SuGiu:
 ; **************************************************************************
 ; *		SCORRIMENTO CICLICO DEI COLORI (Lezione3E.s)		   *
 ; **************************************************************************
-scrollcolors:	
+scrollcolors:
   move.w              col2,col1                                                      ; col2 copiato in col1
   move.w              col3,col2                                                      ; col3 copiato in col2
   move.w              col4,col3                                                      ; col4 copiato in col3
@@ -247,25 +246,16 @@ scrollcolors:
   rts
   ENDC
 
-
   include             "AProcessing/libs/rasterizers/globaloptions.s"
   include             "AProcessing/libs/matrix/matrix.s"
   include             "AProcessing/libs/matrix/scale.s"
-
-  ;include             "AProcessing/libs/rasterizers/3dglobals.i"
-  ;include             "AProcessing/libs/rasterizers/processingfill.s"
-  ;include             "AProcessing/libs/rasterizers/processing_table_plotrefs.s"
-  ;include             "AProcessing/libs/rasterizers/clipping.s"
   include             "AProcessing/libs/trigtables.i"
   include             "AProcessing/libs/matrix/point.s"
-  ;include             "AProcessing/libs/rasterizers/triangle.s"
-  ;include             "AProcessing/libs/rasterizers/rectangle.s"
   include             "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
   include             "AProcessing/libs/blitter/lines.s"
   include             "AProcessing/libs/blitter/triangle.s"
 
   include             "initnoprecalc.s"
-  include             "schedule.s"
   include             "ammxmainloopnoprecalc.s"
 
   include             "copperlists.s"
@@ -335,15 +325,15 @@ SCREEN_2
   PRINT_LEFT_LINE     ; 102
   PRINT_LEFT_LINE
   PRINT_LEFT_LINE
-  
-  PRINT_LINE 38,$00    
-  PRINT_RIGHT_LINE_1ST_FLOOR 
+
+  PRINT_LINE 38,$00
+  PRINT_RIGHT_LINE_1ST_FLOOR
   PRINT_RIGHT_LINE_1ST_FLOOR
   PRINT_RIGHT_LINE_1ST_FLOOR
 
   PRINT_LINE 3,$00     ; 1
   PRINT_RIGHT_LINE_1ST_FLOOR_2
-  
+
   PRINT_LINE 50,$00    ; 163
   PRINT_LINE 62,$00    ; 163
 
@@ -358,7 +348,7 @@ LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
 LADDER_1_HSTART0:
   dc.b                LADDERHORIZONTALPOSITION
-LADDER_1_VSTOP0: 
+LADDER_1_VSTOP0:
   dc.b                LADDERVERTICALPOSITION-LADDERSPACING*2,$00
   dc.w                $FFFF,$FFFF                                                    ; line 1
   dc.w                $FFFF,$FFFF                                                    ; line 2
@@ -390,9 +380,9 @@ LADDER_1_VSTOP2:
 LADDER_2:
 LADDER_2_VSTART0:
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*3
-LADDER_2_HSTART: 
+LADDER_2_HSTART:
   dc.b                LADDERHORIZONTALPOSITION+LADDERHORIZONTALSPACING
-LADDER_2_VSTOP0:  
+LADDER_2_VSTOP0:
   dc.b                LADDERVERTICALPOSITION-LADDERSPACING*3,$01
   dc.w                $FFFF,$FFFF                                                    ; line 1
   dc.w                $FFFF,$FFFF                                                    ; line 2
