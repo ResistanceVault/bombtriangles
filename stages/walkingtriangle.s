@@ -211,7 +211,8 @@ walkingtriangle_no_vertical_climbing:
 
 
 
-
+ADDR_TRIG_TABLE: dc.l ROT_Z_MATRIX_Q5_11
+ADDR_TRIG_TABLE_STEP: dc.w 8
 
 ; ***************************** START IMPLEMENTATION OF Y CLIMBING ------------------
 walkingtriangle_ywalk:
@@ -223,6 +224,24 @@ walkingtriangle_ywalk:
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
+  ; Scale on X to point the triangle to the right - start
+  cmpi.w                 #30,YROLLINGOFFSET_OFFSET(a3)
+  beq.s                  noinverttrigend
+  lea                    ADDR_TRIG_TABLE(PC),a0
+  move.l                 (a0),a0
+  move.w                 (a0),d0
+  cmpi.w                 #%1111101001110010,d0 ; cos(134)
+  bne.s                  noinverttrig
+  move.w                 #-8,ADDR_TRIG_TABLE_STEP
+noinverttrig:
+  asr.w                  #5,d0
+  add.w                  ADDR_TRIG_TABLE_STEP(PC),a0
+  move.l                 a0,ADDR_TRIG_TABLE
+  moveq                  #%0000000001000000,d1
+  jsr                    SCALE
+noinverttrigend:
+  ; Scale on X to point the triangle to the right - end
+
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
 
@@ -233,6 +252,8 @@ walkingtriangle_ywalk:
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)                                  ; next stage must start with this value to 30
   move.w                 #0,ANGLE_OFFSET(a3)                                           ; next stage must start with this value to zero
   move.w                 #STARTDYCLIMB-1,YROLLINGOFFSET_OFFSET(a3)
+  move.l #ROT_Z_MATRIX_Q5_11,ADDR_TRIG_TABLE
+  move.w #8,ADDR_TRIG_TABLE_STEP
   SETSTAGE               walkingtriangle_xwalk_rev
   STOP_LADDERS
 
