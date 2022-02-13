@@ -1,0 +1,1 @@
+exe2adf-linux64bit -i rcompresso -l flash2022_$(date +'%F_%T') -a flash2022_$(date +'%F_%T').adf
