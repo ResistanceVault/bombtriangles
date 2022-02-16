@@ -22,15 +22,20 @@ Inizio:
   lea                 BPLPTR1,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  move.l              #SCREEN_3,d0
+  ;move.l              #SCREEN_3,d0
+  move.l              #SCREEN_2,d0
+  add.l #40*224*1,d0
   lea                 BPLPTR3,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  move.l              #SCREEN_4,d0
+  ;move.l              #SCREEN_4,d0
+  move.l              #SCREEN_2,d0
+  add.l #40*224*2,d0
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; Init active playfield with same data, we will change this later in gameloop
+  IFD LOL
   move.l              #SCREEN_3,d0
   lea                 BPLPTR2,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
@@ -38,6 +43,7 @@ Inizio:
   move.l              #SCREEN_4,d0
   lea                 BPLPTR2,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
+  ENDC
 
   ; Init tiles bitplanes
   move.l              #SCREEN_0+40*(255-9*5),d0
@@ -308,6 +314,8 @@ PRINT_RIGHT_LINE_1ST_FLOOR_2 MACRO
   dc.l 0
   ENDM
 
+  IFD LOL
+
 SCREEN_2
   PRINT_LINE 1,$00     ; 1
   PRINT_LINE 50,$00    ; 51
@@ -342,6 +350,9 @@ SCREEN_3:
 
 SCREEN_4:
   dcb.b                  40*256,$00
+  ENDC
+
+SCREEN_2: incbin assets/bombjack_result.raw
 
 LADDER_1:
 LADDER_1_VSTART0;

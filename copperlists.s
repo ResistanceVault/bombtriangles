@@ -125,7 +125,15 @@ col14:
 				; di schermo sotto l'effetto
 
 
-  dc.w       $0180,$000                                                ; color0
+  ;dc.w       $0180,$000C                                                ; color0
+  dc.w       $0182,$0762
+  dc.w       $0184,$0984
+  dc.w       $0186,$0ba6
+
+  dc.w       $0188,$0540
+  dc.w       $018A,$0dc8
+  dc.w       $018C,$0000
+  dc.w       $018E,$0fea
   ENDC
 
 
@@ -183,52 +191,60 @@ CopBar:
   dc.w       $ac31,$fffe,$196,$103
   dc.w       $ad31,$fffe,$196,COLOR2
   ENDC
-
+  IFND LOL
   dc.w       $ae07,$FFFE                                               ; prossima linea
   dc.w       $180,$006                                                 ; blu a 6
-  dc.w       $b007,$FFFE                                               ; salto 2 linee
+  dc.w       $b007-$0000,$FFFE                                               ; salto 2 linee
   dc.w       $180,$007                                                 ; blu a 7
-  dc.w       $b207,$FFFE                                               ; sato 2 linee
+  dc.w       $b207-$0000,$FFFE                                               ; sato 2 linee
   dc.w       $180,$008                                                 ; blu a 8
-  dc.w       $b507,$FFFE                                               ; salto 3 linee
+  dc.w       $b507-$0000,$FFFE                                               ; salto 3 linee
   dc.w       $180,$009                                                 ; blu a 9
-  dc.w       $b807,$FFFE                                               ; salto 3 linee
+  dc.w       $b807-$0000,$FFFE                                               ; salto 3 linee
   dc.w       $180,$00a                                                 ; blu a 10
-  dc.w       $bb07,$FFFE                                               ; salto 3 linee
+  dc.w       $bb07-$0000,$FFFE                                               ; salto 3 linee
   dc.w       $180,$00b                                                 ; blu a 11
-  dc.w       $be07,$FFFE                                               ; salto 3 linee
+  dc.w       $be07-$0000,$FFFE                                               ; salto 3 linee
   dc.w       $180,$00c                                                 ; blu a 12
-  dc.w       $c207,$FFFE                                               ; salto 4 linee
+  dc.w       $c207-$0000,$FFFE                                               ; salto 4 linee
   dc.w       $180,$00d                                                 ; blu a 13
-  dc.w       $c707,$FFFE                                               ; salto 7 linee
+  dc.w       $c707-$0000,$FFFE                                               ; salto 7 linee
   dc.w       $180,$00e                                                 ; blu a 14
-  dc.w       $ce07,$FFFE                                               ; salto 6 linee
+  dc.w       $ce07-$0000,$FFFE                                               ; salto 6 linee
   dc.w       $180,$00f                                                 ; blu a 15
-  dc.w       $d807,$FFFE                                               ; salto 10 linee
+  dc.w       $d807-$0000,$FFFE                                               ; salto 10 linee
   dc.w       $180,$11F                                                 ; schiarisco...
-  dc.w       $e807,$FFFE                                               ; salto 16 linee
+  dc.w       $e807-$0000,$FFFE                                               ; salto 16 linee
   dc.w       $180,$22F                                                 ; schiarisco...
 
-  dc.w       $eA07,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
+  dc.w       $eA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
   dc.w       $180,$010
-  dc.w       $eB07,$FFFE
+  dc.w       $eB07-$0000,$FFFE
   dc.w       $180,$020
-  dc.w       $eC07,$FFFE
+  dc.w       $eC07-$0000,$FFFE
   dc.w       $180,$030
-  dc.w       $ED07,$FFFE
+  dc.w       $ED07-$0000,$FFFE
   dc.w       $180,$040
-  dc.w       $EE07,$FFFE
+  dc.w       $EE07-$0000,$FFFE
   dc.w       $180,$030
-  dc.w       $EF07,$FFFE
+  dc.w       $EF07-$0000,$FFFE
   dc.w       $180,$020
-  dc.w       $F007,$FFFE
+  dc.w       $F007-$0000,$FFFE
   dc.w       $180,$010
-  dc.w       $F107,$FFFE
+  dc.w       $F107-$0000,$FFFE
   dc.w       $180,$000
   ENDC
+  ENDC
+
+
+
+
 
   ; Bitplanes Tile Pointers
   dc.w       $fddf,$FFFE                                               ; aspetto la linea $79
+  dc.w      $182,COLOR1
+  dc.w      $184,COLOR2
+  dc.w      $186,COLOR3
   COPSET2BPL
 
 BPLPTR1_TILE:
