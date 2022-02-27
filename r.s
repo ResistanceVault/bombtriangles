@@ -15,6 +15,24 @@ Inizio:
 
   bsr.w               Save_all
 
+  ; draw sand
+  lea                 SANDDOWN,a3
+  moveq               #12,d4
+  jsr                 BLITLINEOFTILES
+
+  lea                 SANDTOP,a3
+  moveq               #11,d4
+  jsr                 BLITLINEOFTILES
+
+  ; draw top of pyramids
+  moveq #0,d0
+  moveq #1,d1
+  jsr                 BLITTOPPYRAMID
+
+  ;moveq #9,d0
+  ;moveq #1,d1
+  ;jsr                 BLITTOPPYRAMID
+
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
 ;*****************************************************************************
@@ -33,6 +51,104 @@ Inizio:
   add.l #40*224*2,d0
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; full tiles
+  moveq #6-1,d4
+  moveq #1,d6
+tilefullstart:
+  move.l d6,d0
+  moveq #5,d1
+  lea TILEFULL,a0
+  jsr BLIT_TILE
+  addq #1,d6
+  dbra d4,tilefullstart
+
+  moveq #8-1,d4
+  moveq #0,d6
+tilefullstart2:
+  move.l d6,d0
+  moveq #6,d1
+  lea TILEFULL,a0
+  jsr BLIT_TILE
+  addq #1,d6
+  dbra d4,tilefullstart2
+
+  moveq #9-1,d4
+  moveq #0,d6
+tilefullstart3:
+  move.l d6,d0
+  moveq #7,d1
+  lea TILEFULL,a0
+  jsr BLIT_TILE
+  addq #1,d6
+  dbra d4,tilefullstart3
+
+  moveq #10-1,d4
+  moveq #0,d6
+tilefullstart4:
+  move.l d6,d0
+  moveq #8,d1
+  lea TILEFULL,a0
+  jsr BLIT_TILE
+  addq #1,d6
+  dbra d4,tilefullstart4
+
+  moveq #11-1,d4
+  moveq #0,d6
+tilefullstart5:
+  move.l d6,d0
+  moveq #9,d1
+  lea TILEFULL,a0
+  jsr BLIT_TILE
+  addq #1,d6
+  dbra d4,tilefullstart5
+
+
+  ; slopes start
+  moveq #7,d0
+  moveq #5,d1
+  lea TILERIGHTSLOPE,a0
+  jsr BLIT_TILE
+
+  moveq #8,d0
+  moveq #6,d1
+  lea TILERIGHTSLOPE,a0
+  jsr BLIT_TILE
+
+  moveq #9,d0
+  moveq #7,d1
+  lea TILERIGHTSLOPE,a0
+  jsr BLIT_TILE
+
+  moveq #10,d0
+  moveq #8,d1
+  lea TILERIGHTSLOPE,a0
+  jsr BLIT_TILE
+
+  moveq #11,d0
+  moveq #9,d1
+  lea TILERIGHTSLOPE,a0
+  jsr BLIT_TILE
+
+  ; start blitting platform 1
+  moveq #13-1,d4
+  moveq #15,d6
+tileplatform1:
+  move.l d6,d0
+  move.w #51*40,d1
+  jsr BLIT_PLATFORM
+  subq #1,d6
+  dbra d4,tileplatform1
+
+; start blitting platform 2
+  moveq #8-1,d4
+  moveq #12,d6
+tileplatform2:
+  move.l d6,d0
+  move.w #99*40,d1
+  jsr BLIT_PLATFORM
+  subq #1,d6
+  dbra d4,tileplatform2
 
   ; Init active playfield with same data, we will change this later in gameloop
   IFD LOL
@@ -144,6 +260,98 @@ exit_demo:
 
 POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
+  rts
+
+; blit a platform into background - origin is at top left
+; d0 : x position (trashed)
+; d1 : y position (trashed)
+BLIT_PLATFORM:
+  lea PLATFORM,a0
+  lea SCREEN_2,a1
+  ; add vertical position
+  adda.l d1,a1
+  lsl.w #1,d0
+  adda.l d0,a1
+  moveq #3-1,d7
+blitplatform_startloop:
+  WAITBLITTER
+  move.w           #$09F0,$dff040
+  move.w           #$0000,$dff042
+  move.l           a0,$dff050            ; copy from a channel
+  move.l           a1,$dff054            ; copy to d channel
+  move.w           #$0000,$dff064               ; A mod
+  move.w           #38,$dff066                  ; D mod
+  move.l           #$FFFFFFFF,$DFF044 ; mask
+  move.w           #$0141,$dff058
+  adda.l           #10,a0
+  adda.l           #224*40,a1
+  dbra             d7,blitplatform_startloop
+  rts
+
+BLITTOPPYRAMID:
+  lea SCREEN_2,a1
+  mulu.w #40*16,d1
+  adda.l d1,a1
+  adda.l #40*10,a1
+  lsl.w #1,d0
+  adda.l d0,a1
+  lea PYRAMIDTOP,a0
+  moveq #3-1,d7
+blittoputamid_startloop:
+  WAITBLITTER
+  move.w           #$09F0,$dff040
+  move.w           #$0000,$dff042
+  move.l           a0,$dff050          ; copy from a channel
+  move.l           a1,$dff054            ; copy to d channel
+  move.w           #$0000,$dff064               ; A mod
+  move.w           #40-14,$dff066               ; D mod
+  move.l           #$FFFFFFFF,$DFF044           ; mask
+  move.w           #$0D87,$dff058
+  adda.l           #756,a0
+  adda.l           #224*40,a1
+  dbra             d7,blittoputamid_startloop
+  rts
+
+; blit a tile into background - origin is at top left
+; a0 : pointer to tile (trashed)
+; d0 : x position (trashed)
+; d1 : y position (trashed)
+BLIT_TILE:
+  lea SCREEN_2,a1
+  ; add vertical position
+  mulu.w #40*16,d1
+  adda.l d1,a1
+  lsl.w #1,d0
+  adda.l d0,a1
+  moveq #3-1,d7
+blittile_startloop:
+  WAITBLITTER
+  move.w           #$09F0,$dff040
+  move.w           #$0000,$dff042
+  move.l           a0,$dff050            ; copy from a channel
+  move.l           a1,$dff054            ; copy to d channel
+  move.w           #$0000,$dff064               ; A mod
+  move.w           #38,$dff066                  ; D mod
+  move.l           #$FFFFFFFF,$DFF044 ; mask
+  move.w           #$0401,$dff058
+  adda.l           #32,a0
+  adda.l           #224*40,a1
+  dbra             d7,blittile_startloop
+  rts
+
+; print a line of tiles horizontally
+; a3 : pointer to the tile
+; d4.w : tile row number
+BLITLINEOFTILES:
+  moveq               #16-1,d6
+  moveq               #0,d3
+blitlineoftiles_start:
+  move.l              d3,d0
+  move.w              d4,d1
+  move.l              a3,a0
+  jsr                 BLIT_TILE
+  addq                #1,d3
+  dbra                d6,blitlineoftiles_start
   rts
 
 ;---------------------------------------------------------------
@@ -352,7 +560,8 @@ SCREEN_4:
   dcb.b                  40*256,$00
   ENDC
 
-SCREEN_2: incbin assets/bombjack_result.raw
+SCREEN_2: ;incbin "assets/bombjack_result.raw"
+  dcb.b 40*224*3,$00
 
 LADDER_1:
 LADDER_1_VSTART0;
@@ -422,6 +631,13 @@ LADDER_2_VSTOP2:
   ; END OF SPRITE
   dc.w                0,0
 
+; background tiles
+SANDDOWN:             incbin "assets/tiles/sanddown.raw"
+SANDTOP:              incbin "assets/tiles/sandtop.raw"
+TILEFULL:             incbin "assets/tiles/full.raw"
+TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
+PYRAMIDTOP:           incbin "assets/brush/pyramidtop112x54.raw"
+PLATFORM:             incbin "assets/brush/platform16x5.raw"
 Module1:
   incbin              "P61.chippy_nr.399"                                            ; usecode $945A
   even

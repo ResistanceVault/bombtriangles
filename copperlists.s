@@ -56,7 +56,17 @@ BPLPTR4:
 BPLPTR5:
   dc.w       $f0,$0000,$f2,$0000                                       ;fifth	 bitplane - BPL4PT
 
-  ;dc.w       $180,$0000
+  dc.w       $0182,$0762
+  dc.w       $0184,$0984
+  dc.w       $0186,$0ba6
+
+  dc.w       $0188,$0540
+  dc.w       $018A,$0dc8
+  dc.w       $018C,$0000
+  dc.w       $018E,$0fea
+
+  include "coplistfragments/sky.s"
+
 COLORTEST EQU $194
 ;COLORTEST EQU $180
 OFFSETTEST EQU $1000
@@ -124,23 +134,13 @@ col14:
   dc.w       COLORTEST,COLOR2                                                ; Decidiamo il colore NERO per la parte
 				; di schermo sotto l'effetto
 
-
-  ;dc.w       $0180,$000C                                                ; color0
-  dc.w       $0182,$0762
-  dc.w       $0184,$0984
-  dc.w       $0186,$0ba6
-
-  dc.w       $0188,$0540
-  dc.w       $018A,$0dc8
-  dc.w       $018C,$0000
-  dc.w       $018E,$0fea
   ENDC
 
 
   IFD        EFFECTS
   dc.w       $7007,$fffe                                               ; Aspettiamo la fine della scritta COMMODORE
 
-  dc.w       $0180,$000                                                ; color0
+  ;dc.w       $0180,$000                                                ; color0
 	;dc.w	$0182,$475	; color1
 	;dc.w	$0184,$fff	; color2
 	;dc.w	$0186,$ccc	; color3
@@ -191,33 +191,13 @@ CopBar:
   dc.w       $ac31,$fffe,$196,$103
   dc.w       $ad31,$fffe,$196,COLOR2
   ENDC
-  IFND LOL
-  dc.w       $ae07,$FFFE                                               ; prossima linea
-  dc.w       $180,$006                                                 ; blu a 6
-  dc.w       $b007-$0000,$FFFE                                               ; salto 2 linee
-  dc.w       $180,$007                                                 ; blu a 7
-  dc.w       $b207-$0000,$FFFE                                               ; sato 2 linee
-  dc.w       $180,$008                                                 ; blu a 8
-  dc.w       $b507-$0000,$FFFE                                               ; salto 3 linee
-  dc.w       $180,$009                                                 ; blu a 9
-  dc.w       $b807-$0000,$FFFE                                               ; salto 3 linee
-  dc.w       $180,$00a                                                 ; blu a 10
-  dc.w       $bb07-$0000,$FFFE                                               ; salto 3 linee
-  dc.w       $180,$00b                                                 ; blu a 11
-  dc.w       $be07-$0000,$FFFE                                               ; salto 3 linee
-  dc.w       $180,$00c                                                 ; blu a 12
-  dc.w       $c207-$0000,$FFFE                                               ; salto 4 linee
-  dc.w       $180,$00d                                                 ; blu a 13
-  dc.w       $c707-$0000,$FFFE                                               ; salto 7 linee
-  dc.w       $180,$00e                                                 ; blu a 14
-  dc.w       $ce07-$0000,$FFFE                                               ; salto 6 linee
-  dc.w       $180,$00f                                                 ; blu a 15
-  dc.w       $d807-$0000,$FFFE                                               ; salto 10 linee
-  dc.w       $180,$11F                                                 ; schiarisco...
-  dc.w       $e807-$0000,$FFFE                                               ; salto 16 linee
-  dc.w       $180,$22F                                                 ; schiarisco...
 
-  dc.w       $eA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
+  ; sand
+  IFND LOL
+  include    "coplistfragments/sand.s"
+
+  IFD LAL
+  dc.w       $dA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
   dc.w       $180,$010
   dc.w       $eB07-$0000,$FFFE
   dc.w       $180,$020
@@ -231,6 +211,7 @@ CopBar:
   dc.w       $180,$020
   dc.w       $F007-$0000,$FFFE
   dc.w       $180,$010
+  ENDC
   dc.w       $F107-$0000,$FFFE
   dc.w       $180,$000
   ENDC
