@@ -16,9 +16,9 @@ Inizio:
   bsr.w               Save_all
 
   ; draw sand
-  lea                 SANDDOWN,a3
-  moveq               #12,d4
-  jsr                 BLITLINEOFTILES
+  ;lea                 SANDDOWN,a3
+  ;moveq               #11,d4
+  ;jsr                 BLITLINEOFTILES
 
   lea                 SANDTOP,a3
   moveq               #11,d4
@@ -29,9 +29,9 @@ Inizio:
   moveq #1,d1
   jsr                 BLITTOPPYRAMID
 
-  ;moveq #9,d0
-  ;moveq #1,d1
-  ;jsr                 BLITTOPPYRAMID
+  moveq #12,d0
+  moveq #4,d1
+  jsr                 BLITTOPPYRAMID
 
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
@@ -41,14 +41,14 @@ Inizio:
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ;move.l              #SCREEN_3,d0
-  move.l              #SCREEN_2,d0
-  add.l #40*224*1,d0
+  move.l              #SCREEN_2+40*224*1,d0
+  ;add.l #40*224*1,d0
   lea                 BPLPTR3,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ;move.l              #SCREEN_4,d0
-  move.l              #SCREEN_2,d0
-  add.l #40*224*2,d0
+  move.l              #SCREEN_2+40*224*2,d0
+  ;add.l #40*224*2,d0
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 

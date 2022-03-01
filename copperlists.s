@@ -65,10 +65,11 @@ BPLPTR5:
   dc.w       $018C,$0000
   dc.w       $018E,$0fea
 
+  IFD EFFECTS
   include "coplistfragments/sky.s"
+  ENDC
 
 COLORTEST EQU $194
-;COLORTEST EQU $180
 OFFSETTEST EQU $1000
   IFD        EFFECTS
 ;	L'effetto di Lezione3e.s spostato piu' in ALTO
@@ -136,71 +137,14 @@ col14:
 
   ENDC
 
-
-  IFD        EFFECTS
-  dc.w       $7007,$fffe                                               ; Aspettiamo la fine della scritta COMMODORE
-
-  ;dc.w       $0180,$000                                                ; color0
-	;dc.w	$0182,$475	; color1
-	;dc.w	$0184,$fff	; color2
-	;dc.w	$0186,$ccc	; color3
-	;dc.w	$0188,$999	; color4
-	;dc.w	$018a,$232	; color5
-	;dc.w	$018c,$777	; color6
-	;dc.w	$018e,$444	; color7
-
-;	EFFETTO DELLA LEZIONE3h.s
-  dc.w       $9007,$fffe                                               ; aspettiamo l'inizio della linea
-  dc.w       $180,$000                                                 ; grigio al minimo, ossia NERO!!!
-CopBar:
-  dc.w       $9031,$fffe                                               ; wait che cambiamo ($9033,$9035,$9037...)
-  dc.w       $180,$100                                                 ; colore rosso
-  dc.w       $9107,$fffe                                               ; wait che non cambiamo (Inizio linea)
-  dc.w       $180,$111                                                 ; colore GRIGIO (parte dall'inizio linea fino
-  dc.w       $9131,$fffe                                               ; a questo WAIT, che noi cambiaremo...
-  dc.w       $180,$000                                                 ; dopo il quale comincia il ROSSO
-
-;	    WAIT FISSI (poi grigio) - WAIT DA CAMBIARE (seguiti dal rosso)
-  IFD LOL
-  dc.w       $9231,$fffe,$196,$300               ; linea 3
-  dc.w       $9331,$fffe,$196,$400               ; linea 4
-  dc.w       $9431,$fffe,$196,$500               ; linea 5
-  dc.w       $9531,$fffe,$196,$600               ; ....
-  dc.w       $9631,$fffe,$196,$700
-  dc.w       $9731,$fffe,$196,$800
-  dc.w       $9831,$fffe,$196,$900
-  dc.w       $9931,$fffe,$196,$a00
-  dc.w       $9a31,$fffe,$196,$b00
-  dc.w       $9b31,$fffe,$196,$c00
-  dc.w       $9c31,$fffe,$196,$d00
-  dc.w       $9d31,$fffe,$196,$e00
-  dc.w       $9e31,$fffe,$196,$f00
-  dc.w       $9f31,$fffe,$196,$e00
-  dc.w       $a031,$fffe,$196,$d00
-  dc.w       $a131,$fffe,$196,$c00
-  dc.w       $a231,$fffe,$196,$b00
-  dc.w       $a331,$fffe,$196,$a00
-  dc.w       $a431,$fffe,$196,$900
-  dc.w       $a531,$fffe,$196,$800
-  dc.w       $a631,$fffe,$196,$700
-  dc.w       $a731,$fffe,$196,$600
-  dc.w       $a831,$fffe,$196,$500
-  dc.w       $a931,$fffe,$196,$400
-  dc.w       $aa31,$fffe,$196,$301
-  dc.w       $ab31,$fffe,$196,$202
-  dc.w       $ac31,$fffe,$196,$103
-  dc.w       $ad31,$fffe,$196,COLOR2
-  ENDC
-
   ; sand
-  IFND LOL
+  IFD EFFECTS
   include    "coplistfragments/sand.s"
 
-  IFD LAL
-  dc.w       $dA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
-  dc.w       $180,$010
-  dc.w       $eB07-$0000,$FFFE
-  dc.w       $180,$020
+  ;dc.w       $dA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
+  ;dc.w       $180,$010
+  ;dc.w       $eB07-$0000,$FFFE
+  ;dc.w       $180,$020
   dc.w       $eC07-$0000,$FFFE
   dc.w       $180,$030
   dc.w       $ED07-$0000,$FFFE
@@ -211,27 +155,21 @@ CopBar:
   dc.w       $180,$020
   dc.w       $F007-$0000,$FFFE
   dc.w       $180,$010
-  ENDC
   dc.w       $F107-$0000,$FFFE
   dc.w       $180,$000
   ENDC
-  ENDC
-
-
-
-
 
   ; Bitplanes Tile Pointers
   dc.w       $fddf,$FFFE                                               ; aspetto la linea $79
-  dc.w      $182,COLOR1
-  dc.w      $184,COLOR2
-  dc.w      $186,COLOR3
+  dc.w       $182,COLOR1
+  dc.w       $184,COLOR2
+  dc.w       $186,COLOR3
   COPSET2BPL
 
 BPLPTR1_TILE:
   dc.w       $e0,$0000,$e2,$0000                                       ;first	 bitplane - BPL0PT
 BPLPTR2_TILE:
-  dc.w       $e4,$0000,$e6,$0000  
+  dc.w       $e4,$0000,$e6,$0000
 
   dc.w       $ffdf,$fffe    ; wait line 255
 
