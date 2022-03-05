@@ -137,6 +137,45 @@ col14:
 
   ENDC
 
+  IFD COPPLATFORM
+  dc.w       $5F07,$fffe
+  dc.w       $18e,COLORCOPPLATFORM1
+  dc.w       $6207,$fffe
+  dc.w       $18e,COLORCOPPLATFORM2
+  dc.w       $6307,$fffe
+  dc.w       $18e,COLORCOPPLATFORM3
+  dc.w       $6407,$fffe
+  dc.w       $18e,COLORCOPPLATFORM4
+  dc.w       $6507,$fffe
+  dc.w       $18e,COLORCOPPLATFORM5
+  dc.w       $6607,$fffe
+  dc.w       $18e,COLORCOPPLATFORM6
+  dc.w       $6707,$fffe
+  dc.w       $18e,COLOR3
+
+
+  ;dc.w       $8F07,$fffe
+  ;dc.w       $180,$0FFF
+  ;dc.w       $9007,$fffe
+  ;dc.w       $180,$0000
+
+  dc.w       $8F07,$fffe
+  dc.w       $18e,COLORCOPPLATFORM1
+  dc.w       $9207,$fffe
+  dc.w       $18e,COLORCOPPLATFORM2
+  dc.w       $9307,$fffe
+  dc.w       $18e,COLORCOPPLATFORM3
+  dc.w       $9407,$fffe
+  dc.w       $18e,COLORCOPPLATFORM4
+  dc.w       $9507,$fffe
+  dc.w       $18e,COLORCOPPLATFORM5
+  dc.w       $9607,$fffe
+  dc.w       $18e,COLORCOPPLATFORM6
+  dc.w       $9707,$fffe
+  dc.w       $18e,COLOR3
+
+  ENDC
+
   ; sand
   IFD EFFECTS
   include    "coplistfragments/sand.s"

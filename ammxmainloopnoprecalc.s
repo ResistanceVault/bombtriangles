@@ -38,12 +38,12 @@ CLEARTOP:
             move.w           #$0100,$dff040
             move.w           #$0000,$dff042
             move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
-            move.w           #4,$DFF066           ; D mod
-            move.w           #$2E52,$dff058
+            move.w           #2,$DFF066           ; D mod
+            move.w           #$2E53,$dff058
 
             WAITBLITTER
             move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
-            move.w           #$2E52,$dff058
+            move.w           #$2E53,$dff058
             rts
 
             include          "ladder.s"

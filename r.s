@@ -33,6 +33,20 @@ Inizio:
   moveq #4,d1
   jsr                 BLITTOPPYRAMID
 
+  ; stars start
+  moveq #10-1,d7
+  lea SCREEN_2+40*1+20,a0
+startstarfield:
+  move.w d7,d6
+  neg.w d6
+  lsr.w #2,d6
+  add.l #19,a0
+  bset d6,(a0)
+  bset d6,40*224*1(a0)
+  bset d6,40*224*2(a0)
+  dbra d7,startstarfield
+; endstartfield
+
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
 ;*****************************************************************************
@@ -40,15 +54,11 @@ Inizio:
   lea                 BPLPTR1,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  ;move.l              #SCREEN_3,d0
   move.l              #SCREEN_2+40*224*1,d0
-  ;add.l #40*224*1,d0
   lea                 BPLPTR3,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  ;move.l              #SCREEN_4,d0
   move.l              #SCREEN_2+40*224*2,d0
-  ;add.l #40*224*2,d0
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
@@ -282,7 +292,7 @@ blitplatform_startloop:
   move.w           #$0000,$dff064               ; A mod
   move.w           #38,$dff066                  ; D mod
   move.l           #$FFFFFFFF,$DFF044 ; mask
-  move.w           #$0141,$dff058
+  move.w           #$0201,$dff058
   adda.l           #10,a0
   adda.l           #224*40,a1
   dbra             d7,blitplatform_startloop
@@ -637,7 +647,11 @@ SANDTOP:              incbin "assets/tiles/sandtop.raw"
 TILEFULL:             incbin "assets/tiles/full.raw"
 TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
 PYRAMIDTOP:           incbin "assets/brush/pyramidtop112x54.raw"
+  IFD COPPLATFORM
+PLATFORM: dcb.b 2*16*3,$FF
+  ELSE
 PLATFORM:             incbin "assets/brush/platform16x5.raw"
+  ENDC
 Module1:
   incbin              "P61.chippy_nr.399"                                            ; usecode $945A
   even
