@@ -193,14 +193,24 @@ tileplatform2:
   ; Sprite 2 init
   jsr                 drawtopstep
 
-  ; Sprite colors
-  move.w              #$0888,$dff1a2                                                 ; ladder color 1
-  move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
-  move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
+  ; Sprite 4 init - bomb first 2 bitplanes of attached sprite
+  move.l              #BOMB4_BPL0,d0
+  lea                 Sprite4pointers,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
 
-  move.w              #$0888,$dff1a8                                                 ; ladder color 1
-  move.w              #$0AAA,$dff1aa                                                 ; ladder color 2
-  move.w              #$0BCD,$dff1ac                                                 ; ladder color 3
+  ; Sprite 5 init - bomb first 2 bitplanes of attached sprite
+  move.l              #BOMB4_BPL1,d0
+  lea                 Sprite5pointers,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Sprite colors
+  ;move.w              #$0888,$dff1a2                                                 ; ladder color 1
+  ;move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
+  ;move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
+
+  ;move.w              #$0888,$dff1a8                                                 ; ladder color 1
+  ;move.w              #$0AAA,$dff1aa                                                 ; ladder color 2
+  ;move.w              #$0BCD,$dff1ac                                                 ; ladder color 3
 
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
@@ -640,6 +650,12 @@ LADDER_2_VSTOP2:
 
   ; END OF SPRITE
   dc.w                0,0
+
+; start of bomb sprites
+  include             "bombs/1.s"
+  include             "bombs/2.s"
+  include             "bombs/3.s"
+  include             "bombs/4.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"

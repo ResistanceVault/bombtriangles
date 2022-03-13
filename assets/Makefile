@@ -7,3 +7,7 @@ all:
 
 	rm -f "brush/pyramidtop112x54.raw" && rm -f "brush/pyramidtop112x54.pal" && ilbm2raw "brush/pyramidtop112x54.brush" "brush/pyramidtop112x54.raw" -p "brush/pyramidtop112x54.pal"
 	rm -f "brush/platform16x5.raw" && rm -f "brush/platform16x5.pal" && ilbm2raw "brush/platform16x5.brush" "brush/platform16x5.raw" -p "brush/platform16x5.pal"
+
+
+	# bombs
+	rm -f bombs/1.raw && ilbm2raw  "bombs/1_risultato.iff" "bombs/1.raw"

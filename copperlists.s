@@ -23,14 +23,33 @@ COPSET23BPL MACRO
 
 COPPERLIST:
 
-	; Facciamo puntare gli sprite a ZERO, per eliminarli, o ce li troviamo
-	; in giro impazziti a disturbare!!!
+; Sprites pointer init
 SpritePointers:
-  dc.w       $120,$0000,$122,$0000,$124,$0000,$126,$0000,$128,$0000
-  dc.w       $12a,$0000,$12c,$0000,$12e,$0000,$130,$0000,$132,$0000
-  dc.w       $134,$0000,$136,$0000,$138,$0000,$13a,$0000,$13c,$0000
-  dc.w       $13e,$0000
+Sprite0pointers:
+  dc.w       $120,$0000,$122,$0000
 
+Sprite1pointers:
+  dc.w       $124,$0000,$126,$0000
+
+Sprite2pointers:
+  dc.w       $128,$0000,$12a,$0000
+  
+Sprite3pointers:
+  dc.w       $12c,$0000,$12e,$0000
+
+Sprite4pointers:
+  dc.w       $130,$0000,$132,$0000
+
+Sprite5pointers:
+  dc.w       $134,$0000,$136,$0000
+
+Sprite6pointers; 
+  dc.w       $138,$0000,$13a,$0000
+  
+Sprite7pointers:
+  dc.w       $13c,$0000,$13e,$0000
+
+; other stuff
   dc.w       $8e,$2c81                                                 ; DiwStrt	(registri con valori normali)
   dc.w       $90,$2cc1                                                 ; DiwStop
   dc.w       $92,$0038                                                 ; DdfStart
