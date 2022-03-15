@@ -42,7 +42,7 @@ _ammxmainloop3_init:
   move.w    #$f0f,(a0)+        ; color24
   move.w    #$f0f,(a0)+        ; color25
   move.w    #$f0f,(a0)+        ; color26
-  move.w    #$f0f,(a0)+        ; color27
+  move.w    #$f06,(a0)+        ; color27
   move.w    #$f0f,(a0)+        ; color28
   move.w    #$f0f,(a0)+        ; color29
   move.w    #$f0f,(a0)+        ; color30

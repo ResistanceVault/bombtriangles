@@ -194,12 +194,12 @@ tileplatform2:
   jsr                 drawtopstep
 
   ; Sprite 4 init - bomb first 2 bitplanes of attached sprite
-  move.l              #BOMB4_BPL0,d0
+  move.l              #BOMB8_BPL0,d0
   lea                 Sprite4pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; Sprite 5 init - bomb first 2 bitplanes of attached sprite
-  move.l              #BOMB4_BPL1,d0
+  move.l              #BOMB8_BPL1,d0
   lea                 Sprite5pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
@@ -656,6 +656,7 @@ LADDER_2_VSTOP2:
   include             "bombs/2.s"
   include             "bombs/3.s"
   include             "bombs/4.s"
+  include             "bombs/8.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"
