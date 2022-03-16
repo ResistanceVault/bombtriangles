@@ -1,7 +1,12 @@
+BOMB8_VERTICAL_START equ 112
+BOMB8_VERTICAL_STOP equ BOMB7_VERTICAL_START+31
+
 BOMB8_BPL0:
-BOMB8_BPL0_VSTART:  dc.b    $30
+BOMB8_BPL0_VSTART:  dc.b    BOMB8_VERTICAL_START
 BOMB8_BPL0_HSTART:  dc.b    $90
-BOMB8_BPL0_VSTOP:   dc.b    $4f,$00
+BOMB8_BPL0_VSTOP:   dc.b    BOMB8_VERTICAL_STOP
+                    dc.b    0
+
                     dc.w    $0000,$0000      ; line 1
                     dc.w    $0080,$0000      ; line 2
                     dc.w    $00C0,$0000      ; line 3
@@ -35,9 +40,11 @@ BOMB8_BPL0_VSTOP:   dc.b    $4f,$00
                     dc.w    $0000,$0000      ; line 31
                     dc.w    0,0
 BOMB8_BPL1:
-BOMB8_BPL1_VSTART:  dc.b    $30
+BOMB8_BPL1_VSTART:  dc.b    BOMB8_VERTICAL_START
 BOMB8_BPL1_HSTART:  dc.b    $98
-BOMB8_BPL1_VSTOP:   dc.b    $4f,%00000000
+BOMB8_BPL1_VSTOP:   dc.b    BOMB8_VERTICAL_STOP
+                    dc.b    0
+
                     dc.w    $0004,$0000      ; line 1
                     dc.w    $000C,$0000      ; line 2
                     dc.w    $0018,$0000      ; line 3

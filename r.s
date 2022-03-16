@@ -194,23 +194,14 @@ tileplatform2:
   jsr                 drawtopstep
 
   ; Sprite 4 init - bomb first 2 bitplanes of attached sprite
-  move.l              #BOMB8_BPL0,d0
+  move.l              #BOMB1_BPL0,d0
   lea                 Sprite4pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; Sprite 5 init - bomb first 2 bitplanes of attached sprite
-  move.l              #BOMB8_BPL1,d0
+  move.l              #BOMB1_BPL1,d0
   lea                 Sprite5pointers,a1
-  bsr.w               POINTINCOPPERLIST_FUNCT
-
-  ; Sprite colors
-  ;move.w              #$0888,$dff1a2                                                 ; ladder color 1
-  ;move.w              #$0AAA,$dff1a4                                                 ; ladder color 2
-  ;move.w              #$0BCD,$dff1a6                                                 ; ladder color 3
-
-  ;move.w              #$0888,$dff1a8                                                 ; ladder color 1
-  ;move.w              #$0AAA,$dff1aa                                                 ; ladder color 2
-  ;move.w              #$0BCD,$dff1ac                                                 ; ladder color 3
+  bsr.w               POINTINCOPPERLIST_FUNCT                                                ; ladder color 3
 
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
@@ -656,6 +647,7 @@ LADDER_2_VSTOP2:
   include             "bombs/2.s"
   include             "bombs/3.s"
   include             "bombs/4.s"
+  include             "bombs/7.s"
   include             "bombs/8.s"
 
 ; background tiles

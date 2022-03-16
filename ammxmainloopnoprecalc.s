@@ -1,4 +1,5 @@
     include "tiles.s"
+    include "bombs/bombmanager.s"
 
 ammxmainloop3:
             SWAP_BPL
@@ -40,6 +41,8 @@ CLEARTOP:
             move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
             move.w           #2,$DFF066           ; D mod
             move.w           #$2E53,$dff058
+
+            jsr             BOMBMANAGER
 
             WAITBLITTER
             move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
