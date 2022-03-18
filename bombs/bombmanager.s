@@ -1,4 +1,4 @@
-BOMBTIMERSTART EQU 100
+BOMBTIMERSTART EQU 30
 
 BOMBMANAGER_SPRITESLIST:
   dc.l      BOMB2_BPL0
@@ -22,26 +22,28 @@ BOMBMANAGER:
 
   ; manage here all the stuff to move to the next bomb sprite
   ; Sprite 4 init
-  lea       BOMBMANAGER_PTR,a0
-  move.l    (a0),d0
+  lea       BOMBMANAGER_PTR(PC),a0
+  move.l    (a0),a2
+  move.l    (a2),d0
   lea       Sprite4pointers,a1
   jsr       POINTINCOPPERLIST_FUNCT
 
   ; Sprite 5 init
-  move.l    4(a0),d0
+  addq      #4,a2
+  move.l    (a2),d0
   lea       Sprite5pointers,a1
   jsr       POINTINCOPPERLIST_FUNCT
 
   ; go to next sprite
-  addq      #8,d0
+  addq      #4,a2
 
   ; if we reached the end reset the pointer
-  cmp.l     #BOMBMANAGER_SPRITESLIST_END,d0
+  cmp.l     #BOMBMANAGER_SPRITESLIST_END,a2
   bne.s     bombmanager_dontresetptr
-  move.l    #BOMBMANAGER_SPRITESLIST,d0
+  move.l    #BOMBMANAGER_SPRITESLIST,a2
 bombmanager_dontresetptr:
   ; update pointer
-  move.l    d0,BOMBMANAGER_PTR
+  move.l    a2,(a0)
 
 bombmanager_end:
   rts

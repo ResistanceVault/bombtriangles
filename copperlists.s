@@ -33,7 +33,7 @@ Sprite1pointers:
 
 Sprite2pointers:
   dc.w       $128,$0000,$12a,$0000
-  
+
 Sprite3pointers:
   dc.w       $12c,$0000,$12e,$0000
 
@@ -43,9 +43,9 @@ Sprite4pointers:
 Sprite5pointers:
   dc.w       $134,$0000,$136,$0000
 
-Sprite6pointers; 
+Sprite6pointers;
   dc.w       $138,$0000,$13a,$0000
-  
+
 Sprite7pointers:
   dc.w       $13c,$0000,$13e,$0000
 
@@ -54,8 +54,13 @@ Sprite7pointers:
   dc.w       $90,$2cc1                                                 ; DiwStop
   dc.w       $92,$0038                                                 ; DdfStart
   dc.w       $94,$00d0                                                 ; DdfStop
-  dc.w       $102,0                                                    ; BplCon1
-  dc.w       $104,$0040 ; Playfield 2 priority over Playfield 1 ON                                                    ; BplCon2
+  dc.w       $102,0
+                                                      ; BplCon1
+  ; BplCon2
+  ; Playfield 2 priority over Playfield 1 ON
+  ; Sprites max priority over playfields
+  dc.w       $104,$007f
+
   dc.w       $108,0                                                    ; Bpl1Mod
   dc.w       $10a,0                                                    ; Bpl2Mod
 
@@ -255,5 +260,5 @@ BARRA:
   dc.w       $180,$000                                                 ; colore NERO
   ENDC
 
-
+; Copperlist end
   dc.w       $FFFF,$FFFE                                               ; End of copperlist
