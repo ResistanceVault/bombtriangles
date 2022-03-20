@@ -649,6 +649,8 @@ LADDER_2_VSTOP2:
   include             "bombs/4.s"
   include             "bombs/7.s"
   include             "bombs/8.s"
+  include             "bombs/9.s"
+  include             "bombs/10.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"

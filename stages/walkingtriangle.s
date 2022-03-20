@@ -437,8 +437,10 @@ notdownborder2;
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
 
   ; ***************************** START IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
+SAVE_X: dc.w 0
 walkingtriangle_xwalk_right_2:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
+  move.w d0,SAVE_X
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
@@ -482,6 +484,16 @@ walkingtriangle_xwalk_right_2:
   VERTEX2D_INIT_I        3,0000,0000 ; #0,#0
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
+
+  move.w                 SAVE_X,d6
+  cmpi.w                 #$b6,d6
+  bne.s nobombred
+  jsr BOMB_RED
+nobombred:
+  ;cmpi.w                 #$98,d6
+  ;bne.s nobombshort
+  ;jsr BOMB_SHORT
+;nobombshort:
 
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
@@ -538,6 +550,10 @@ walkingtriangle_reverse_dive:
   VERTEX2D_INIT_I        3,000F,000C ;  #0+15,#0+12
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
+
+  ; bomb is blowing up
+  jsr BOMB_EXPLODE
+
   rts
 
 walkingfloor1:

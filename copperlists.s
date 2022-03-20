@@ -59,7 +59,8 @@ Sprite7pointers:
   ; BplCon2
   ; Playfield 2 priority over Playfield 1 ON
   ; Sprites max priority over playfields
-  dc.w       $104,$007f
+  ;dc.w       $104,$007f
+  dc.w       $104,$0040
 
   dc.w       $108,0                                                    ; Bpl1Mod
   dc.w       $10a,0                                                    ; Bpl2Mod

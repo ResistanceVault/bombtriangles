@@ -1,8 +1,14 @@
 BOMBTIMERSTART EQU 30
 
+BOMB_RESET_TIMER MACRO
+  move.w    #BOMBTIMERSTART,BOMBTIMER
+  ENDM
+
 BOMBMANAGER_SPRITESLIST:
   dc.l      BOMB2_BPL0
   dc.l      BOMB2_BPL1
+  dc.l      BOMB3_BPL0
+  dc.l      BOMB3_BPL1
   dc.l      BOMB1_BPL0
   dc.l      BOMB1_BPL1
 BOMBMANAGER_SPRITESLIST_END:
@@ -13,12 +19,55 @@ BOMBMANAGER_PTR:
 BOMBTIMER:
   dc.w      BOMBTIMERSTART
 
+BOMB_EXPLODE:
+  ;move.l    #BOMB10_BPL0,d0
+  ;lea       Sprite4pointers,a1
+  ;jsr       POINTINCOPPERLIST_FUNCT
+  ;move.l    #BOMB10_BPL1,d0
+  ;lea       Sprite5pointers,a1
+  ;jsr       POINTINCOPPERLIST_FUNCT
+  ;BOMB_RESET_TIMER
+  lea BOMBMANAGER_SPRITESLIST(PC),a0
+  move.l #BOMB8_BPL0,(a0)+
+  move.l #BOMB8_BPL1,(a0)+
+  move.l #BOMB9_BPL0,(a0)+
+  move.l #BOMB9_BPL1,(a0)+
+  move.l #BOMB10_BPL0,(a0)+
+  move.l #BOMB10_BPL1,(a0)
+  rts
+
+BOMB_RED:
+  move.l    #BOMB4_BPL0,d0
+  lea       Sprite4pointers,a1
+  jsr       POINTINCOPPERLIST_FUNCT
+  move.l    #BOMB4_BPL1,d0
+  lea       Sprite5pointers,a1
+  jsr       POINTINCOPPERLIST_FUNCT
+  BOMB_RESET_TIMER
+  rts
+
+BOMB_SHORT:
+  move.l    #BOMB3_BPL0,d0
+  lea       Sprite4pointers,a1
+  jsr       POINTINCOPPERLIST_FUNCT
+  move.l    #BOMB3_BPL1,d0
+  lea       Sprite5pointers,a1
+  jsr       POINTINCOPPERLIST_FUNCT
+  BOMB_RESET_TIMER
+  ;lea BOMBMANAGER_SPRITESLIST(PC),a0
+  ;move.l #BOMB3_BPL0,(a0)+
+  ;move.l #BOMB3_BPL1,(a0)+
+  ;move.l #BOMB3_BPL0,(a0)+
+  ;move.l #BOMB3_BPL1,(a0)
+
+  rts
+
 BOMBMANAGER:
   subq      #1,BOMBTIMER
   bne.s     bombmanager_end
 
   ; reset timer
-  move.w    #BOMBTIMERSTART,BOMBTIMER
+  BOMB_RESET_TIMER
 
   ; manage here all the stuff to move to the next bomb sprite
   ; Sprite 4 init
