@@ -438,6 +438,7 @@ notdownborder2;
 
   ; ***************************** START IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
 SAVE_X: dc.w 0
+SAVE_ANGLE: dc.w 0
 walkingtriangle_xwalk_right_2:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w d0,SAVE_X
@@ -445,6 +446,7 @@ walkingtriangle_xwalk_right_2:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   move.w                 ANGLE_OFFSET(a3),d0
+  move.w                 d0,SAVE_ANGLE
   jsr                    ROTATE_INV_Q_5_11_F
 
   ; Sub 1 to angle
@@ -462,6 +464,8 @@ walkingtriangle_xwalk_right_2:
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
   SETSTAGE               walkingtriangle_reverse_dive
+    ; bomb is blowing up
+  jsr BOMB_EXPLODE
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   lsl.w                  #6,d0
   move.w                 d0,XPOSITIONVECTOR_OFFSET(a3)
@@ -488,12 +492,10 @@ walkingtriangle_xwalk_right_2:
   move.w                 SAVE_X,d6
   cmpi.w                 #$b6,d6
   bne.s nobombred
+  cmpi.w                 #320,SAVE_ANGLE
+  bne.s nobombred
   jsr BOMB_RED
 nobombred:
-  ;cmpi.w                 #$98,d6
-  ;bne.s nobombshort
-  ;jsr BOMB_SHORT
-;nobombshort:
 
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor part 2 ------------------
@@ -536,6 +538,8 @@ walkingtriangle_reverse_dive:
   cmpi.w                  #124,d7
   ble.s                   .noendoffall
   SETSTAGE                walkingfloor1
+     ; bomb is ON
+  jsr BOMB_ON
    ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
@@ -550,9 +554,6 @@ walkingtriangle_reverse_dive:
   VERTEX2D_INIT_I        3,000F,000C ;  #0+15,#0+12
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
-
-  ; bomb is blowing up
-  jsr BOMB_EXPLODE
 
   rts
 
