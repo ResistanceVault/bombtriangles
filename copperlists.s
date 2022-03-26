@@ -199,18 +199,19 @@ col14:
 
   dc.w       $9707,$fffe
   dc.w       $18e,COLORCOPPLATFORM1
-  dc.w       $9807,$fffe
-  dc.w       $18e,COLORCOPPLATFORM2
-  dc.w       $9907,$fffe
-  dc.w       $18e,COLORCOPPLATFORM3
   dc.w       $9A07,$fffe
-  dc.w       $18e,COLORCOPPLATFORM4
+  dc.w       $18e,COLORCOPPLATFORM2
   dc.w       $9B07,$fffe
-  dc.w       $18e,COLORCOPPLATFORM5
+  dc.w       $18e,COLORCOPPLATFORM3
   dc.w       $9C07,$fffe
-  dc.w       $18e,COLORCOPPLATFORM6
-
+  dc.w       $18e,COLORCOPPLATFORM4
   dc.w       $9D07,$fffe
+  dc.w       $18e,COLORCOPPLATFORM5
+  dc.w       $9E07,$fffe
+  dc.w       $18e,COLORCOPPLATFORM6
+  dc.w    $180,$540 
+
+  dc.w       $9F07,$fffe
   dc.w       $18e,COLOR3
 
   ENDC
