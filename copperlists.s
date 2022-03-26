@@ -209,7 +209,7 @@ col14:
   dc.w       $18e,COLORCOPPLATFORM5
   dc.w       $9E07,$fffe
   dc.w       $18e,COLORCOPPLATFORM6
-  dc.w    $180,$540 
+  dc.w       $180,$540
 
   dc.w       $9F07,$fffe
   dc.w       $18e,COLOR3

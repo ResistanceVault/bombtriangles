@@ -170,6 +170,26 @@ tileplatform3:
   subq #1,d6
   dbra d4,tileplatform3
 
+; start blitting platform 4
+  moveq #2-1,d4
+  moveq #15,d6
+tileplatform4:
+  move.l d6,d0
+  move.w #147*40,d1
+  jsr BLIT_PLATFORM
+  subq #1,d6
+  dbra d4,tileplatform4
+
+; start blitting platform 5
+  moveq #2-1,d4
+  moveq #8,d6
+tileplatform5:
+  move.l d6,d0
+  move.w #153*40,d1
+  jsr BLIT_PLATFORM
+  subq #1,d6
+  dbra d4,tileplatform5
+
   ; Init active playfield with same data, we will change this later in gameloop
   IFD LOL
   move.l              #SCREEN_3,d0
