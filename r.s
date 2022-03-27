@@ -231,7 +231,17 @@ tileplatform5:
   ; Sprite 5 init - bomb first 2 bitplanes of attached sprite
   move.l              #BOMB1_BPL1,d0
   lea                 Sprite5pointers,a1
-  bsr.w               POINTINCOPPERLIST_FUNCT                                                ; ladder color 3
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Sprite 6 init - spaceship first 2 bitplanes of attached sprite
+  move.l              #SPACESHIP1_BPL0,d0
+  lea                 Sprite6pointers,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Sprite 7 init - bomb first 2 bitplanes of attached sprite
+  move.l              #SPACESHIP1_BPL1,d0
+  lea                 Sprite7pointers,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
 
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
@@ -384,7 +394,7 @@ blittile_startloop:
 ; a3 : pointer to the tile
 ; d4.w : tile row number
 BLITLINEOFTILES:
-  moveq               #16-1,d6
+  moveq               #20-1,d6
   moveq               #0,d3
 blitlineoftiles_start:
   move.l              d3,d0
@@ -682,6 +692,9 @@ LADDER_2_VSTOP2:
   include             "bombs/8.s"
   include             "bombs/9.s"
   include             "bombs/10.s"
+
+; start of spaceship sprites
+  include             "spaceship/spaceship1.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"
