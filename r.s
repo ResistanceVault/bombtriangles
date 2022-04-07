@@ -694,7 +694,7 @@ LADDER_2_VSTOP2:
   include             "bombs/10.s"
 
 ; start of spaceship sprites
-  include             "spaceship/spaceship1.s"
+  include             "spaceship/spaceship_spr1.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"

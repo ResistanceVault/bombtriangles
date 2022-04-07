@@ -1,5 +1,8 @@
+    include "AProcessing/libs/vectors/operations.s"
+
     include "tiles.s"
     include "bombs/bombmanager.s"
+    include "spaceship/spaceshipmanager.s"
 
 ammxmainloop3:
             SWAP_BPL
@@ -43,6 +46,7 @@ CLEARTOP:
             move.w           #$2E53,$dff058
 
             jsr             BOMBMANAGER
+            jsr             SPACESHIPMANAGER
 
             WAITBLITTER
             move.l           SCREEN_PTR_1,$dff054 ; copy to d channel

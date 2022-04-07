@@ -1,6 +1,3 @@
-;includes
-    include              "AProcessing/libs/vectors/operations.s"
-
 ; DEFINES
 NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
