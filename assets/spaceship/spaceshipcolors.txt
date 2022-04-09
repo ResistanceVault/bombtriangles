@@ -1,0 +1,17 @@
+;Spaceship palette, just a note dont uncomment this code
+;dc.w    $1a0,$bfc    ; color transparency
+;dc.w    $1a2,$f0f    ; color17
+;dc.w    $1a4,$f0f    ; color18
+;dc.w    $1a6,$000    ; color19
+;dc.w    $1a8,$f00    ; color20
+;dc.w    $1aa,$f0f    ; color21
+;dc.w    $1ac,$f0f    ; color22
+;dc.w    $1ae,$fff    ; color23
+;dc.w    $1b0,$ddd    ; color24
+;dc.w    $1b2,$f0f    ; color25
+;dc.w    $1b4,$f0f    ; color26
+;dc.w    $1b6,$f0f    ; color27
+;dc.w    $1b8,$f0f    ; color28
+;dc.w    $1ba,$555    ; color29
+;dc.w    $1bc,$888    ; color30
+;dc.w    $1be,$bbb    ; color31
