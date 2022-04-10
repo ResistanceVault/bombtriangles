@@ -30,6 +30,7 @@ SPACESHIP1_BPL1_VSTOP    dc.b    $3a,%10000000
                          dc.w    0,0
 
 
+
 ;Spaceship palette, just a note dont uncomment this code
 ;dc.w    $1a0,$bfc    ; color transparency
 ;dc.w    $1a2,$f0f    ; color17

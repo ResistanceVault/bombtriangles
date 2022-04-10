@@ -5,6 +5,8 @@ SPACESHIP_DESTINATION_X EQU 160
 SPACESHIP_DESTINATION_Y EQU 100
 SPACESHIP_SPRITE_HEIGHT EQU 10
 
+SPACESHIP_FRAME_RATE    EQU 60*2
+
 SPACESHIP_SET_NEW_DESTINATION MACRO
   move.l #((SPACESHIP_DECIMALDIGITS*2*\1)<<16)|\2,SPACESHIPDESTINATIONPOSITION
   ENDM
@@ -23,8 +25,42 @@ SPACESHIPDIRECTIONVECTOR:
 DESTINATION_REACHED:
   dc.w                  0
 
+SPACESHIP_FRAME_COUNTER:
+  dc.w                  SPACESHIP_FRAME_RATE
+SPACESHIP_FRAME_PTR:
+  dc.l                  SPACESHIP2_DIFF
+
 SPACESHIPMANAGER:
   movem.l                d0-d7/a0-a6,-(sp)
+
+  ; spaceship light animation start
+  subq                 #1,SPACESHIP_FRAME_COUNTER
+  bne.s                spaceship_do_not_update_lights
+  lea                  SPACESHIP1_BPL0,a2
+  lea                  SPACESHIP_FRAME_PTR(PC),a0
+  move.l               (a0),a1
+  move.l               (a1)+,16(a2)
+  move.l               (a1)+,36(a2)
+  move.l               (a1)+,40(a2)
+  lea                  SPACESHIP1_BPL1,a2
+  move.l               (a1)+,16(a2)
+  move.l               (a1)+,36(a2)
+  move.l               (a1)+,40(a2)
+  move.w               #SPACESHIP_FRAME_RATE,SPACESHIP_FRAME_COUNTER
+
+  ; if a1 contains now the same address of SPACESHIP_DIFF_END
+  ; we must start from the first frame
+  cmp.l                #SPACESHIP_DIFF_END,a1
+  bne.s                spaceship_ptr_do_not_reset
+  move.l               #SPACESHIP1_DIFF,a1
+spaceship_ptr_do_not_reset:
+
+  ; update ptr
+  move.l               a1,(a0)
+
+spaceship_do_not_update_lights:
+  ; spaceship light animation end
+
   ; vector 2 is current position
   lea                  SPACESHIPCURRENTPOSITION(PC),a1
 
@@ -45,8 +81,8 @@ SPACESHIPMANAGER:
   tst.w SPACESHIPDIRECTIONVECTOR+2
   bne.s nogotonextlocation
   move.l SPACESHIPDESTINATIONPOSITION,SPACESHIPCURRENTPOSITION
-  ;move.l #$23002f00,SPACESHIPDESTINATIONPOSITION
-  SPACESHIP_SET_NEW_DESTINATION 64,150
+  move.l #$23002f00,SPACESHIPDESTINATIONPOSITION
+  ;SPACESHIP_SET_NEW_DESTINATION 64,150
   move.w #1,DESTINATION_REACHED
   movem.l                (sp)+,d0-d7/a0-a6
   rts
