@@ -461,6 +461,7 @@ walkingtriangle_xwalk_right_2:
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
   SETSTAGE               walkingtriangle_reverse_dive
+  SPACESHIP_SET_NEW_DESTINATION2 122,148
     ; bomb is blowing up
   jsr BOMB_EXPLODE
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
