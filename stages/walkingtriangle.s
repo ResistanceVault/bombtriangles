@@ -7,7 +7,7 @@ LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                   
 STARTDXCLIMB           EQU 300-60                                                      ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB           EQU 150
 STARTDYCLIMBX2         EQU STARTDYCLIMB*2
-TIMEDELAY              EQU 510                                                         ; Number of frames before the triangle is rendered
+TIMEDELAY              EQU 575                                                         ; Number of frames before the triangle is rendered
 STARTDXDESCEND_OFFSET  EQU 210                                                         ; Offset where the triangles are expected to fall after xreverse walking (must be miltiple of 30)
 SECOND_FLOOR_Y         EQU 90                                                          ; Y coordinate of the second floor
 STARTSTAGE             EQU 9                                                           ; Number of the first stage
@@ -31,6 +31,11 @@ YVELOCITYVECTOR_OFFSET EQU 22
 SCALEFACTOR_OFFSET     EQU 24
 STAGEPOINTER_OFFSET    EQU 26
 TRIANGLE_END_OFFSET    EQU 30
+
+SPACESHIP_LOCATION_LOAD_X   EQU 122
+SPACESHIP_LOCATION_LOAD_Y   EQU 160
+SPACESHIP_LOCATION_UNLOAD_X EQU 68
+SPACESHIP_LOCATION_UNLOAD_Y EQU 200
 
 ; VARIABLES
 OFFBITPLANEMEM:
@@ -461,7 +466,7 @@ walkingtriangle_xwalk_right_2:
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
   SETSTAGE               walkingtriangle_reverse_dive
-  SPACESHIP_SET_NEW_DESTINATION2 122,158
+  SPACESHIP_SET_NEW_DESTINATION2 SPACESHIP_LOCATION_LOAD_X,SPACESHIP_LOCATION_LOAD_Y
     ; bomb is blowing up
   jsr                    BOMB_EXPLODE
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
@@ -625,9 +630,9 @@ teletrasportationstart:
   move.w                 SCALEFACTOR_OFFSET(a3),d0
   move.w                 d0,d1
   bne.w                  .noscale
-  SETSTAGE               teletrasportationend
+  SETSTAGE               teletrasportationwait
   SPACESHIP_RAY_OFF
-  SPACESHIP_SET_NEW_DESTINATION2 102,188
+  SPACESHIP_SET_NEW_DESTINATION2 SPACESHIP_LOCATION_UNLOAD_X,SPACESHIP_LOCATION_UNLOAD_Y
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
   move.l                 #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
   move.w                 #64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET),XPOSITIONVECTOR_OFFSET(a3)
@@ -652,6 +657,17 @@ teletrasportationstart:
   ; ***************************** END IMPLEMENTATION OF TELETRANSPORTATION START ------------------
 
 
+  ; ***************************** START IMPLEMENTATION OF TELETRANSPORTATIN WAIT - WAIT FOR THE SPACESHIP TO REACH TARGET
+teletrasportationwait:
+  tst.w SPACESHIPDIRECTIONVECTOR+2
+  bne.s wait4spaceship
+  SETSTAGE               teletrasportationend
+  SPACESHIP_RAY_ON
+wait4spaceship:
+  rts
+  ; ***************************** END IMPLEMENTATION OF TELETRANSPORTATIN WAIT - WAIT FOR THE SPACESHIP TO REACH TARGET
+
+
 teletrasportationend:
   moveq                  #STARTWALKXPOS,d0
   add.w                  XROLLINGOFFSET_OFFSET(a3),d0
@@ -667,6 +683,7 @@ teletrasportationend:
   cmpi.w                 #1*64,d0
   bne.w                  .noscale2
   SETSTAGE               walkingtriangle_xwalk
+  SPACESHIP_RAY_OFF
     ; reset initial values
   move.w                 #30,YROLLINGOFFSET_OFFSET(a3)
 .noscale2
