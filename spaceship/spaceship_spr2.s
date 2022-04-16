@@ -53,7 +53,7 @@ SPACESHIP2_DIFF:
     dc.w $0400,$0418
     dc.w $0016,$0016 ; line 9
     dc.w $0008,$0008 ; line 10
-    
+
     dc.w $3DFC,$0218
     dc.w $7BD6,$000E ; line 9
 	dc.w $3188,$0004 ; line 10

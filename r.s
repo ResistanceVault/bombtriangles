@@ -243,6 +243,10 @@ tileplatform5:
   lea                 Sprite7pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
+  ; At the start of the demo the ray of the spaceship must be off
+  move.l #$00000000,SPACESHIP1_BPL1_RAY
+  move.w #SPACESHIP_SPRITE_HEIGHT_NO_RAY,SPACESHIP_SPRITE_HEIGHT
+
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
   move                #%1000011111100000,$96(a6)                                     ;Master,Copper,Blitter,Bitplanes
@@ -694,7 +698,7 @@ LADDER_2_VSTOP2:
   include             "bombs/10.s"
 
 ; start of spaceship sprites
-  include             "spaceship/spaceship_spr1.s"
+  include             "spaceship/spaceship_spr1_ray.s"
   include             "spaceship/spaceship_spr2.s"
 
 ; background tiles

@@ -461,9 +461,9 @@ walkingtriangle_xwalk_right_2:
   cmpi.w                 #212,XPOSITIONVECTOR_OFFSET(a3)
   bne.s                  .decrease_angle_by_1_exit
   SETSTAGE               walkingtriangle_reverse_dive
-  SPACESHIP_SET_NEW_DESTINATION2 122,148
+  SPACESHIP_SET_NEW_DESTINATION2 122,158
     ; bomb is blowing up
-  jsr BOMB_EXPLODE
+  jsr                    BOMB_EXPLODE
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   lsl.w                  #6,d0
   move.w                 d0,XPOSITIONVECTOR_OFFSET(a3)
@@ -537,7 +537,9 @@ walkingtriangle_reverse_dive:
   ble.s                   .noendoffall
   SETSTAGE                walkingfloor1
      ; bomb is ON
-  jsr BOMB_ON
+  jsr                     BOMB_ON
+  SPACESHIP_RAY_ON
+
    ; new velocity
   move.l                  a3,a0
   adda.w                  #VELOCITYVECTOR_OFFSET,a0
@@ -624,6 +626,8 @@ teletrasportationstart:
   move.w                 d0,d1
   bne.w                  .noscale
   SETSTAGE               teletrasportationend
+  SPACESHIP_RAY_OFF
+  SPACESHIP_SET_NEW_DESTINATION2 102,188
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)
   move.l                 #ROTATIONS_ANGLES_64_180-2,XROLLINGANGLE_OFFSET(a3)
   move.w                 #64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET),XPOSITIONVECTOR_OFFSET(a3)
