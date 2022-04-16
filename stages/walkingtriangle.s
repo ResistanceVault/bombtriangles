@@ -7,7 +7,7 @@ LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                   
 STARTDXCLIMB           EQU 300-60                                                      ; X Position where to start climbing the screen (must be multiple of 30, size of the triangle)
 STARTDYCLIMB           EQU 150
 STARTDYCLIMBX2         EQU STARTDYCLIMB*2
-TIMEDELAY              EQU 575                                                         ; Number of frames before the triangle is rendered
+TIMEDELAY              EQU 600                                                         ; Number of frames before the triangle is rendered
 STARTDXDESCEND_OFFSET  EQU 210                                                         ; Offset where the triangles are expected to fall after xreverse walking (must be miltiple of 30)
 SECOND_FLOOR_Y         EQU 90                                                          ; Y coordinate of the second floor
 STARTSTAGE             EQU 9                                                           ; Number of the first stage
@@ -35,7 +35,7 @@ TRIANGLE_END_OFFSET    EQU 30
 SPACESHIP_LOCATION_LOAD_X   EQU 122
 SPACESHIP_LOCATION_LOAD_Y   EQU 160
 SPACESHIP_LOCATION_UNLOAD_X EQU 68
-SPACESHIP_LOCATION_UNLOAD_Y EQU 200
+SPACESHIP_LOCATION_UNLOAD_Y EQU 195
 
 ; VARIABLES
 OFFBITPLANEMEM:
@@ -671,11 +671,13 @@ wait4spaceship:
 teletrasportationend:
   moveq                  #STARTWALKXPOS,d0
   add.w                  XROLLINGOFFSET_OFFSET(a3),d0
+  sub.w                  #15,d0
   move.w                 #STARTWALKYPOS,d1
+  sub.w                  #13,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;move.w                 ANGLE_OFFSET(a3),d0
+  ;jsr                    ROTATE_INV_Q_5_11_F
 
   addq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
@@ -690,9 +692,9 @@ teletrasportationend:
   jsr                    SCALE
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT_I          1,FFF1,FFE6  ;#-15,#-26
-  VERTEX2D_INIT_I          2,FFE2,0000  ;#-30,#0
-  VERTEX2D_INIT_I          3,0000,0000  ;#0,#0
+  VERTEX2D_INIT_I          1,0000,FFEC  ;#0,#-13
+  VERTEX2D_INIT_I          2,FFF1,000C  ;#-15,#13
+  VERTEX2D_INIT_I          3,000F,000C  ;#15,#13
 
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT

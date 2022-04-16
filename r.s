@@ -185,7 +185,7 @@ tileplatform4:
   moveq #8,d6
 tileplatform5:
   move.l d6,d0
-  move.w #153*40,d1
+  move.w #155*40,d1
   jsr BLIT_PLATFORM
   subq #1,d6
   dbra d4,tileplatform5
@@ -244,8 +244,8 @@ tileplatform5:
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; At the start of the demo the ray of the spaceship must be off
-  move.l #$00000000,SPACESHIP1_BPL1_RAY
-  move.w #SPACESHIP_SPRITE_HEIGHT_NO_RAY,SPACESHIP_SPRITE_HEIGHT
+  move.l              #$00000000,SPACESHIP1_BPL1_RAY
+  move.w              #SPACESHIP_SPRITE_HEIGHT_NO_RAY,SPACESHIP_SPRITE_HEIGHT
 
   lea                 $dff000,a6
   move                #$7ff,$96(a6)                                                  ;Disable DMAs
@@ -422,7 +422,7 @@ Save_all:
   rts
 Restore_all:
   move.l              SaveIRQ,$6c
-  move.w              #$7fff,$dff09a	
+  move.w              #$7fff,$dff09a
   move.w              Saveint,$dff09a
   move.w              #$7fff,$dff096
   move.w              SaveDMA,$dff096

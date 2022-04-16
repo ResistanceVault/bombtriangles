@@ -35,10 +35,22 @@
   dc.w       $c607,$fffe
   dc.w       $18e,COLORCOPPLATFORM6
   dc.w       $c707,$fffe
-  dc.w       $18e,COLOR3
+  dc.w       $18e,COLORCOPPLATFORM1
   ; end plaform
 
-  dc.w    $c807-$0000,$FFFE
-  dc.w    $180,$dc7
+  dc.w       $c807,$FFFE
+  dc.w       $180,$dc7
+
+  dc.w       $ca07,$FFFE
+  dc.w       $18e,COLORCOPPLATFORM2
+  dc.w       $cb07,$FFFE
+  dc.w       $18e,COLORCOPPLATFORM3
+  dc.w       $cc07,$FFFE
+  dc.w       $18e,COLORCOPPLATFORM4
+  dc.w       $cd07,$FFFE
+  dc.w       $18e,COLORCOPPLATFORM5
+  dc.w       $ce07,$FFFE
+  dc.w       $18e,COLORCOPPLATFORM6
+
   dc.w    $d807-$0000,$FFFE
   dc.w    $180,$DC8
