@@ -699,7 +699,7 @@ LADDER_2_VSTOP2:
 
 ; start of spaceship sprites
   include             "spaceship/spaceship_spr1_ray.s"
-  include             "spaceship/spaceship_spr2.s"
+  include             "spaceship/spaceship_spr_diffs.s"
 
 ; background tiles
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"
