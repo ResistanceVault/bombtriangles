@@ -113,6 +113,11 @@ tilefullstart5:
   addq #1,d6
   dbra d4,tilefullstart5
 
+; left slopes tile (trashing the full tile)
+  moveq #0,d0
+  moveq #5,d1
+  lea TILELEFTSLOPE,a0
+  jsr BLIT_TILE
 
   ; slopes start
   moveq #7,d0
@@ -705,6 +710,7 @@ LADDER_2_VSTOP2:
 SANDDOWN:             incbin "assets/tiles/sanddown.raw"
 SANDTOP:              incbin "assets/tiles/sandtop.raw"
 TILEFULL:             incbin "assets/tiles/full.raw"
+TILELEFTSLOPE:        incbin "assets/tiles/leftslope.raw"
 TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
 PYRAMIDTOP:           incbin "assets/brush/pyramidtop112x54.raw"
   IFD COPPLATFORM
