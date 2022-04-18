@@ -65,53 +65,63 @@ startstarfield:
   ; full tiles
   moveq #6-1,d4
   moveq #1,d6
-tilefullstart:
-  move.l d6,d0
-  moveq #5,d1
-  lea TILEFULL,a0
-  jsr BLIT_TILE
-  addq #1,d6
-  dbra d4,tilefullstart
+  moveq #5,d5
+  jsr BLIT_TILES
+;tilefullstart:
+;  move.l d6,d0
+;  move.w d5,d1
+;  lea TILEFULL,a0
+;  jsr BLIT_TILE
+;  addq #1,d6
+;  dbra d4,tilefullstart
 
   moveq #8-1,d4
   moveq #0,d6
-tilefullstart2:
-  move.l d6,d0
-  moveq #6,d1
-  lea TILEFULL,a0
-  jsr BLIT_TILE
-  addq #1,d6
-  dbra d4,tilefullstart2
+  moveq #6,d5
+  jsr BLIT_TILES
+;tilefullstart2:
+;  move.l d6,d0
+;  moveq #6,d1
+;  lea TILEFULL,a0
+;  jsr BLIT_TILE
+;  addq #1,d6
+;  dbra d4,tilefullstart2
 
   moveq #9-1,d4
   moveq #0,d6
-tilefullstart3:
-  move.l d6,d0
-  moveq #7,d1
-  lea TILEFULL,a0
-  jsr BLIT_TILE
-  addq #1,d6
-  dbra d4,tilefullstart3
+  moveq #7,d5
+  jsr BLIT_TILES
+;tilefullstart3:
+;  move.l d6,d0
+;  moveq #7,d1
+;  lea TILEFULL,a0
+;  jsr BLIT_TILE
+;  addq #1,d6
+;  dbra d4,tilefullstart3
 
   moveq #10-1,d4
   moveq #0,d6
-tilefullstart4:
-  move.l d6,d0
-  moveq #8,d1
-  lea TILEFULL,a0
-  jsr BLIT_TILE
-  addq #1,d6
-  dbra d4,tilefullstart4
+  moveq #8,d5
+  jsr BLIT_TILES
+;tilefullstart4:
+;  move.l d6,d0
+;  moveq #8,d1
+;  lea TILEFULL,a0
+;  jsr BLIT_TILE
+;  addq #1,d6
+;  dbra d4,tilefullstart4
 
   moveq #11-1,d4
   moveq #0,d6
-tilefullstart5:
-  move.l d6,d0
-  moveq #9,d1
-  lea TILEFULL,a0
-  jsr BLIT_TILE
-  addq #1,d6
-  dbra d4,tilefullstart5
+  moveq #9,d5
+  jsr BLIT_TILES
+;tilefullstart5:
+;  move.l d6,d0
+;  moveq #9,d1
+;  lea TILEFULL,a0
+;  jsr BLIT_TILE
+;  addq #1,d6
+;  dbra d4,tilefullstart5
 
 ; left slopes tile (trashing the full tile)
   moveq #0,d0
@@ -370,6 +380,21 @@ blittoputamid_startloop:
   adda.l           #756,a0
   adda.l           #224*40,a1
   dbra             d7,blittoputamid_startloop
+  rts
+
+; blit tiles
+; blit a series of tiles using blit tile
+; d4 - number of tiles to blit minus 1 (trashed)
+; d6 - x position (trashed)
+; d5 - y position
+BLIT_TILES:
+tilefullstart:
+  move.l           d6,d0
+  move.w           d5,d1
+  lea              TILEFULL,a0
+  bsr.s            BLIT_TILE
+  addq             #1,d6
+  dbra             d4,tilefullstart
   rts
 
 ; blit a tile into background - origin is at top left
@@ -707,7 +732,7 @@ LADDER_2_VSTOP2:
   include             "spaceship/spaceship_spr_diffs.s"
 
 ; background tiles
-SANDDOWN:             incbin "assets/tiles/sanddown.raw"
+;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
 SANDTOP:              incbin "assets/tiles/sandtop.raw"
 TILEFULL:             incbin "assets/tiles/full.raw"
 TILELEFTSLOPE:        incbin "assets/tiles/leftslope.raw"
