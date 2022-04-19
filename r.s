@@ -20,9 +20,15 @@ Inizio:
   ;moveq               #11,d4
   ;jsr                 BLITLINEOFTILES
 
-  lea                 SANDTOP,a3
-  moveq               #11,d4
-  jsr                 BLITLINEOFTILES
+  ;lea                 SANDTOP,a3
+  ;moveq               #11,d4
+  ;jsr                 BLITLINEOFTILES
+
+  lea                  SANDTOP,a0
+  moveq                #20-1,d4
+  moveq                #0,d0
+  moveq                #11,d1
+  jsr                  BLIT_TILES
 
   ; draw top of pyramids
   moveq #0,d0
@@ -62,66 +68,33 @@ startstarfield:
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  ; full tiles
+  ; Start drawing full pyramid tiles
+
+  lea TILEFULL,a0
   moveq #6-1,d4
-  moveq #1,d6
-  moveq #5,d5
+  moveq #1,d0
+  moveq #5,d1
   jsr BLIT_TILES
-;tilefullstart:
-;  move.l d6,d0
-;  move.w d5,d1
-;  lea TILEFULL,a0
-;  jsr BLIT_TILE
-;  addq #1,d6
-;  dbra d4,tilefullstart
 
   moveq #8-1,d4
-  moveq #0,d6
-  moveq #6,d5
+  moveq #0,d0
+  moveq #6,d1
   jsr BLIT_TILES
-;tilefullstart2:
-;  move.l d6,d0
-;  moveq #6,d1
-;  lea TILEFULL,a0
-;  jsr BLIT_TILE
-;  addq #1,d6
-;  dbra d4,tilefullstart2
 
   moveq #9-1,d4
-  moveq #0,d6
-  moveq #7,d5
+  moveq #0,d0
+  moveq #7,d1
   jsr BLIT_TILES
-;tilefullstart3:
-;  move.l d6,d0
-;  moveq #7,d1
-;  lea TILEFULL,a0
-;  jsr BLIT_TILE
-;  addq #1,d6
-;  dbra d4,tilefullstart3
 
   moveq #10-1,d4
-  moveq #0,d6
-  moveq #8,d5
+  moveq #0,d0
+  moveq #8,d1
   jsr BLIT_TILES
-;tilefullstart4:
-;  move.l d6,d0
-;  moveq #8,d1
-;  lea TILEFULL,a0
-;  jsr BLIT_TILE
-;  addq #1,d6
-;  dbra d4,tilefullstart4
 
   moveq #11-1,d4
-  moveq #0,d6
-  moveq #9,d5
+  moveq #0,d0
+  moveq #9,d1
   jsr BLIT_TILES
-;tilefullstart5:
-;  move.l d6,d0
-;  moveq #9,d1
-;  lea TILEFULL,a0
-;  jsr BLIT_TILE
-;  addq #1,d6
-;  dbra d4,tilefullstart5
 
 ; left slopes tile (trashing the full tile)
   moveq #0,d0
@@ -384,31 +357,32 @@ blittoputamid_startloop:
 
 ; blit tiles
 ; blit a series of tiles using blit tile
+; a0 - address of the tile
 ; d4 - number of tiles to blit minus 1 (trashed)
-; d6 - x position (trashed)
-; d5 - y position
+; d0 - x position
+; d1 - y position
 BLIT_TILES:
+  move.l           d0,-(sp)
 tilefullstart:
-  move.l           d6,d0
-  move.w           d5,d1
-  lea              TILEFULL,a0
   bsr.s            BLIT_TILE
-  addq             #1,d6
+  addq             #1,d0
   dbra             d4,tilefullstart
+  move.l           (sp)+,d0
   rts
 
 ; blit a tile into background - origin is at top left
-; a0 : pointer to tile (trashed)
-; d0 : x position (trashed)
-; d1 : y position (trashed)
+; a0 : pointer to tile
+; d0 : x position
+; d1 : y position
 BLIT_TILE:
-  lea SCREEN_2,a1
+  movem.l           d0/d1/a0,-(sp)
+  lea               SCREEN_2,a1
   ; add vertical position
-  mulu.w #40*16,d1
-  adda.l d1,a1
-  lsl.w #1,d0
-  adda.l d0,a1
-  moveq #3-1,d7
+  mulu.w            #40*16,d1
+  adda.l            d1,a1
+  lsl.w             #1,d0
+  adda.l            d0,a1
+  moveq             #3-1,d7
 blittile_startloop:
   WAITBLITTER
   move.w           #$09F0,$dff040
@@ -422,21 +396,7 @@ blittile_startloop:
   adda.l           #32,a0
   adda.l           #224*40,a1
   dbra             d7,blittile_startloop
-  rts
-
-; print a line of tiles horizontally
-; a3 : pointer to the tile
-; d4.w : tile row number
-BLITLINEOFTILES:
-  moveq               #20-1,d6
-  moveq               #0,d3
-blitlineoftiles_start:
-  move.l              d3,d0
-  move.w              d4,d1
-  move.l              a3,a0
-  jsr                 BLIT_TILE
-  addq                #1,d3
-  dbra                d6,blitlineoftiles_start
+  movem.l          (sp)+,d0/d1/a0
   rts
 
 ;---------------------------------------------------------------
