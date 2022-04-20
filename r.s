@@ -519,93 +519,7 @@ scrollcolors:
 
   include             "copperlists.s"
 
-PRINT_CELING_ROW MACRO
-  dcb.b               7*1,$00
-  dcb.b               25*1,$FF
-  dcb.b               8*1,$00
-  ENDM
-
-PRINT_LINE MACRO
-  dcb.b               40*\1,\2     ; 1
-  ENDM
-
-PRINT_LEFT_LINE MACRO
-  dc.w 0
-  dc.l $FFFFFFFF
-  dcb.b 34,$00
-  ENDM
-
-PRINT_RIGHT_LINE MACRO
-  dc.l 0
-  dc.l 0
-  dcb.b 19,$FF
-  dc.b 0
-  dc.l 0
-  dc.l 0
-  dc.l 0
-  ENDM
-
-PRINT_RIGHT_LINE_1ST_FLOOR MACRO
-  dc.l 0
-  dc.l 0
-  dc.l 0
-  dc.l 0
-  dcb.b 14,$00
-  dc.w $FF00
-  dc.l 0
-  dc.l 0
-  ENDM
-
-PRINT_RIGHT_LINE_1ST_FLOOR_2 MACRO
-  dc.l 0
-  dc.l 0
-  dc.l 0
-  dc.l $FFFF
-  dcb.b 14,$00
-  dc.w $0000
-  dc.l 0
-  dc.l 0
-  ENDM
-
-  IFD LOL
-
-SCREEN_2
-  PRINT_LINE 1,$00     ; 1
-  PRINT_LINE 50,$00    ; 51
-
-  ;ceiling start
-  PRINT_CELING_ROW ; 52
-  PRINT_CELING_ROW ; 53
-  PRINT_CELING_ROW ; 54
-  ;ceiling end
-  PRINT_LINE 45,$00   ; 99
-  PRINT_RIGHT_LINE    ; 106
-  PRINT_RIGHT_LINE ; 107
-  PRINT_RIGHT_LINE ; 108
-  PRINT_LINE 3,$00    ; 105
-  PRINT_LEFT_LINE     ; 102
-  PRINT_LEFT_LINE
-  PRINT_LEFT_LINE
-
-  PRINT_LINE 38,$00
-  PRINT_RIGHT_LINE_1ST_FLOOR
-  PRINT_RIGHT_LINE_1ST_FLOOR
-  PRINT_RIGHT_LINE_1ST_FLOOR
-
-  PRINT_LINE 3,$00     ; 1
-  PRINT_RIGHT_LINE_1ST_FLOOR_2
-
-  PRINT_LINE 50,$00    ; 163
-  PRINT_LINE 62,$00    ; 163
-
-SCREEN_3:
-  dcb.b                  40*256,$00
-
-SCREEN_4:
-  dcb.b                  40*256,$00
-  ENDC
-
-SCREEN_2: ;incbin "assets/bombjack_result.raw"
+SCREEN_2:
   dcb.b 40*224*3,$00
 
 LADDER_1:
@@ -680,7 +594,7 @@ LADDER_2_VSTOP2:
   include             "bombs/0.s"
   include             "bombs/1.s"
   include             "bombs/2.s"
-  include             "bombs/3.s"
+  ;include             "bombs/3.s"
   include             "bombs/4.s"
   include             "bombs/7.s"
   include             "bombs/8.s"

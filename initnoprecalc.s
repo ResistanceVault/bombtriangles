@@ -32,19 +32,32 @@ _ammxmainloop3_init:
     ;move.w    $1a0,$bfc    ; color transparency
     ; start of sprite colors
   lea       $dff1a2,a0
-  move.w    #$a20,(a0)+        ; color17
-  move.w    #$ff0,(a0)+        ; color18
-  move.w    #$000,(a0)+        ; color19
-  move.w    #$f00,(a0)+        ; color20
-  move.w    #$c00,(a0)+        ; color21
-  move.w    #$800,(a0)+        ; color22
-  move.w    #$fff,(a0)+        ; color23
-  move.w    #$ddd,(a0)+        ; color24
-  move.w    #$f0a,(a0)+        ; color25 ; sprites 4 and 5 (bomb) color 1
-  move.w    #$f0f,(a0)+        ; color26 ; sprites 4 and 5 (bomb) color 2
-  move.w    #$f06,(a0)+        ; color27 ; sprites 4 and 5 (bomb) color 3
-  move.w    #$f0f,(a0)+        ; color28
-  move.w    #$555,(a0)+        ; color29
-  move.w    #$888,(a0)+        ; color30
+  move.l     #$0a200ff0,(a0)+
+  ;move.w    #$a20,(a0)+        ; color17
+  ;move.w    #$ff0,(a0)+        ; color18
+
+  move.l     #$00000f00,(a0)+
+  ;move.w    #$000,(a0)+        ; color19
+  ;move.w    #$f00,(a0)+        ; color20
+
+  move.l    #$0c000800,(a0)+
+  ;move.w    #$c00,(a0)+        ; color21
+  ;move.w    #$800,(a0)+        ; color22
+
+  move.l    #$0fff0ddd,(a0)+
+  ;move.w    #$fff,(a0)+        ; color23
+  ;move.w    #$ddd,(a0)+        ; color24
+
+  move.l    #$0f0a0f0f,(a0)+
+  ;move.w    #$f0a,(a0)+        ; color25 ; sprites 4 and 5 (bomb) color 1
+  ;move.w    #$f0f,(a0)+        ; color26 ; sprites 4 and 5 (bomb) color 2
+
+  move.l    #$0f060f0f,(a0)+
+  ;move.w    #$f06,(a0)+        ; color27 ; sprites 4 and 5 (bomb) color 3
+  ;move.w    #$f0f,(a0)+        ; color28
+  move.l    #$05550888,(a0)+
+  ;move.w    #$555,(a0)+        ; color29
+  ;move.w    #$888,(a0)+        ; color30
+  
   move.w    #$bbb,(a0)+        ; color31
   rts
