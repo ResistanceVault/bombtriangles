@@ -254,8 +254,8 @@ noinverttrigend:
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)                                  ; next stage must start with this value to 30
   move.w                 #0,ANGLE_OFFSET(a3)                                           ; next stage must start with this value to zero
   move.w                 #STARTDYCLIMB-1,YROLLINGOFFSET_OFFSET(a3)
-  move.l #ROT_Z_MATRIX_Q5_11,ADDR_TRIG_TABLE
-  move.w #8,ADDR_TRIG_TABLE_STEP
+  move.l                 #ROT_Z_MATRIX_Q5_11,ADDR_TRIG_TABLE
+  move.w                 #8,ADDR_TRIG_TABLE_STEP
   SETSTAGE               walkingtriangle_xwalk_rev
   STOP_LADDERS
 
@@ -277,7 +277,7 @@ walkingtriangle_no_horizontal_climbing:
 
 ; ***************************** START IMPLEMENTATION OF X REVERSE ------------------
 walkingtriangle_xwalk_rev:
-                    ; Translate
+  ; Translate
   move.w                 #STARTWALKXPOS+STARTDXCLIMB,d0
   sub.w                  XROLLINGOFFSET_OFFSET(a3),d0
   move.w                 #STARTWALKYPOS+15,d1
@@ -467,7 +467,7 @@ walkingtriangle_xwalk_right_2:
   bne.s                  .decrease_angle_by_1_exit
   SETSTAGE               walkingtriangle_reverse_dive
   SPACESHIP_SET_NEW_DESTINATION2 SPACESHIP_LOCATION_LOAD_X,SPACESHIP_LOCATION_LOAD_Y
-    ; bomb is blowing up
+  ; bomb is blowing up
   jsr                    BOMB_EXPLODE
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   lsl.w                  #6,d0
@@ -494,10 +494,10 @@ walkingtriangle_xwalk_right_2:
 
   move.w                 SAVE_X,d6
   cmpi.w                 #$b6,d6
-  bne.s nobombred
+  bne.s                  nobombred
   cmpi.w                 #320,SAVE_ANGLE
-  bne.s nobombred
-  jsr BOMB_RED
+  bne.s                  nobombred
+  jsr                    BOMB_RED
 nobombred:
 
   rts
@@ -541,7 +541,7 @@ walkingtriangle_reverse_dive:
   cmpi.w                  #124,d7
   ble.s                   .noendoffall
   SETSTAGE                walkingfloor1
-     ; bomb is ON
+  ; bomb is ON
   jsr                     BOMB_ON
   SPACESHIP_RAY_ON
 
@@ -611,9 +611,6 @@ walkingfloor1:
   jsr                    TRIANGLE_BLIT
   rts
 
-
-
-
   ; ***************************** START IMPLEMENTATION OF TELETRANSPORTATION START ------------------
 teletrasportationstart:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
@@ -659,14 +656,13 @@ teletrasportationstart:
 
   ; ***************************** START IMPLEMENTATION OF TELETRANSPORTATIN WAIT - WAIT FOR THE SPACESHIP TO REACH TARGET
 teletrasportationwait:
-  tst.w SPACESHIPDIRECTIONVECTOR+2
-  bne.s wait4spaceship
+  tst.w                  SPACESHIPDIRECTIONVECTOR+2
+  bne.s                  wait4spaceship
   SETSTAGE               teletrasportationend
   SPACESHIP_RAY_ON
 wait4spaceship:
   rts
   ; ***************************** END IMPLEMENTATION OF TELETRANSPORTATIN WAIT - WAIT FOR THE SPACESHIP TO REACH TARGET
-
 
 teletrasportationend:
   moveq                  #STARTWALKXPOS,d0
@@ -676,9 +672,6 @@ teletrasportationend:
   sub.w                  #13,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  ;move.w                 ANGLE_OFFSET(a3),d0
-  ;jsr                    ROTATE_INV_Q_5_11_F
-
   addq                   #1,SCALEFACTOR_OFFSET(a3)
   move.w                 SCALEFACTOR_OFFSET(a3),d0
   move.w                 d0,d1
@@ -686,15 +679,15 @@ teletrasportationend:
   bne.w                  .noscale2
   SETSTAGE               walkingtriangle_xwalk
   SPACESHIP_RAY_OFF
-    ; reset initial values
+  ; reset initial values
   move.w                 #30,YROLLINGOFFSET_OFFSET(a3)
 .noscale2
   jsr                    SCALE
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT_I          1,0000,FFEC  ;#0,#-13
-  VERTEX2D_INIT_I          2,FFF1,000C  ;#-15,#13
-  VERTEX2D_INIT_I          3,000F,000C  ;#15,#13
+  VERTEX2D_INIT_I        1,0000,FFEC  ;#0,#-13
+  VERTEX2D_INIT_I        2,FFF1,000C  ;#-15,#13
+  VERTEX2D_INIT_I        3,000F,000C  ;#15,#13
 
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT

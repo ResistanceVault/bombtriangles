@@ -6,34 +6,34 @@ SET_TILES MACRO
 TILES_TIMEOUT_SECONDS equ 10
 
 TILE_DATA:
-    dc.l EMPTYTILEPATTERN
-    dc.l TILETXT_EMPTY
+  dc.l EMPTYTILEPATTERN
+  dc.l TILETXT_EMPTY
 
-    dc.l PATTERN_FULL
-    dc.l TILETXT1
-    
-    dc.l PA2022
-    dc.l TILETXT_EMPTY
+  dc.l PATTERN_FULL
+  dc.l TILETXT1
 
-    dc.l EMPTYTILEPATTERN
-    dc.l TILETXT_EMPTY
+  dc.l PA2022
+  dc.l TILETXT_EMPTY
 
-    dc.l SPOLETO
-    dc.l TILETXT_EMPTY
+  dc.l EMPTYTILEPATTERN
+  dc.l TILETXT_EMPTY
 
-    dc.l EMPTYTILEPATTERN
-    dc.l TILETXT_EMPTY
+  dc.l SPOLETO
+  dc.l TILETXT_EMPTY
 
-    dc.l PATTERN_FULL
-    dc.l TILETXT2
+  dc.l EMPTYTILEPATTERN
+  dc.l TILETXT_EMPTY
+
+  dc.l PATTERN_FULL
+  dc.l TILETXT2
 TILE_DATA_END:
 
 TILE_PTR:
-    dc.l TILE_DATA
+  dc.l TILE_DATA
 
 TILE_COUNTER:
     dc.w TILES_TIMEOUT_SECONDS*50
-    
+
 WIDTHTILE equ 9
 
 EMPTYTILEPATTERN:
@@ -179,7 +179,6 @@ SPOLETO_5:
 
 tile_empty:
   dc.b      $0
-    ;dc.b $0
   dc.b      $0
   dc.b      $0
   dc.b      $0
@@ -191,7 +190,6 @@ tile_empty:
 
 space_1:
   dc.b      $FE
-    ;dc.b $FC
   dc.b      $FC
   dc.b      $FC
   dc.b      $FC
@@ -203,7 +201,6 @@ space_1:
 
 space_2:
   dc.b      $00
-    ;dc.b $7E
   dc.b      $7E
   dc.b      $7E
   dc.b      $7E
@@ -225,9 +222,8 @@ banner:
   cmpi.w    #40*5*WIDTHTILE,BANNER_CURRENT_Y
   beq.s     donotresetbannerx
 
-    ; before drawing tiles fetch the pattern and determine if the file
-    ; has to be drawn OR cleared
-    ;DEBUG 1235
+  ; before drawing tiles fetch the pattern and determine if the file
+  ; has to be drawn OR cleared
   move.w    BANNER_CURRENT_X(PC),d0
   move.w    d0,d2
   andi.w    #7,d2
@@ -243,31 +239,29 @@ banner:
   lea       tile_empty(PC),a2
   bra.s     drawtile
 donotcleartile:
-    ; Draw (or clear) the tile
+  ; Draw (or clear) the tile
   lea       space_1(PC),a1
   lea       space_2(PC),a2
 drawtile:
-  bsr.w     blittilecpu
-    
-    ; Go to the next X location for next frame
+  bsr.s     blittilecpu
+
+  ; Go to the next X location for next frame
   addq      #1,BANNER_CURRENT_X
   cmpi.w    #40,BANNER_CURRENT_X                ; check if raw is done, in this case reset X and go to next Y
   bne.s     donotresetbannerx
   move.w    #0,BANNER_CURRENT_X
   add.w     #40*WIDTHTILE,BANNER_CURRENT_Y
-    ;DEBUG 1234
-  add.l     #5,TILE_POINTER
+  addq.l    #5,TILE_POINTER
 
 donotresetbannerx:
   rts
 
-
 blittilecpu:
   ; if we are in NOP mode just print an empty character
-  tst.w TILETEXT_NOP
-  beq.s notiletextnop
-  subq #1,TILETEXT_NOP
-  lea       WFONT,a4
+  tst.w     TILETEXT_NOP
+  beq.s     notiletextnop
+  subq      #1,TILETEXT_NOP
+  lea       WFONT(PC),a4
   bra.s     tilestartdrawingprocess
 notiletextnop
 
@@ -290,68 +284,54 @@ tilevalidfont
 
   ; a4 will hold the pointer to the font, each font is 3 bytes so we multiply d0 by 3
   mulu      #3,d0
-  lea       AFONT,a4
+  lea       AFONT(PC),a4
   adda.w    d0,a4
 
   ; here a4 must hold the address of the letter to print
-  
 tilestartdrawingprocess:
   ; Load bitplane pointers and point them to the font location
   lea       SCREEN_0,a0
-  ;lea       SCREEN_00,a3
   move.w    #40*(256-5*WIDTHTILE),d7
   add.w     BANNER_CURRENT_Y,d7
   adda.w    d7,a0
   adda.w    BANNER_CURRENT_X,a0
 
-  ;adda.w    d7,a3
-  ;adda.w    BANNER_CURRENT_X,a3
-
   ; Start drawing the font with the CPU (cmooooon m68k I know you can do it)
   moveq     #WIDTHTILE-1,d0
 blittilecpu_startcycle:
-  cmp.w #WIDTHTILE-2,d0
-  bge.w blitwithnoletters
-  tst.w d0
-  beq.w blitwithnoletters
+  cmp.w     #WIDTHTILE-2,d0
+  bge.s     blitwithnoletters
+  tst.w     d0
+  beq.s     blitwithnoletters
 
-  move.b (a1),d7
-  move.b (a4),d6
+  move.b    (a1),d7
+  move.b    (a4),d6
 
-  btst #0,d0
+  btst      #0,d0
 
-  beq.s donotincrementfont
-  addq #1,a4
-  lsl.b #2,d6
-  bra.s blittilecpu_elaborate
+  beq.s     donotincrementfont
+  addq      #1,a4
+  lsl.b     #2,d6
+  bra.s     blittilecpu_elaborate
 donotincrementfont
-  lsr.b #2,d6
+  lsr.b     #2,d6
 blittilecpu_elaborate:
-  andi.b #%00111100,d6
-  not.b d6
-  and.b d6,d7
-;  move.b d7,(a3)
-  move.b d7,(a0)
-  
-  move.b (a2),d7
- ;   move.b AFONT,d6
-  ;lsr.b #2,d6
-  ;andi.b #$C,d6
-  ;not.b d6
-  and.b d6,d7
-;  move.b d7,256*40(a3)
-  move.b d7,256*40(a0)
-  addq #1,a1
-  addq #1,a2
-  bra.w blitwithnolettersend
+  andi.b    #%00111100,d6
+  not.b     d6
+  and.b     d6,d7
+  move.b    d7,(a0)
+
+  move.b    (a2),d7
+  and.b     d6,d7
+  move.b    d7,256*40(a0)
+  addq      #1,a1
+  addq      #1,a2
+  bra.s   blitwithnolettersend
 blitwithnoletters:
-;  move.b    (a1),(a3)
-;  move.b    (a2),256*40(a3)
   move.b    (a1)+,(a0)
   move.b    (a2)+,256*40(a0)
 blitwithnolettersend:
   adda.w    #40,a0
-;  adda.w    #40,a3
   dbra      d0,blittilecpu_startcycle
   rts
 
@@ -382,7 +362,7 @@ TILETXT_EMPTY:
   dc.b 40
   dc.b 40
   dc.b 40
-  
+
 even
 
 AFONT:

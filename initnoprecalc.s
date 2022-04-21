@@ -12,26 +12,27 @@ COLORCOPPLATFORM7 = $0F30
 
 _ammxmainloop3_init:
                         ; set palette
-  move.w    #COLOR1,$dff182    ; color1
-  move.w    #COLOR2,$dff184    ; color2
-  move.w    #COLOR3,$dff186    ; color3
-  move.w    #COLOR1,$dff188    ; color4
-  move.w    #COLOR1,$dff18A    ; color5
-  move.w    #COLOR2,$dff18C    ; color6
-  move.w    #COLOR3,$dff18E    ; color7
-  move.w    #COLOR2,$dff190    ; color8
-  move.w    #COLOR3,$dff192    ; color9
-  move.w    #COLOR2,$dff194    ; color10
-  move.w    #COLOR2,$dff196    ; color11
-  move.w    #COLOR3,$dff198    ; color12
-  move.w    #COLOR3,$dff19a    ; color13
-  move.w    #COLOR3,$dff19c    ; color14
-  move.w    #COLOR3,$dff19e    ; color15
+  lea       $dff182,a0
+  move.w    #COLOR1,(a0)+    ; color1
+  move.w    #COLOR2,(a0)+    ; color2
+  move.w    #COLOR3,(a0)+    ; color3
+  move.w    #COLOR1,(a0)+    ; color4
+  move.w    #COLOR1,(a0)+    ; color5
+  move.w    #COLOR2,(a0)+    ; color6
+  move.w    #COLOR3,(a0)+    ; color7
+  move.w    #COLOR2,(a0)+    ; color8
+  move.w    #COLOR3,(a0)+    ; color9
+  move.w    #COLOR2,(a0)+    ; color10
+  move.w    #COLOR2,(a0)+    ; color11
+  move.w    #COLOR3,(a0)+    ; color12
+  move.w    #COLOR3,(a0)+    ; color13
+  move.w    #COLOR3,(a0)+    ; color14
+  move.w    #COLOR3,(a0)+    ; color15
 
 
     ;move.w    $1a0,$bfc    ; color transparency
     ; start of sprite colors
-  lea       $dff1a2,a0
+  lea        $dff1a2,a0
   move.l     #$0a200ff0,(a0)+
   ;move.w    #$a20,(a0)+        ; color17
   ;move.w    #$ff0,(a0)+        ; color18
