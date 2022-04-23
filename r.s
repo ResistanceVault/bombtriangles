@@ -31,8 +31,8 @@ Inizio:
   jsr                  BLIT_TILES
 
   ; draw top of pyramids
-  moveq #0,d0
-  moveq #1,d1
+  moveq               #0,d0
+  moveq               #1,d1
   jsr                 BLITTOPPYRAMID
 
   moveq #12,d0
@@ -70,113 +70,98 @@ startstarfield:
 
   ; Start drawing full pyramid tiles
 
-  lea TILEFULL,a0
-  moveq #6-1,d4
-  moveq #1,d0
-  moveq #5,d1
-  jsr BLIT_TILES
+  lea                 TILEFULL,a0
+  moveq               #6-1,d4
+  moveq               #1,d0
+  moveq               #5,d1
+  bsr.w               BLIT_TILES
 
-  moveq #8-1,d4
-  moveq #0,d0
-  moveq #6,d1
-  jsr BLIT_TILES
+  moveq               #8-1,d4
+  moveq               #0,d0
+  moveq               #6,d1
+  bsr.w               BLIT_TILES
 
-  moveq #9-1,d4
-  moveq #0,d0
-  moveq #7,d1
-  jsr BLIT_TILES
+  moveq               #9-1,d4
+  moveq               #0,d0
+  moveq               #7,d1
+  bsr.w               BLIT_TILES
 
-  moveq #10-1,d4
-  moveq #0,d0
-  moveq #8,d1
-  jsr BLIT_TILES
+  moveq               #10-1,d4
+  moveq               #0,d0
+  moveq               #8,d1
+  bsr.w               BLIT_TILES
 
-  moveq #11-1,d4
-  moveq #0,d0
-  moveq #9,d1
-  jsr BLIT_TILES
+  moveq               #11-1,d4
+  moveq               #0,d0
+  moveq               #9,d1
+  bsr.w               BLIT_TILES
 
-; left slopes tile (trashing the full tile)
-  moveq #0,d0
-  moveq #5,d1
-  lea TILELEFTSLOPE,a0
-  jsr BLIT_TILE
+; left slope tile (trashing the full tile)
+  moveq               #0,d0
+  moveq               #5,d1
+  lea                 TILELEFTSLOPE,a0
+  bsr.w               BLIT_TILE
 
-  ; slopes start
-  moveq #7,d0
-  moveq #5,d1
-  lea TILERIGHTSLOPE,a0
-  jsr BLIT_TILE
-
-  moveq #8,d0
-  moveq #6,d1
-  lea TILERIGHTSLOPE,a0
-  jsr BLIT_TILE
-
-  moveq #9,d0
-  moveq #7,d1
-  lea TILERIGHTSLOPE,a0
-  jsr BLIT_TILE
-
-  moveq #10,d0
-  moveq #8,d1
-  lea TILERIGHTSLOPE,a0
-  jsr BLIT_TILE
-
-  moveq #11,d0
-  moveq #9,d1
-  lea TILERIGHTSLOPE,a0
-  jsr BLIT_TILE
+  ; right slopes start
+  moveq               #5-1,d6
+  moveq               #7,d0
+  moveq               #5,d1
+  lea                 TILERIGHTSLOPE,a0
+rightslopesstart:
+  bsr.w               BLIT_TILE
+  addq                #1,d0
+  addq                #1,d1
+  dbra                d6,rightslopesstart
 
   ; start blitting platform 1
-  moveq #13-1,d4
-  moveq #15,d6
+  moveq               #13-1,d4
+  moveq               #15,d6
 tileplatform1:
-  move.l d6,d0
-  move.w #51*40,d1
-  jsr BLIT_PLATFORM
-  subq #1,d6
-  dbra d4,tileplatform1
+  move.l              d6,d0
+  move.w              #51*40,d1
+  bsr.w               BLIT_PLATFORM
+  subq                #1,d6
+  dbra                d4,tileplatform1
 
 ; start blitting platform 2
-  moveq #8-1,d4
-  moveq #12,d6
+  moveq               #8-1,d4
+  moveq               #12,d6
 tileplatform2:
-  move.l d6,d0
-  move.w #99*40,d1
-  jsr BLIT_PLATFORM
-  subq #1,d6
-  dbra d4,tileplatform2
+  move.l              d6,d0
+  move.w              #99*40,d1
+  bsr.w               BLIT_PLATFORM
+  subq                #1,d6
+  dbra                d4,tileplatform2
 
 ; start blitting platform 3
-  moveq #2-1,d4
-  moveq #2,d6
+  moveq               #2-1,d4
+  moveq               #2,d6
 tileplatform3:
-  move.l d6,d0
-  move.w #107*40,d1
-  jsr BLIT_PLATFORM
-  subq #1,d6
-  dbra d4,tileplatform3
+  move.l              d6,d0
+  move.w              #107*40,d1
+  bsr.w               BLIT_PLATFORM
+  subq                #1,d6
+  dbra                d4,tileplatform3
 
 ; start blitting platform 4
-  moveq #2-1,d4
-  moveq #15,d6
+  moveq               #2-1,d4
+  moveq               #15,d6
 tileplatform4:
-  move.l d6,d0
-  move.w #147*40,d1
-  jsr BLIT_PLATFORM
-  subq #1,d6
-  dbra d4,tileplatform4
+  move.l              d6,d0
+  move.w              #147*40,d1
+  bsr.w               BLIT_PLATFORM
+  subq                #1,d6
+  dbra                d4,tileplatform4
 
 ; start blitting platform 5
-  moveq #2-1,d4
-  moveq #8,d6
+  moveq               #2-1,d4
+  moveq               #8,d6
 tileplatform5:
-  move.l d6,d0
-  move.w #155*40,d1
-  jsr BLIT_PLATFORM
-  subq #1,d6
-  dbra d4,tileplatform5
+  move.l              d6,d0
+  move.w              #155*40,d1
+  bsr.w               BLIT_PLATFORM
+  subq                #1,d6
+  dbra                d4,tileplatform5
 
   ; Init active playfield with same data, we will change this later in gameloop
   IFD LOL
@@ -245,11 +230,11 @@ tileplatform5:
   move                d0,$106(a6)                                                    ;Disable AGA/ECS-stuff
   move                d0,$1fc(a6)
 
-  move.l              #COPPERLIST,$dff080                                            ; Puntiamo la nostra COP
-  move.w              d0,$dff088                                                     ; Facciamo partire la COP
+  move.l              #COPPERLIST,$80(a6)                                            ; Copperlist point
+  move.w              d0,$88(a6)                                                     ; Copperlist start
 
-  move.w              #0,$dff1fc                                                     ; FMODE - Disattiva l'AGA
-  move.w              #$c00,$dff106                                                  ; BPLCON3 - Disattiva l'AGA
+  move.w              #0,$1fc(a6)                                                    ; FMODE - NO AGA
+  move.w              #$c00,$106(a6)                                                 ; BPLCON3 - NO AGA
 
   lea                 Module1,a0
   sub.l               a1,a1
@@ -277,8 +262,8 @@ mouse:
   ENDC
 
   IFD                 EFFECTS
-  jsr                 muovicopper                                                    ; barra rossa sotto linea $ff
-  jsr                 scrollcolors                                                   ; scorrimento ciclico dei colori
+  bsr.w               muovicopper                                                    ; barra rossa sotto linea $ff
+  bsr.w               scrollcolors                                                   ; scorrimento ciclico dei colori
   ENDC
 Aspetta:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
@@ -309,13 +294,13 @@ POINTINCOPPERLIST_FUNCT:
 ; d0 : x position (trashed)
 ; d1 : y position (trashed)
 BLIT_PLATFORM:
-  lea PLATFORM,a0
-  lea SCREEN_2,a1
-  ; add vertical position
-  adda.l d1,a1
-  lsl.w #1,d0
-  adda.l d0,a1
-  moveq #3-1,d7
+  lea              PLATFORM,a0
+  lea              SCREEN_2,a1
+; add vertical position
+  adda.l           d1,a1
+  lsl.w            #1,d0
+  adda.l           d0,a1
+  moveq            #3-1,d7
 blitplatform_startloop:
   WAITBLITTER
   move.w           #$09F0,$dff040
@@ -332,14 +317,14 @@ blitplatform_startloop:
   rts
 
 BLITTOPPYRAMID:
-  lea SCREEN_2,a1
-  mulu.w #40*16,d1
-  adda.l d1,a1
-  adda.l #40*10,a1
-  lsl.w #1,d0
-  adda.l d0,a1
-  lea PYRAMIDTOP,a0
-  moveq #3-1,d7
+  lea              SCREEN_2,a1
+  mulu.w           #40*16,d1
+  adda.l           d1,a1
+  adda.l           #40*10,a1
+  lsl.w            #1,d0
+  adda.l           d0,a1
+  lea              PYRAMIDTOP,a0
+  moveq            #3-1,d7
 blittoputamid_startloop:
   WAITBLITTER
   move.w           #$09F0,$dff040
@@ -374,6 +359,9 @@ tilefullstart:
 ; a0 : pointer to tile
 ; d0 : x position
 ; d1 : y position
+; trashes:
+;  - a1
+;  - d7
 BLIT_TILE:
   movem.l           d0/d1/a0,-(sp)
   lea               SCREEN_2,a1
@@ -488,6 +476,13 @@ SuGiu:
 ; *		SCORRIMENTO CICLICO DEI COLORI (Lezione3E.s)		   *
 ; **************************************************************************
 scrollcolors:
+  moveq               #13-1,d7
+  lea                 col1,a4
+scrollcolors_startcycle
+  move.w              8(a4),(a4)
+  addq.l              #8,a4
+  dbra                d7,scrollcolors_startcycle
+  IFD LOL
   move.w              col2,col1                                                      ; col2 copiato in col1
   move.w              col3,col2                                                      ; col3 copiato in col2
   move.w              col4,col3                                                      ; col4 copiato in col3
@@ -501,6 +496,7 @@ scrollcolors:
   move.w              col12,col11                                                    ; col12 copiato in col11
   move.w              col13,col12                                                    ; col13 copiato in col12
   move.w              col14,col13                                                    ; col14 copiato in col13
+  ENDC
   move.w              col1,col14                                                     ; col1 copiato in col14
   rts
   ENDC
@@ -613,7 +609,7 @@ TILELEFTSLOPE:        incbin "assets/tiles/leftslope.raw"
 TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
 PYRAMIDTOP:           incbin "assets/brush/pyramidtop112x54.raw"
   IFD COPPLATFORM
-PLATFORM: dcb.b 2*16*3,$FF
+PLATFORM:             dcb.b 2*16*3,$FF
   ELSE
 PLATFORM:             incbin "assets/brush/platform16x5.raw"
   ENDC
