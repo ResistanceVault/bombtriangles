@@ -35,23 +35,27 @@ Inizio:
   moveq               #1,d1
   jsr                 BLITTOPPYRAMID
 
-  moveq #12,d0
-  moveq #4,d1
+  moveq               #12,d0
+  moveq               #4,d1
   jsr                 BLITTOPPYRAMID
 
+  IFD STARS
   ; stars start
-  moveq #10-1,d7
+  moveq #80-1,d7
   lea SCREEN_2+40*1+20,a0
+  move.l d7,d6
 startstarfield:
-  move.w d7,d6
-  neg.w d6
-  lsr.w #2,d6
-  add.l #19,a0
+  add.w d7,d6
+  divs.w d7,d6
+  swap d6
+  ;andi.l #$7,d6
   bset d6,(a0)
   bset d6,40*224*1(a0)
   bset d6,40*224*2(a0)
+  addq  #2,a0
   dbra d7,startstarfield
 ; endstartfield
+  ENDC
 
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
@@ -421,7 +425,7 @@ SaveDMA:              dc.w 0
 SaveIRQ:              dc.l 0
 Name:                 dc.b "graphics.library",0
   even
-;----------------------------------------------------------------  
+;----------------------------------------------------------------
 
 Playrtn:
   include             "P6112-Play.i"
@@ -434,16 +438,11 @@ muovicopper:
   beq.w               VAIGIU
   cmpi.b              #$0a,(a0)                                                      ; siamo arrivati alla linea $0a+$ff? (265)
   beq.s               MettiGiu                                                       ; se si, siamo in cima e dobbiamo scendere
+  moveq               #10-1,d7
+movecopper_startloop:
   subq.b              #1,(a0)
-  subq.b              #1,8(a0)                                                       ; ora cambiamo gli altri wait: la distanza
-  subq.b              #1,8*2(a0)                                                     ; tra un wait e l'altro e' di 8 bytes
-  subq.b              #1,8*3(a0)
-  subq.b              #1,8*4(a0)
-  subq.b              #1,8*5(a0)
-  subq.b              #1,8*6(a0)
-  subq.b              #1,8*7(a0)                                                     ; qua dobbiamo modificare tutti i 9 wait della
-  subq.b              #1,8*8(a0)                                                     ; barra rossa ogni volta per farla salire!
-  subq.b              #1,8*9(a0)
+  addq                #8,a0
+  dbra                d7,movecopper_startloop
   rts
 
 MettiGiu:
@@ -451,18 +450,13 @@ MettiGiu:
   rts                                                                                ; fara' saltare alla routine VAIGIU, e
 
 VAIGIU:
-  cmpi.b              #$2c,8*9(a0)                                                   ; siamo arrivati alla linea $2c?
-  beq.s               MettiSu                                                        ; se si, siamo in fondo e dobbiamo risalire
+  cmpi.b              #$2c,8*9(a0)                                                   ; check if we are at line$2c?
+  beq.s               MettiSu                                                        ; if yes we are at the bottom and must go up
+  moveq #10-1,d7
+godown_loop:
   addq.b              #1,(a0)
-  addq.b              #1,8(a0)                                                       ; ora cambiamo gli altri wait: la distanza
-  addq.b              #1,8*2(a0)                                                     ; tra un wait e l'altro e' di 8 bytes
-  addq.b              #1,8*3(a0)
-  addq.b              #1,8*4(a0)
-  addq.b              #1,8*5(a0)
-  addq.b              #1,8*6(a0)
-  addq.b              #1,8*7(a0)                                                     ; qua dobbiamo modificare tutti i 9 wait della
-  addq.b              #1,8*8(a0)                                                     ; barra rossa ogni volta per farla scendere!
-  addq.b              #1,8*9(a0)
+  addq                #8,a0
+  dbra                d7,godown_loop
   rts
 
 MettiSu:
@@ -472,9 +466,9 @@ MettiSu:
 SuGiu:
   dc.b                0,0
 
-; **************************************************************************
-; *		SCORRIMENTO CICLICO DEI COLORI (Lezione3E.s)		   *
-; **************************************************************************
+; ************************
+; *		Color cycling		   *
+; ************************
 scrollcolors:
   moveq               #13-1,d7
   lea                 col1,a4
@@ -482,22 +476,7 @@ scrollcolors_startcycle
   move.w              8(a4),(a4)
   addq.l              #8,a4
   dbra                d7,scrollcolors_startcycle
-  IFD LOL
-  move.w              col2,col1                                                      ; col2 copiato in col1
-  move.w              col3,col2                                                      ; col3 copiato in col2
-  move.w              col4,col3                                                      ; col4 copiato in col3
-  move.w              col5,col4                                                      ; col5 copiato in col4
-  move.w              col6,col5                                                      ; col6 copiato in col5
-  move.w              col7,col6                                                      ; col7 copiato in col6
-  move.w              col8,col7                                                      ; col8 copiato in col7
-  move.w              col9,col8                                                      ; col9 copiato in col8
-  move.w              col10,col9                                                     ; col10 copiato in col9
-  move.w              col11,col10                                                    ; col11 copiato in col10
-  move.w              col12,col11                                                    ; col12 copiato in col11
-  move.w              col13,col12                                                    ; col13 copiato in col12
-  move.w              col14,col13                                                    ; col14 copiato in col13
-  ENDC
-  move.w              col1,col14                                                     ; col1 copiato in col14
+  move.w              col1,col14
   rts
   ENDC
 
