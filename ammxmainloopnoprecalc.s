@@ -3,10 +3,13 @@
     include "tiles.s"
     include "bombs/bombmanager.s"
     include "spaceship/spaceshipmanager.s"
+    include "twister/twistermanager.s"
 
 ammxmainloop3:
             SWAP_BPL
             bsr.w            CLEARTOP
+
+            jsr             TWISTERMANAGER
 
             ; execute banner routine
             subq             #1,TILE_COUNTER

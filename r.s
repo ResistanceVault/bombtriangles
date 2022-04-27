@@ -10,10 +10,14 @@ POINTINCOPPERLIST MACRO
   SECTION             CiriCop,CODE_C
 
   include             "AProcessing/libs/ammxmacros.i"
-
 Inizio:
 
   bsr.w               Save_all
+
+  ; Build trigonometric table
+  lea                 SIN_Q5_11(PC),a0
+  lea                 ROT_X_MATRIX_Q5_11(PC),a1
+  bsr.w               PRECALC_BY_SIN
 
   ; draw sand
   ;lea                 SANDDOWN,a3
@@ -28,16 +32,16 @@ Inizio:
   moveq                #20-1,d4
   moveq                #0,d0
   moveq                #11,d1
-  jsr                  BLIT_TILES
+  bsr.w                BLIT_TILES
 
   ; draw top of pyramids
   moveq               #0,d0
   moveq               #1,d1
-  jsr                 BLITTOPPYRAMID
+  bsr.w               BLITTOPPYRAMID
 
   moveq               #12,d0
   moveq               #4,d1
-  jsr                 BLITTOPPYRAMID
+  bsr.w               BLITTOPPYRAMID
 
   IFD STARS
   ; stars start
@@ -73,7 +77,25 @@ startstarfield:
   bsr.w               POINTINCOPPERLIST_FUNCT
 
   ; Start drawing full pyramid tiles
+  lea                 TILEFULL,a0
+  moveq               #6-1,d4
+  moveq               #1,d0
+  moveq               #5,d1
+  bsr.w               BLIT_TILES
 
+  moveq #4-1,d6
+  moveq               #8-1,d4
+  moveq               #0,d0
+  moveq               #6,d1
+tiles_vloop:
+  
+  bsr.w               BLIT_TILES
+  addq    #1,d1
+  addq #1,d4
+
+  dbra d6,tiles_vloop
+
+  IFD OLD
   lea                 TILEFULL,a0
   moveq               #6-1,d4
   moveq               #1,d0
@@ -99,6 +121,7 @@ startstarfield:
   moveq               #0,d0
   moveq               #9,d1
   bsr.w               BLIT_TILES
+  ENDC
 
 ; left slope tile (trashing the full tile)
   moveq               #0,d0
@@ -351,12 +374,12 @@ blittoputamid_startloop:
 ; d0 - x position
 ; d1 - y position
 BLIT_TILES:
-  move.l           d0,-(sp)
+  movem.l           d0-d1/d4,-(sp)
 tilefullstart:
   bsr.s            BLIT_TILE
   addq             #1,d0
   dbra             d4,tilefullstart
-  move.l           (sp)+,d0
+  movem.l           (sp)+,d0-d1/d4
   rts
 
 ; blit a tile into background - origin is at top left
@@ -483,7 +506,12 @@ scrollcolors_startcycle
   include             "AProcessing/libs/rasterizers/globaloptions.s"
   include             "AProcessing/libs/matrix/matrix.s"
   include             "AProcessing/libs/matrix/scale.s"
-  include             "AProcessing/libs/trigtables.i"
+  ;include             "AProcessing/libs/trigtables.i"
+  include             "AProcessing/libs/precalc/precalc_by_sin.s"
+  include             "AProcessing/libs/trigtables_sin.i"
+ROT_Z_MATRIX_Q5_11: ; cos -sin sin cos
+ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
+  dcb.b 361*8,$00
   include             "AProcessing/libs/matrix/point.s"
   include             "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
   include             "AProcessing/libs/blitter/lines.s"
