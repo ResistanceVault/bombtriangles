@@ -29,8 +29,11 @@ donoresettilecounter:
 
             bsr.w            banner
 
+            IFD LADDERS
             ; move ladders
             bsr.w            moveladders
+            ENDC
+
 
             ; execute the drawing routine
             ;lea              DRAWFUNCTARRAY_START(PC),a0

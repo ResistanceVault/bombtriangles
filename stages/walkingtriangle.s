@@ -196,7 +196,9 @@ walkingtriangle_xwalk:
   move.w                 #1,STAGEWALK_OFFSET(a3)
   SETSTAGE               walkingtriangle_ywalk
   move.w                 #359,ANGLE_OFFSET(a3)
+  IFD LADDERS
   START_LADDERS
+  ENDC
 
 walkingtriangle_no_vertical_climbing:
 
@@ -219,35 +221,49 @@ ADDR_TRIG_TABLE_STEP: dc.w 8
 ; ***************************** START IMPLEMENTATION OF Y CLIMBING ------------------
 walkingtriangle_ywalk:
                     ; Translate
-  move.w                 #STARTWALKXPOS+STARTDXCLIMB,d0
-  move.w                 #STARTWALKYPOS-15,d1
+  move.w                 #STARTWALKXPOS+STARTDXCLIMB-13,d0
+  move.w                 #STARTWALKYPOS,d1
   move.w                 YROLLINGOFFSET_OFFSET(a3),d2
   lsr.w                  #1,d2
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ; Scale on X to point the triangle to the right - start
-  cmpi.w                 #30,YROLLINGOFFSET_OFFSET(a3)
-  beq.s                  noinverttrigend
-  lea                    ADDR_TRIG_TABLE(PC),a0
-  move.l                 (a0),a0
-  move.w                 (a0),d0
-  cmpi.w                 #%1111101001110010,d0 ; cos(134)
-  bne.s                  noinverttrig
-  move.w                 #-8,ADDR_TRIG_TABLE_STEP
+  IFD LOL
+  ;cmpi.w                 #30,YROLLINGOFFSET_OFFSET(a3)
+  ;beq.s                  noinverttrigend
+  ;lea                    ADDR_TRIG_TABLE(PC),a0
+  ;move.l                 (a0),a0
+  ;move.w                 (a0),d0
+  ;cmpi.w                 #%1111101001110010,d0 ; cos(134)
+  ;bne.s                  noinverttrig
+  ;move.w                 #-8,ADDR_TRIG_TABLE_STEP
 noinverttrig:
-  asr.w                  #5,d0
-  add.w                  ADDR_TRIG_TABLE_STEP(PC),a0
-  move.l                 a0,ADDR_TRIG_TABLE
-  moveq                  #%0000000001000000,d1
-  jsr                    SCALE
+  ;asr.w                  #5,d0
+  ;add.w                  ADDR_TRIG_TABLE_STEP(PC),a0
+  ;move.l                 a0,ADDR_TRIG_TABLE
+  ;moveq                  #%0000000001000000,d1
+  ;jsr                    SCALE
+  ELSE
+  ; Add 1 to angle
+  addq                   #4,ANGLE_OFFSET(a3)
+  cmpi.w                 #360,ANGLE_OFFSET(a3)
+  bcs.s                  .increase_angle_by_1_exitlol
+  move.w                 #0,ANGLE_OFFSET(a3)
+  .increase_angle_by_1_exitlol:
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_INV_Q_5_11_F
+  ENDC
+  ;subi.w #-1,ANGLE_OFFSET(a3)
 noinverttrigend:
   ; Scale on X to point the triangle to the right - end
 
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
+  ;move.w YROLLINGOFFSET_OFFSET(a3),D0
+  ;DEBUG 1234
 
-  ; when the triangle reaches thetop, stop the ladder
+  ; when the triangle reaches the top, go to next stage
   cmpi.w                 #STARTDYCLIMBX2,YROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_horizontal_climbing
 
@@ -257,14 +273,20 @@ noinverttrigend:
   move.l                 #ROT_Z_MATRIX_Q5_11,ADDR_TRIG_TABLE
   move.w                 #8,ADDR_TRIG_TABLE_STEP
   SETSTAGE               walkingtriangle_xwalk_rev
+  IFD LADDERS
   STOP_LADDERS
+  ENDC
 
 walkingtriangle_no_horizontal_climbing:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  VERTEX2D_INIT_I        1,0000,0000 ;   0,0
-  VERTEX2D_INIT_I        2,0000,001E ;   0,30
-  VERTEX2D_INIT_I        3,FFE6,000F ; -26,30
+  ;VERTEX2D_INIT_I        1,0000,0000 ;   0,0
+  ;VERTEX2D_INIT_I        2,0000,001E ;   0,30
+  ;VERTEX2D_INIT_I        3,FFE6,000F ; -26,15
+
+  VERTEX2D_INIT_I        1,000D,FFF1 ;   13,-15
+  VERTEX2D_INIT_I        2,000D,000F ;   13,15
+  VERTEX2D_INIT_I        3,FFF3,0000 ; -13,0
 
   lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT

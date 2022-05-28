@@ -88,7 +88,7 @@ startstarfield:
   moveq               #0,d0
   moveq               #6,d1
 tiles_vloop:
-  
+
   bsr.w               BLIT_TILES
   addq    #1,d1
   addq #1,d4
@@ -211,6 +211,7 @@ tileplatform5:
   bsr.w               POINTINCOPPERLIST_FUNCT
 
 	; Sprite 0 init
+  IFD LADDERS
   MOVE.L              #LADDER_1,d0
   LEA                 SpritePointers,a1                                              ; SpritePointers is in copperlist
   bsr.w               POINTINCOPPERLIST_FUNCT
@@ -222,6 +223,7 @@ tileplatform5:
 
   ; Sprite 2 init
   jsr                 drawtopstep
+  ENDC
 
   ; Sprite 4 init - bomb first 2 bitplanes of attached sprite
   move.l              #BOMB1_BPL0,d0
