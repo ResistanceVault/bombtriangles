@@ -527,6 +527,7 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
 SCREEN_2:
   dcb.b 40*224*3,$00
 
+  IFD LADDERS
 LADDER_1:
 LADDER_1_VSTART0;
   dc.b                LADDERVERTICALPOSITION-LADDERHEIGHT-LADDERSPACING*2
@@ -594,6 +595,7 @@ LADDER_2_VSTOP2:
 
   ; END OF SPRITE
   dc.w                0,0
+  ENDC
 
 ; start of bomb sprites
   include             "bombs/0.s"

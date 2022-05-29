@@ -59,7 +59,10 @@ CLEARTOP:
             move.w           #$2E53,$dff058
             rts
 
+            IFD LADDERS
             include          "ladder.s"
+            ENDC
+
             include          "stages/walkingtriangle.s"
 
 
