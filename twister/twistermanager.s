@@ -1,3 +1,12 @@
+SPRITES_VSTART		   equ  $2C
+
+TWISTER_SPR_START_VPOS equ	12+SPRITES_VSTART ; Vertical position of the sprite where to start plotting twister
+TWISTER_SPR_Y_STEP	   equ   4 ; Space between each row in pixel
+TWISTER_SPR_NUM_ROWS   equ  35 ; How many rows in a twister?
+
+; Full vertical height of the sprite in pixels
+TWISTER_SPR_HEIGHT	   equ  TWISTER_SPR_NUM_ROWS+(TWISTER_SPR_NUM_ROWS*TWISTER_SPR_Y_STEP)
+
 TWISTER_HEIGHT 	 equ 	35
 TWISTER_Y_STEP	 equ	5*40
 TWISTER_TRIGSTEP:
@@ -10,6 +19,73 @@ TWISTER_ANGLE_STEP:
   dc.w 		 	 0
 
 TWISTERMANAGER:
+	lea          SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
+	adda.l 		 TWISTER_START_ANGLE(PC),a1; Go to the lookup table position corresponding to the angle
+
+	; go to the next angle
+	addq.l 		 #8,TWISTER_START_ANGLE
+  	cmpi.l 		 #720,TWISTER_START_ANGLE
+  	bcs.s 		 twister_angle_dont_reset
+  	move.l 		 #0,TWISTER_START_ANGLE
+twister_angle_dont_reset:
+
+	; point twister sprite data into a0 and a2
+	lea 		 SANDTWISTER_2_DATA(PC),a2
+	lea 		 SANDTWISTER_1_DATA(PC),a0
+
+	moveq        #TWISTER_SPR_NUM_ROWS-1,d7       ; iterate for each twister row
+twister_for_each_row:
+	moveq.l		 #0,d4					; clean d4
+
+	move.w       (a1),d0                    ; fetch sin(a/amp), put the result into d0
+                                          	; d0 will hold a value from 0 to 32 because
+                                          	; the sin table will be multiplied and offsetted
+                                          	; by the value of 16
+
+
+  	bset 		 d0,d4
+
+	;		x2=((sin((a/amp)+ang+90))*32)+150;
+	move.w       90*2(a1),d0
+	bset 		 d0,d4
+
+	;		x3=((sin((a/amp)+ang+90*2))*32)+150;
+	move.w       180*2(a1),d0
+	bset 		 d0,d4
+
+	;		x4=((sin((a/amp)+ang+90*3))*32)+150;
+	move.w       270*2(a1),d0
+	bset 		 d0,d4
+
+	; plot the sand grains into the sprite
+	move.w		 d4,(a2)
+	swap 		 d4
+	move.w		 d4,(a0)
+
+	; go to next twister row
+	adda.l		 #4*(TWISTER_SPR_Y_STEP+1),a0
+	adda.l		 #4*(TWISTER_SPR_Y_STEP+1),a2
+
+	; go to next point into sin table
+	adda.w       TWISTER_TRIGSTEP(PC),a1
+
+	; now we are going to update the sin table pointer BUT first we must check if we
+	; are at the end of the table, if this is the case we cant add because we are going
+	; out of bounds, in this case reset to the first element
+	cmp.l          #SIN_TWISTER_TABLE_END,a1
+	bcs.s          SIN_TWISTER_PTR_END
+	move.l 		   a1,a4
+	sub.l		   #SIN_TWISTER_TABLE_END,a4
+	lea            SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
+	add.l		   a4,a1
+	SIN_TWISTER_PTR_END:
+
+	; cycle
+	dbra           d7,twister_for_each_row
+
+	rts
+
+TWISTERMANAGER2:
   moveq          #TWISTER_HEIGHT,d7       ; twister height into d7
   moveq          #0,d5                    ; y position
   lea            SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
@@ -90,17 +166,48 @@ twister_mainloop:
   ; now we are going to update the sin table pointer BUT first we must check if we
   ; are at the end of the table, if this is the case we cant add because we are going
   ; out of bounds, in this case reset to the first element
-  cmp.l          #SIN_TWISTER_TABLE_END,a1
-  bcs.s          SIN_TWISTER_PTR_END
-  nop
-  move.l 		 a1,a4
-  sub.l			 #SIN_TWISTER_TABLE_END,a4
-  lea            SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
-  add.l			 a4,a1
-SIN_TWISTER_PTR_END:
+  ;cmp.l          #SIN_TWISTER_TABLE_END,a1
+  ;bcs.s          SIN_TWISTER_PTR_END
+  ;nop
+  ;move.l 		 a1,a4
+  ;sub.l			 #SIN_TWISTER_TABLE_END,a4
+  ;lea            SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
+  ;add.l			 a4,a1
+;SIN_TWISTER_PTR_END:
   dbra           d7,twister_mainloop
   rts
 
+; The twister is made of 2 sprites side by side, this is the first one (left one)
+SANDTWISTER_1:
+SANDTWISTER_1_VSTART0;
+  dc.b                TWISTER_SPR_START_VPOS
+SANDTWISTER_1_HSTART0:
+  dc.b                $B8
+SANDTWISTER_1_VSTOP0:
+  IFGT TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT-255
+  dc.b                TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT-255,$02
+  ELSE
+  dc.b                TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT,$00
+  ENDC
+SANDTWISTER_1_DATA:
+  dcb.l 			  TWISTER_SPR_HEIGHT,$00000000
+  dc.w                0,0
+
+; The twister is made of 2 sprites side by side, this is the second one (right one)
+SANDTWISTER_2:
+SANDTWISTER_2_VSTART0;
+  dc.b                TWISTER_SPR_START_VPOS
+SANDTWISTER_2_HSTART0:
+  dc.b                $B8+8
+SANDTWISTER_2_VSTOP0:
+  IFGT TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT-255
+  dc.b                TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT-255,$02
+  ELSE
+  dc.b                TWISTER_SPR_START_VPOS+TWISTER_SPR_HEIGHT,$00
+  ENDC
+SANDTWISTER_2_DATA:
+  dcb.l 			  TWISTER_SPR_HEIGHT,$00000000
+  dc.w                0,0
 ; sin table in format q2,14 with offset 1 (value ranges 0-2)
 SIN_TWISTER_TABLE:
 	dc.w 16 ; degrees: 0

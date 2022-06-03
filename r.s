@@ -210,6 +210,16 @@ tileplatform5:
   lea                 BPLPTR2_TILE,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
+  ; Sprite 0 init
+  MOVE.L              #SANDTWISTER_1,d0
+  LEA                 SpritePointers,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
+  ; Sprite 1 init
+  MOVE.L              #SANDTWISTER_2,d0
+  LEA                 SpritePointers+8,a1
+  bsr.w               POINTINCOPPERLIST_FUNCT
+
 	; Sprite 0 init
   IFD LADDERS
   MOVE.L              #LADDER_1,d0
