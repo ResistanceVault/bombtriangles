@@ -141,8 +141,8 @@ rightslopesstart:
   dbra                d6,rightslopesstart
 
   ; start blitting platform 1
-  moveq               #13-1,d4
-  moveq               #15,d6
+  moveq               #14-1,d4
+  moveq               #16,d6
 tileplatform1:
   move.l              d6,d0
   move.w              #51*40,d1

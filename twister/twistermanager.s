@@ -1,6 +1,6 @@
 SPRITES_VSTART		   equ  $2C
 
-TWISTER_SPR_START_VPOS equ	12+SPRITES_VSTART ; Vertical position of the sprite where to start plotting twister
+TWISTER_SPR_START_VPOS equ	10+SPRITES_VSTART ; Vertical position of the sprite where to start plotting twister
 TWISTER_SPR_Y_STEP	   equ   4 ; Space between each row in pixel
 TWISTER_SPR_NUM_ROWS   equ  35 ; How many rows in a twister?
 
@@ -11,6 +11,8 @@ TWISTER_HEIGHT 	 equ 	35
 TWISTER_Y_STEP	 equ	5*40
 TWISTER_TRIGSTEP:
 	dc.w 		 64
+TWISTER_MASK_ROWS_COUNTER:
+	dc.w		 TWISTER_SPR_NUM_ROWS-TWISTER_SPR_NUM_ROWS+10
 
 TWISTER_START_ANGLE:
   dc.l           0
@@ -33,9 +35,16 @@ twister_angle_dont_reset:
 	lea 		 SANDTWISTER_2_DATA(PC),a2
 	lea 		 SANDTWISTER_1_DATA(PC),a0
 
+	; save TWISTER_MASK_ROWS_COUNTER into d6 for comparisin within iteration
+	move.w		 TWISTER_MASK_ROWS_COUNTER(PC),d6
+
 	moveq        #TWISTER_SPR_NUM_ROWS-1,d7       ; iterate for each twister row
 twister_for_each_row:
 	moveq.l		 #0,d4					; clean d4
+
+	; do not show twister for lines where d7>TWISTER_MASK_ROWS_COUNTER
+	cmp.w 		 d6,d7
+	bcc.s 		 blanktwisterrow
 
 	move.w       (a1),d0                    ; fetch sin(a/amp), put the result into d0
                                           	; d0 will hold a value from 0 to 32 because
@@ -56,11 +65,12 @@ twister_for_each_row:
 	;		x4=((sin((a/amp)+ang+90*3))*32)+150;
 	move.w       270*2(a1),d0
 	bset 		 d0,d4
+blanktwisterrow:
 
 	; plot the sand grains into the sprite
-	move.w		 d4,(a2)
+	move.w		 d4,2(a2)
 	swap 		 d4
-	move.w		 d4,(a0)
+	move.w		 d4,2(a0)
 
 	; go to next twister row
 	adda.l		 #4*(TWISTER_SPR_Y_STEP+1),a0

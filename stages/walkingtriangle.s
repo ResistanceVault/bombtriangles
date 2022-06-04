@@ -218,6 +218,11 @@ walkingtriangle_no_vertical_climbing:
 ADDR_TRIG_TABLE: dc.l ROT_Z_MATRIX_Q5_11
 ADDR_TRIG_TABLE_STEP: dc.w 8
 
+TWISTERFLAG:
+  dc.w 0
+MIRRORFLAG:
+  dc.w %0000000001000000
+
 ; ***************************** START IMPLEMENTATION OF Y CLIMBING ------------------
 walkingtriangle_ywalk:
                     ; Translate
@@ -246,17 +251,37 @@ noinverttrig:
   ;jsr                    SCALE
   ELSE
   ; Add 1 to angle
-  addq                   #4,ANGLE_OFFSET(a3)
+  addq                   #2,ANGLE_OFFSET(a3)
   cmpi.w                 #360,ANGLE_OFFSET(a3)
   bcs.s                  .increase_angle_by_1_exitlol
   move.w                 #0,ANGLE_OFFSET(a3)
   .increase_angle_by_1_exitlol:
   move.w                 ANGLE_OFFSET(a3),d0
   jsr                    ROTATE_INV_Q_5_11_F
+  move.w                 MIRRORFLAG,d0
+  moveq                  #%0000000001000000,d1
+  cmpi.w #%1111111110111110,d0
+  beq.s donotmirror
+  subq.w #1,MIRRORFLAG
+donotmirror:
+  jsr                    SCALE
   ENDC
   ;subi.w #-1,ANGLE_OFFSET(a3)
 noinverttrigend:
   ; Scale on X to point the triangle to the right - end
+
+  ; move twister up one pixel
+  ;DEBUG 1234
+  ;move.w TWISTER_MASK_ROWS_COUNTER,d0
+  cmpi.w                 #TWISTER_SPR_NUM_ROWS,TWISTER_MASK_ROWS_COUNTER
+  beq.s                  donotincreasetwister
+  cmp.w #10,TWISTERFLAG
+  bne.s donotincreasetwister
+  add.w                 #1,TWISTER_MASK_ROWS_COUNTER
+  move.w #1,TWISTERFLAG
+donotincreasetwister:
+  add.w #1,TWISTERFLAG
+
 
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
@@ -266,12 +291,19 @@ noinverttrigend:
   ; when the triangle reaches the top, go to next stage
   cmpi.w                 #STARTDYCLIMBX2,YROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_horizontal_climbing
+  
+  ;subq                   #1,YROLLINGOFFSET_OFFSET(a3)
+  ;cmpi.w #270,ANGLE_OFFSET(a3) 
+  ;bne.s walkingtriangle_no_horizontal_climbing
+
 
   move.w                 #0,XROLLINGOFFSET_OFFSET(a3)                                  ; next stage must start with this value to 30
   move.w                 #0,ANGLE_OFFSET(a3)                                           ; next stage must start with this value to zero
   move.w                 #STARTDYCLIMB-1,YROLLINGOFFSET_OFFSET(a3)
   move.l                 #ROT_Z_MATRIX_Q5_11,ADDR_TRIG_TABLE
   move.w                 #8,ADDR_TRIG_TABLE_STEP
+  move.w #0,TWISTERFLAG
+  move.w #%0000000001000000,MIRRORFLAG
   SETSTAGE               walkingtriangle_xwalk_rev
   IFD LADDERS
   STOP_LADDERS
@@ -295,9 +327,10 @@ walkingtriangle_no_horizontal_climbing:
 ; ***************************** END IMPLEMENTATION OF Y CLIMBING ------------------
 
 
-
-
 ; ***************************** START IMPLEMENTATION OF X REVERSE ------------------
+TWISTERDECR:
+  dc.w 10
+
 walkingtriangle_xwalk_rev:
   ; Translate
   move.w                 #STARTWALKXPOS+STARTDXCLIMB,d0
@@ -305,6 +338,18 @@ walkingtriangle_xwalk_rev:
   move.w                 #STARTWALKYPOS+15,d1
   sub.w                  YROLLINGOFFSET_OFFSET(a3),d1
   jsr                    LOADIDENTITYANDTRANSLATE
+
+  ; move twister down one pixel
+  tst.w TWISTERFLAG
+  bne.s donotdecreasetwister
+  cmp.w                  #10,TWISTER_MASK_ROWS_COUNTER
+  beq.s                  donotdecreasetwister
+  sub.w #1,TWISTERDECR
+  tst.w TWISTERDECR
+  bne.s                  donotdecreasetwister
+  subq.w                 #1,TWISTER_MASK_ROWS_COUNTER
+  move.w #10,TWISTERDECR
+donotdecreasetwister:
 
   ; Add 1 to angle
   addq                   #1,ANGLE_OFFSET(a3)
