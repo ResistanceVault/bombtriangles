@@ -9,16 +9,23 @@ TWISTER_SPR_HEIGHT	   equ  TWISTER_SPR_NUM_ROWS+(TWISTER_SPR_NUM_ROWS*TWISTER_SP
 
 TWISTER_HEIGHT 	 equ 	35
 TWISTER_Y_STEP	 equ	5*40
+
+TWISTER_INC_SPEED equ   5 ; high values means go slow
+TWISTER_DEC_SPEED equ   10 ; high values means go slow
+
+TWISTERDECR:
+  	dc.w 10
+
 TWISTER_TRIGSTEP:
-	dc.w 		 64
+  	dc.w 		 64
 TWISTER_MASK_ROWS_COUNTER:
-	dc.w		 TWISTER_SPR_NUM_ROWS-TWISTER_SPR_NUM_ROWS+10
+  	dc.w		 TWISTER_SPR_NUM_ROWS-TWISTER_SPR_NUM_ROWS
 
 TWISTER_START_ANGLE:
-  dc.l           0
+  	dc.l           0
 
 TWISTER_ANGLE_STEP:
-  dc.w 		 	 0
+  	dc.w 		 	 0
 
 TWISTERMANAGER:
 	lea          SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
