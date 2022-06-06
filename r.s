@@ -386,12 +386,12 @@ blittoputamid_startloop:
 ; d0 - x position
 ; d1 - y position
 BLIT_TILES:
-  movem.l           d0-d1/d4,-(sp)
+  movem.l          d0-d1/d4,-(sp)
 tilefullstart:
   bsr.s            BLIT_TILE
   addq             #1,d0
   dbra             d4,tilefullstart
-  movem.l           (sp)+,d0-d1/d4
+  movem.l          (sp)+,d0-d1/d4
   rts
 
 ; blit a tile into background - origin is at top left

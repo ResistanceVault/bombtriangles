@@ -285,10 +285,6 @@ donotincreasetwister:
 walkingtriangle_no_horizontal_climbing:
 
   ; Triangle calculation (notice the first vertex is the origin, important to rotate around this point)
-  ;VERTEX2D_INIT_I        1,0000,0000 ;   0,0
-  ;VERTEX2D_INIT_I        2,0000,001E ;   0,30
-  ;VERTEX2D_INIT_I        3,FFE6,000F ; -26,15
-
   VERTEX2D_INIT_I        1,000D,FFF1 ;   13,-15
   VERTEX2D_INIT_I        2,000D,000F ;   13,15
   VERTEX2D_INIT_I        3,FFF3,0000 ; -13,0
