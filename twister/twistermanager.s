@@ -32,15 +32,18 @@ TWISTER_ANGLE_STEP:
 	include 			"twister/twistertables.i"
 
 TWISTERMANAGER:
-	lea          SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
-	adda.l 		 TWISTER_START_ANGLE(PC),a1; Go to the lookup table position corresponding to the angle
+  lea        TWISTER_START_ANGLE(PC),a0
+	lea        SIN_TWISTER_TABLE(PC),a1     ; Load addr of twister sin table into a1
+	adda.w 		 (a0),a1   ; Go to the lookup table position corresponding to the angle
 
 	; go to the next angle
-	addq.l 		 #8,TWISTER_START_ANGLE
-  	cmpi.l 		 #720,TWISTER_START_ANGLE
-  	bcs.s 		 twister_angle_dont_reset
-  	move.l 		 #0,TWISTER_START_ANGLE
+  move.w     (a0),d0
+	addq  		 #8,d0
+  cmpi.w 		 #720,d0
+  bcs.s 		 twister_angle_dont_reset
+  moveq 		 #0,d0
 twister_angle_dont_reset:
+  move.w     d0,TWISTER_START_ANGLE
 
 	; point twister sprite data into a0 and a2
 	lea 		 SANDTWISTER_2_DATA(PC),a2
