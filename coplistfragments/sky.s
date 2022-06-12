@@ -12,6 +12,7 @@
     dc.w    $3e07,$FFFE    ; salto 3 linee
     dc.w    $180,$00c            ; blu a 12
     dc.w    $4207,$FFFE    ; salto 4 linee
+    include "coplistfragments/pyramidcolors.s"
     dc.w    $180,$00d            ; blu a 13
     dc.w    $4707,$FFFE    ; salto 7 linee
     dc.w    $180,$00e            ; blu a 14
