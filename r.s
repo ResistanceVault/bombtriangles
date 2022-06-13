@@ -190,33 +190,17 @@ tileplatform5:
   subq                #1,d6
   dbra                d4,tileplatform5
 
-  ; draw big spaceship start
-  ;move.w $0300,(a0)
-  ;03 00 0E 30 1C 70 3B EC 
-;31 C0 7F FE C7 03 C7 03 
-;5B DE 21 8C 00 C0 01 F0 
-;03 F0 04 20 0F C4 7F FE 
-;3F 1F 3F 1F 38 00 10 00 
-;00 00 00 00 00 08 33 DC 
-;00 3C 7F FE 00 FF 00 FF 
-;03 DE 01 8C 00 00 00 00 
-;00 00 00 00 00 00 00 00 
-;00 00 00 00 00 00 00 00
+  jsr               DRAWBIGSPACESHIP
+  
+  IFD LOL
+  move.w #%00001110,d0
+  jsr double_byte
+  move.w d0,(a0)
+  move.w #%00110000,d0
+  jsr double_byte
+  move.w d0,2(a0)
 
-;00000011 00000000 00001110 00110000 00011100 01110000 00111011 11101100  -
-;00110001 11000000 01111111 11111110 11000111 00000011 11000111 00000011  -
-;01011011 11011110 00100001 10001100 00000000 11000000 00000001 11110000 -
-;00000011 11110000 00000100 00100000 00001111 11000100 01111111 11111110 -
-;00111111 00011111 00111111 00011111 00111000 00000000 00010000 00000000 -
-;00000000 00000000 00000000 00000000 00000000 00001000 00110011 11011100 -
-;00000000 00111100 01111111 11111110 00000000 11111111 00000000 11111111 
-;00000011 11011110 00000001 10001100 00000000 00000000 00000000 00000000 
-;00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-;00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-  ; first bpl
-  lea SCREEN_2,a0
-  move.w #%0000001100000000,0*40(a0) ; row 1
+  ;move.w #%0000001100000000,0*40(a0) ; row 1
   move.w #%0000111000110000,1*40(a0) ; row 2
   move.w #%0001110001110000,2*40(a0) ; row 3
   move.w #%0011101111101100,3*40(a0) ; row 4
@@ -252,6 +236,7 @@ tileplatform5:
   move.w #%0000000011111111,7*40(a0) ; row 8
   move.w #%0000001111011110,8*40(a0) ; row 9
   move.w #%0000000110001100,9*40(a0) ; row 10
+  ENDC
 
 ;dc.w    $1a0,$bfc    ; color transparency
 ;dc.w    $1a2,$fff    ; color17
@@ -507,6 +492,27 @@ blittile_startloop:
   movem.l          (sp)+,d0/d1/a0
   rts
 
+; this function doubles the byte on the lower part of d0
+; for example , if d0 lsb is 10101010 the function stores in
+; the lower word of d0 the value 1100110011001100.
+; Useful for X scaling an image
+; trashes nothing
+; output is into d0
+DOUBLE_BYTE:
+  movem.l          d1/d7,-(sp)
+  moveq            #8-1,d7 ; we want to cycle 8 times because we are processing a byte
+  andi.l           #$000000FF,d0 ; clean d0
+  ror.l            #8,d0 ; put the byte to analyze on the high part
+double_byte_loop:
+  rol.l            #1,d0
+  scs              d1
+  andi.w           #1,d1
+  lsl.w            #1,d0
+  or.b             d1,d0
+  dbra             d7,double_byte_loop
+  movem.l          (sp)+,d1/d7
+  rts
+
 ;---------------------------------------------------------------
 Save_all:
   move.b              #$87,$bfd100                                                   ; stop drive
@@ -702,6 +708,7 @@ LADDER_2_VSTOP2:
 ; start of spaceship sprites
   include             "spaceship/spaceship_spr1_ray.s"
   include             "spaceship/spaceship_spr_diffs.s"
+  include             "spaceship/bigspaceship.s"
 
 ; background tiles
 ;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
