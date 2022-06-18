@@ -9,8 +9,16 @@
     dc.w    $180,$00a            ; blu a 10
     dc.w    $3b07,$FFFE    ; salto 3 linee
     dc.w    $180,$00b            ; blu a 11
+
+BIGSPACESHIP_ACTIVE_COLORS:
+            dc.w       $182,$fff
+            dc.w       $184,$ddd
+            dc.w       $186,$bbb
+            dc.w       $188,$888
+
     dc.w    $3e07,$FFFE    ; salto 3 linee
     dc.w    $180,$00c            ; blu a 12
+
     dc.w    $4207,$FFFE    ; salto 4 linee
     include "coplistfragments/pyramidcolors.s"
     dc.w    $180,$00d            ; blu a 13

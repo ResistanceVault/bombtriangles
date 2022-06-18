@@ -605,6 +605,7 @@ scrollcolors_startcycle
   include             "AProcessing/libs/rasterizers/globaloptions.s"
   include             "AProcessing/libs/matrix/matrix.s"
   include             "AProcessing/libs/matrix/scale.s"
+  include             "AProcessing/libs/matrix/shear.s"
   ;include             "AProcessing/libs/trigtables.i"
   include             "AProcessing/libs/precalc/precalc_by_sin.s"
   include             "AProcessing/libs/trigtables_sin.i"

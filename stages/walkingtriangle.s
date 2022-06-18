@@ -194,7 +194,8 @@ walkingtriangle_xwalk:
   cmpi.w                 #325,ANGLE_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
-  SETSTAGE               walkingtriangle_ywalk
+  ;SETSTAGE               walkingtriangle_ywalk
+  SETSTAGE                bigspaceship_activation
   move.w                 #359,ANGLE_OFFSET(a3)
   IFD LADDERS
   START_LADDERS
@@ -213,6 +214,55 @@ walkingtriangle_no_vertical_climbing:
   rts
   ; ***************************** END OF FIRST HORIZONTAL WALKING
 
+  ; ***************************** START IMPLEMENTATION OF BIG SPACESHIP ACTIVATION ------------------
+BIGSPACESHIP_SHEAR:
+  dc.w  0
+bigspaceship_activation:
+                  ; Translate
+  move.w                 #STARTWALKXPOS+STARTDXCLIMB-13,d0
+  move.w                 #STARTWALKYPOS,d1
+  move.w                 YROLLINGOFFSET_OFFSET(a3),d2
+  lsr.w                  #1,d2
+  sub.w                  d2,d1
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  move.w                                        BIGSPACESHIP_SHEAR,d0
+  move.w                                        #%0000000000000000,d1
+  sub.w #1,BIGSPACESHIP_SHEAR
+  jsr                                         SHEAR
+
+  ; ray is descending
+  move.w                #1,TWISTERFLAG
+  cmpi.w                 #TWISTER_SPR_NUM_ROWS,TWISTER_MASK_ROWS_COUNTER
+  beq.s                  bigspaceship_activation_nextstage
+  subi.w                 #1,TWISTERDECR
+  tst.w                  TWISTERDECR
+  bne.s                  bigspaceship_activation_draw
+  move.w                 #TWISTER_INC_SPEED,TWISTERDECR
+  addi.w                 #1,TWISTER_MASK_ROWS_COUNTER
+  bra.s                  bigspaceship_activation_draw
+bigspaceship_activation_nextstage:
+  SETSTAGE               walkingtriangle_ywalk
+bigspaceship_activation_draw:
+
+  VERTEX2D_INIT_I        1,000D,FFF1 ;   13,-15
+  VERTEX2D_INIT_I        2,000D,000F ;   13,15
+  VERTEX2D_INIT_I        3,FFF3,0000 ;   -13,0
+
+  lea                    OFFBITPLANEMEM(PC),a4
+  jsr                    TRIANGLE_BLIT
+
+  IFD EFFECTS
+  lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
+  moveq                  #4-1,d7
+bigspaceship_active_loop:
+  move.w                 #$0f00,(a0)
+  addq                   #4,a0
+  dbra                   d7,bigspaceship_active_loop
+  ENDC
+
+  rts
+; ***************************** END IMPLEMENTATION OF BIG SPACESHIP ACTIVATION ------------------
 
 
 ADDR_TRIG_TABLE: dc.l ROT_Z_MATRIX_Q5_11
@@ -232,6 +282,15 @@ walkingtriangle_ywalk:
   lsr.w                  #1,d2
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
+
+  move.w                                        BIGSPACESHIP_SHEAR,d0
+  move.w                                        #%0000000000000000,d1
+  add.w #1,BIGSPACESHIP_SHEAR
+  tst BIGSPACESHIP_SHEAR
+  ble.s shearnotzero
+  moveq #0,d0
+shearnotzero:
+  jsr                                         SHEAR
 
   ; Scale on X to point the triangle to the right - start
 
@@ -254,6 +313,7 @@ noinverttrigend:
   ; Scale on X to point the triangle to the right - end
 
   ; move twister up one pixel
+  IFD LOL
   cmpi.w                #TWISTER_SPR_NUM_ROWS,TWISTER_MASK_ROWS_COUNTER
   beq.s                 donotincreasetwister
   cmp.w                 #TWISTER_INC_SPEED,TWISTERFLAG
@@ -262,6 +322,7 @@ noinverttrigend:
   move.w                #1,TWISTERFLAG
 donotincreasetwister:
   add.w                 #1,TWISTERFLAG
+  ENDC
 
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
@@ -277,6 +338,17 @@ donotincreasetwister:
   move.w                 #8,ADDR_TRIG_TABLE_STEP
   move.w                 #0,TWISTERFLAG
   move.w                 #%0000000001000000,MIRRORFLAG
+  move.w                 #0,BIGSPACESHIP_SHEAR
+  IFD EFFECTS
+  lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
+  ;moveq #4-1,d7
+bigspaceship_passive_loop:
+  move.w                 #$0fff,(a0)
+  move.w                 #$0ddd,4(a0)
+  move.w                 #$0bbb,8(a0)
+  move.w                 #$0888,12(a0)
+  ;dbra                   d7,bigspaceship_passive_loop
+  ENDC
   SETSTAGE               walkingtriangle_xwalk_rev
   IFD LADDERS
   STOP_LADDERS
@@ -306,16 +378,19 @@ walkingtriangle_xwalk_rev:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ; move twister down one pixel
+  ;subi.w                 #2,TWISTER_MASK_ROWS_COUNTER
+  IFND LOL
   tst.w                  TWISTERFLAG ; make sure the twister is not going up
   bne.s                  donotdecreasetwister
   cmp.w                  #0,TWISTER_MASK_ROWS_COUNTER
   beq.s                  donotdecreasetwister
-  sub.w                  #1,TWISTERDECR ; we dont want to decrement each frame
+  subi.w                  #1,TWISTERDECR ; we dont want to decrement each frame
   tst.w                  TWISTERDECR
   bne.s                  donotdecreasetwister
   subq.w                 #1,TWISTER_MASK_ROWS_COUNTER
   move.w                 #TWISTER_DEC_SPEED,TWISTERDECR
 donotdecreasetwister:
+  ENDC
 
   ; Add 1 to angle
   addq                   #1,ANGLE_OFFSET(a3)
