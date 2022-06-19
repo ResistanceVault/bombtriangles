@@ -217,6 +217,7 @@ walkingtriangle_no_vertical_climbing:
   ; ***************************** START IMPLEMENTATION OF BIG SPACESHIP ACTIVATION ------------------
 BIGSPACESHIP_SHEAR:
   dc.w  0
+BIGSPACESHIP_COLORSTABLE_PTR: dc.l BIGSPACESHIP_COLORSTABLE
 bigspaceship_activation:
                   ; Translate
   move.w                 #STARTWALKXPOS+STARTDXCLIMB-13,d0
@@ -253,12 +254,7 @@ bigspaceship_activation_draw:
   jsr                    TRIANGLE_BLIT
 
   IFD EFFECTS
-  lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
-  moveq                  #4-1,d7
-bigspaceship_active_loop:
-  move.w                 #$0f00,(a0)
-  addq                   #4,a0
-  dbra                   d7,bigspaceship_active_loop
+  jsr cyclebigspaceshipcolors
   ENDC
 
   rts
@@ -327,6 +323,10 @@ donotincreasetwister:
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
 
+   IFD EFFECTS
+  jsr cyclebigspaceshipcolors
+  ENDC
+
   ; when the triangle reaches the top, go to next stage
   cmpi.w                 #STARTDYCLIMBX2,YROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_horizontal_climbing
@@ -347,6 +347,7 @@ bigspaceship_passive_loop:
   move.w                 #$0ddd,4(a0)
   move.w                 #$0bbb,8(a0)
   move.w                 #$0888,12(a0)
+  move.l #BIGSPACESHIP_COLORSTABLE,BIGSPACESHIP_COLORSTABLE_PTR
   ;dbra                   d7,bigspaceship_passive_loop
   ENDC
   SETSTAGE               walkingtriangle_xwalk_rev
@@ -801,3 +802,23 @@ teletrasportationend:
   jsr                    TRIANGLE_BLIT
 
   rts
+
+  IFD EFFECTS
+cyclebigspaceshipcolors:
+  lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
+  move.l                    BIGSPACESHIP_COLORSTABLE_PTR,a1
+  ;move.l (a1),a1
+  moveq                  #4-1,d7
+bigspaceship_active_loop:
+  move.w                 (a1),(a0)
+  addq                   #4,a0
+  dbra                   d7,bigspaceship_active_loop
+
+  addq #2,a1
+  cmp.l #BIGSPACESHIP_COLORSTABLE_END,a1
+  bne.s bigspaceship_colortable_noend
+  move.l #BIGSPACESHIP_COLORSTABLE,a1
+bigspaceship_colortable_noend:
+  move.l a1,BIGSPACESHIP_COLORSTABLE_PTR
+  rts
+  ENDC
