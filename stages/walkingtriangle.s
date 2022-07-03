@@ -227,13 +227,13 @@ bigspaceship_activation:
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  move.w                                        BIGSPACESHIP_SHEAR,d0
-  move.w                                        #%0000000000000000,d1
-  sub.w #1,BIGSPACESHIP_SHEAR
-  jsr                                         SHEAR
+  move.w                 BIGSPACESHIP_SHEAR,d0
+  moveq                  #0,d1
+  sub.w                  #1,BIGSPACESHIP_SHEAR
+  jsr                    SHEAR
 
   ; ray is descending
-  move.w                #1,TWISTERFLAG
+  move.w                 #1,TWISTERFLAG
   cmpi.w                 #TWISTER_SPR_NUM_ROWS,TWISTER_MASK_ROWS_COUNTER
   beq.s                  bigspaceship_activation_nextstage
   subi.w                 #1,TWISTERDECR
@@ -254,7 +254,7 @@ bigspaceship_activation_draw:
   jsr                    TRIANGLE_BLIT
 
   IFD EFFECTS
-  jsr cyclebigspaceshipcolors
+  bsr.w                  cyclebigspaceshipcolors
   ENDC
 
   rts
@@ -279,14 +279,14 @@ walkingtriangle_ywalk:
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
-  move.w                                        BIGSPACESHIP_SHEAR,d0
-  move.w                                        #%0000000000000000,d1
-  add.w #1,BIGSPACESHIP_SHEAR
-  tst BIGSPACESHIP_SHEAR
-  ble.s shearnotzero
-  moveq #0,d0
+  move.w                 BIGSPACESHIP_SHEAR,d0
+  moveq                  #0,d1
+  add.w                  #1,BIGSPACESHIP_SHEAR
+  tst                    BIGSPACESHIP_SHEAR
+  ble.s                  shearnotzero
+  moveq                  #0,d0
 shearnotzero:
-  jsr                                         SHEAR
+  jsr                    SHEAR
 
   ; Scale on X to point the triangle to the right - start
 
@@ -295,7 +295,7 @@ shearnotzero:
   cmpi.w                 #360,ANGLE_OFFSET(a3)
   bcs.s                  .increase_angle_by_1_exitlol
   move.w                 #0,ANGLE_OFFSET(a3)
-  .increase_angle_by_1_exitlol:
+.increase_angle_by_1_exitlol:
   move.w                 ANGLE_OFFSET(a3),d0
   jsr                    ROTATE_INV_Q_5_11_F
   move.w                 MIRRORFLAG,d0
@@ -308,23 +308,11 @@ donotmirror:
 noinverttrigend:
   ; Scale on X to point the triangle to the right - end
 
-  ; move twister up one pixel
-  IFD LOL
-  cmpi.w                #TWISTER_SPR_NUM_ROWS,TWISTER_MASK_ROWS_COUNTER
-  beq.s                 donotincreasetwister
-  cmp.w                 #TWISTER_INC_SPEED,TWISTERFLAG
-  bne.s                 donotincreasetwister
-  add.w                 #1,TWISTER_MASK_ROWS_COUNTER
-  move.w                #1,TWISTERFLAG
-donotincreasetwister:
-  add.w                 #1,TWISTERFLAG
-  ENDC
-
   ; move triangle UP 1 pixel
   addq                   #1,YROLLINGOFFSET_OFFSET(a3)
 
    IFD EFFECTS
-  jsr cyclebigspaceshipcolors
+  bsr.w                  cyclebigspaceshipcolors
   ENDC
 
   ; when the triangle reaches the top, go to next stage
@@ -341,14 +329,12 @@ donotincreasetwister:
   move.w                 #0,BIGSPACESHIP_SHEAR
   IFD EFFECTS
   lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
-  ;moveq #4-1,d7
 bigspaceship_passive_loop:
   move.w                 #$0fff,(a0)
   move.w                 #$0ddd,4(a0)
   move.w                 #$0bbb,8(a0)
   move.w                 #$0888,12(a0)
-  move.l #BIGSPACESHIP_COLORSTABLE,BIGSPACESHIP_COLORSTABLE_PTR
-  ;dbra                   d7,bigspaceship_passive_loop
+  move.l                 #BIGSPACESHIP_COLORSTABLE,BIGSPACESHIP_COLORSTABLE_PTR
   ENDC
   SETSTAGE               walkingtriangle_xwalk_rev
   IFD LADDERS
@@ -379,19 +365,16 @@ walkingtriangle_xwalk_rev:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   ; move twister down one pixel
-  ;subi.w                 #2,TWISTER_MASK_ROWS_COUNTER
-  IFND LOL
   tst.w                  TWISTERFLAG ; make sure the twister is not going up
   bne.s                  donotdecreasetwister
   cmp.w                  #0,TWISTER_MASK_ROWS_COUNTER
   beq.s                  donotdecreasetwister
-  subi.w                  #1,TWISTERDECR ; we dont want to decrement each frame
-  tst.w                  TWISTERDECR
+  subq.w                 #1,TWISTERDECR ; we dont want to decrement each frame
+  ;tst.w                  TWISTERDECR
   bne.s                  donotdecreasetwister
   subq.w                 #1,TWISTER_MASK_ROWS_COUNTER
   move.w                 #TWISTER_DEC_SPEED,TWISTERDECR
 donotdecreasetwister:
-  ENDC
 
   ; Add 1 to angle
   addq                   #1,ANGLE_OFFSET(a3)
@@ -401,7 +384,6 @@ donotdecreasetwister:
   .increase_angle_by_1_exit:
   move.w                 ANGLE_OFFSET(a3),d0
   jsr                    ROTATE_INV_Q_5_11_F
-
 
   ;,UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
   cmpi.w                 #30,ANGLE_OFFSET(a3)
@@ -805,20 +787,19 @@ teletrasportationend:
 
   IFD EFFECTS
 cyclebigspaceshipcolors:
-  lea                    BIGSPACESHIP_ACTIVE_COLORS+2,a0
-  move.l                    BIGSPACESHIP_COLORSTABLE_PTR,a1
-  ;move.l (a1),a1
+  lea                    2+BIGSPACESHIP_ACTIVE_COLORS,a0
+  move.l                 BIGSPACESHIP_COLORSTABLE_PTR(PC),a1
   moveq                  #4-1,d7
 bigspaceship_active_loop:
   move.w                 (a1),(a0)
   addq                   #4,a0
   dbra                   d7,bigspaceship_active_loop
 
-  addq #2,a1
-  cmp.l #BIGSPACESHIP_COLORSTABLE_END,a1
-  bne.s bigspaceship_colortable_noend
-  move.l #BIGSPACESHIP_COLORSTABLE,a1
+  addq                   #2,a1
+  cmp.l                  #BIGSPACESHIP_COLORSTABLE_END,a1
+  bne.s                  bigspaceship_colortable_noend
+  move.l                 #BIGSPACESHIP_COLORSTABLE,a1
 bigspaceship_colortable_noend:
-  move.l a1,BIGSPACESHIP_COLORSTABLE_PTR
+  move.l                 a1,BIGSPACESHIP_COLORSTABLE_PTR
   rts
   ENDC

@@ -46,7 +46,7 @@ TWISTERMANAGER:
   bcs.s 		   twister_angle_dont_reset
   moveq 		   #0,d0
 twister_angle_dont_reset:
-  move.w       d0,TWISTER_START_ANGLE
+  move.w       d0,(a0)
 
 	; point twister sprite data into a0 and a2
 	lea 		     SANDTWISTER_2_DATA(PC),a2

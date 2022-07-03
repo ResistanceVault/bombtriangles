@@ -9,7 +9,30 @@ ammxmainloop3:
             SWAP_BPL
             bsr.w            CLEARTOP
 
-            jsr             TWISTERMANAGER
+            IFD LADDERS
+            ; move ladders
+            bsr.w            moveladders
+            ENDC
+
+            ; execute the drawing routine
+            bsr.w              WALKINGTRIANGLE
+
+            rts
+
+CLEARTOP:
+            WAITBLITTER
+            move.w           #$0100,$dff040
+            move.w           #$0000,$dff042
+            move.l          SCREEN_PTR_0,d0
+            addi.l          #40*3,d0
+            move.l          d0,$dff054
+            ;move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
+            move.w           #2,$DFF066           ; D mod
+            move.w           #$2D93,$dff058
+
+            bsr.w            TWISTERMANAGER
+            bsr.w            BOMBMANAGER
+            bsr.w            SPACESHIPMANAGER
 
             ; execute banner routine
             subq             #1,TILE_COUNTER
@@ -29,34 +52,14 @@ donoresettilecounter:
 
             bsr.w            banner
 
-            IFD LADDERS
-            ; move ladders
-            bsr.w            moveladders
-            ENDC
-
-
-            ; execute the drawing routine
-            ;lea              DRAWFUNCTARRAY_START(PC),a0
-            ;move.l           (a0),a0
-            ;jsr              (a0)
-            jsr               WALKINGTRIANGLE
-
-            rts
-
-CLEARTOP:
-            WAITBLITTER
-            move.w           #$0100,$dff040
-            move.w           #$0000,$dff042
-            move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
-            move.w           #2,$DFF066           ; D mod
-            move.w           #$2E53,$dff058
-
-            jsr             BOMBMANAGER
-            jsr             SPACESHIPMANAGER
 
             WAITBLITTER
-            move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
-            move.w           #$2E53,$dff058
+            ;move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
+            move.l          SCREEN_PTR_1,d0
+            addi.l          #40*3,d0
+            move.l          d0,$dff054
+            move.w           #$2D93,$dff058
+
             rts
 
             IFD LADDERS
