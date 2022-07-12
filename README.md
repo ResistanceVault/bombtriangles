@@ -15,7 +15,7 @@ What I need now
 
 - [x] fix the exit problem (THX Kristoff)
 - [x] fix the music problem
-- [ ] migrate to pretracker
+- [x] migrate to pretracker
 - [ ] tiles at 3 playfields?
 - [ ] ideas on how to syncronize rotation with the music
 - [ ] ideas on general how to proceed
