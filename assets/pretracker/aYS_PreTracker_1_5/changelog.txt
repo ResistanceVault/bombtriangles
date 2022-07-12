@@ -1,0 +1,197 @@
+Version 1.5
+============
+- NEW: Added features for using PreTracker in Amiga Games (Subsongs + SoundFx)
+- NEW: Drag'n'Drop for songs is now supported
+- Format version increased to 30 all older songs can still be imported.
+- FIX: Instruments only used in last sequence position didn't play right on Amiga with notes >= B-2
+- FIX:'Cursor left' in first column of the instrument editor caused to change current channel
+
+Version 1.02
+============
+- FIX: Program freeze with speed 0 in previous pattern
+- FIX: Program freeze with when using Bxx in previous pattern
+- FIX: Replayer restart DMA for low notes
+
+Version 1.01
+============
+- FIX: Sequencer cursor pos under certain conditions (thanks Tekon!)
+- FIX: Mute channel didn't work for command 0xx 'Play 2nd Instrument' (thanks. Silomani)
+
+
+Version 1.0
+============
+- Initial release version
+
+Version 0.93
+============
+- Song Format version increased to 27. Songs saved with this version can't be loaded into older versions.
+- BREAKING: Waves->ADSR has been improved and behaves now differently. Old songs Waves will be adjusted on import, but adjustments may be needed.
+- FIX: Load Instrument remap was broken
+
+Version 0.92
+============
+- NEW: Prefs->Choose Background Color
+- FIX: Optimize may corrupted arpeggios (thanks Geir)
+- NEW: Experimental Amiga 500 Sample precalc time displayed
+- NEW: Clear Song (keep Instruments) added (thanks Tecon)
+- NEW: Home key is now working in Pattern and Sequence Editor (thanks Tecon)
+- FIX: Mute Channel now also works again in Waves editor (thanks Geir)
+- FIX: Waves Editor -> Current Instrument settings no more apply to Waves editor playback (thanks Tecon)
+- FIX: Waves Editor -> Synthwaves are now played on the current channel
+- FIX: Paste Wave/Instrument was broken (thanks Tecon)
+- FIX: Notes A#4/B could not be played in Waves editor (thanks Tecon)
+- IMPROVEMENT: Channel Mute still processes the track (so Fxx or Bxx commands still do their job)
+
+Version 0.91
+============
+- FIX: Waves ADSR [FAST] option was innacurate
+- FIX: Amiga replayer various issues fixed
+- FIX: Endless loop when using F00 and F0x in the same position
+- FIX: Some older songs were able to make the editor unstable
+
+
+Version 0.90
+============
+- NEW: Waves Editor -> Volume Envelope -> 'Fast' button added, for 16x faster volume envelope
+- NEW: Waves Editor -> Loop -> Added a Auto-Setup icon ('Gear' icon)
+
+Version 0.89
+============
+- FIX: Redo is now done with CTRL+LSHIFT+Z like in most Windows applications
+- NEW: Waves Editor -> Menu [WAVES]: New options to adjust volume of all waves in 10% steps
+- IMPROVEMENT: Waves Editor clone wav is now better visualized (by hiding the unadjustable parameters)
+- IMPROVEMENT: Waves Editor clone wav now stores/restores original wave
+- IMPROVEMENT: Waves Editor clone wav now allow cloning of any wave (not only previous waves)
+- IMPROVEMENT: Copy/Paste/Clear commands for Instrument and Waves now in Menu
+- FIX: Waves Loop Step was not clamped to sample size
+- FIX: Instrument F3 (clear instrument) did not work correctly
+- FIX: Undo in instrument editor now working correctly
+
+Version 0.88
+============
+- NEW: 'Unisono' effect added to waves. This detunes the OSC and mixes it with itself for a fatter and rounder sound.
+- FIX: Preferences [HALF _STEREO] Option now sounding correctly
+- FIX: Song Load -> Cancel cleared the song name (thanks Tecon)
+- FIX: SDI Import now works also for longer songs (thanks GRG)
+
+Version 0.87
+=============
+- NEW: Load/Save Instrument now working. Waves are sesolved and checked of duplicates on loading.
+- NEW: Wave Editor -> "MIX WAVE" no works for all waves (previously only for below waves).
+- Song Format version increased to 26. Songs saved with this version cant be loaded into old versions.
+       
+Version 0.866
+=============
+- FIX: Clone Wave button was decimal, but should be hex (thanks Firefox)
+- FIX: Wave button $18 was not working
+
+Version 0.8652
+==============
+- FIX: Sequencer selection various bugs fixed
+- FIX: Occasional render problems on wide gui change
+
+Version 0.8651
+==============
+- NEW: Experimental 'Wide Gui' option added in the prefs (thanks Geir)
+
+Version 0.863
+=============
+- FIX: Waves Editor "Clone Wave" now also works when loading a song (thanks Tecon)
+- FIX: Reversed INSERT key w/o shift behavior to work in sequence editor like in pattern editor (thanks Geir)
+- FIX: Mute channel now also work in Instrument editor (thanks Geir)
+- FIX: DELETE key in sequence editor now moves cursor down
+- FIX: Pattern Channel mute icons are working again
+- NEW: Window is now resizeable (thanks Geir)
+- NEW: Sequence Editor duplicate entries down/up with CTRL+SHIFT+ UP (or DOWN) (thanks Geir)
+- IMPROVEMENT: When muting channels you can still play instruments manually on these channels (thanks Geir)
+
+Version 0.861
+=============
+- FIX: Waves Editor "Clone Wave" now also works when loading a song (thanks Tecon)
+
+Version 0.86
+============
+- NEW: If you used 5xx to enable track delay then its visualized in the pattern editor
+- FIX: Waves Editor "Clone Wave" should now update always correctly (thanks Tecon)
+- FIX: "1" key was not working correctly anymore with key modifiers (thanks GRG)
+
+Version 0.85
+============
+- NEW: "Left ALT"+UP/DOWN moves sequence editor step up down (thanks for Tecon for the suggestion)
+- FIX: Instrument endless loop (thanks Tecon)
+- FIX: Amiga export working again
+
+
+Version 0.84
+============
+- FIX: The loop end was not clamped to chipram size
+- IMPROVEMENT: Edit Skip 0 is now supported (thanks GRG!)
+
+Version 0.83
+============
+- FIX: The loop start (beside for Wave #1) was incremented to early 
+- IMPROVEMENT: Waves Editor layout has been slighlty modified
+ 
+Version 0.82
+============
+- IMPROVEMENT: Calculated a new hardware frequency table (used so far the Protracker one). Needs more testing, but sounds good to me.
+- IMPROVEMENT: Some software wave frequencies were up to 10.5% detuned (thanks to Virgill for pointing me on it!)
+ 
+
+Version 0.81
+============
+- NEW: Help file has now explantion of the waves editor
+- NEW: Wave Loops can now be adjusted by Dragable Slider
+- FIX: Export WAV was broken
+- FIX: Wave window in INSTRUMENT screen is now working properly
+- IMPROVEMENT: Waves Editor -> Chord Shift now also affects a non chord waves
+- IMPROVEMENT: Waves Editor -> Loop section has now more meaningful labels
+- IMPROVEMENT: Waves Editor -> Waves length position button moved upward
+
+
+Version 0.8
+===========
+- IMPROVEMENT: "File/Optimize Song" now removes all unused waves, not only instruments.
+- NEW: Hold Left Shift key while entering a note without setting the instrument
+- FIX: Pattern Command 500 now clears the note delay buffer
+- FIX: F00 now stops the songs (before it just got very slow). This also fixes song duration calculation.
+- FIX: EAx (Notecut) command now working 
+- FIX: Cached Song state should now work much more reliable
+
+Version 0.7
+===========
+- IMPROVEMENT: Amiga sample precalc roughly 2x faster
+- NEW: Cache Song state. This means you can play from any sequencer pos with the correct song state (for instance correct Fxx speed at this position in the song).
+- NEW: Added menu entries and shortcuts for the different Windows (Main=ALT+F1,Instruments=ALT+F2,Waves=ALT+F3)
+- NEW: Extra octaves are only calculated for instruments that use them (for less chipmem and faster precalc)
+- NEW: Added Clear/Copy/Paste Pattern Commands (CTRL + F3/F4/F5)
+- FIX: 9xx command now also working properly with non looped samples and across octaves >1
+- FIX: Waves with LOOP START offset now get correctly played in first frame when using Octave >1
+- FIX: Rnd/Noise OSC frequency precalc was locked to octaves, now it works on any note.
+- FIX: Cloned Waves got only updated when selecting them
+- FIX: Editstep now wraps correctly at end of pattern
+- FIX: Octaves >=2 now get correctly mixed in when using "MIX WAVE" in WAVE EDITOR
+- FIX: No more lockup when copying a WAVE that references a MIX WAVE lower then the current wave number
+- FIX/BREAKING: Fixed Instrument ADSR release behavior. May need manual modification when loading older songs
+
+Version 0.6
+===========
+- NEW: Support for 5 octaves have been added
+- NEW: New "Boost" flag in WAVES screen. Boosts sample volume x 4 before ADSR apply.
+
+Version 0.5
+===========
+- Added export AMIGA executable 
+
+Version 0.4
+===========
+- Fixed playing instruments on load song
+- Fixed mixed waves on octave >2
+
+Version 0.3
+===========
+- Format version increased to 25
+- Fixed Vibrato < Depth 5 
+- Fixed repeat bug for non looping waves > note A2
+- Fixed empty unused wave on load song
+- Fixed Instrument ADSR bug when release started before sustain was reached

@@ -5,7 +5,9 @@ POINTINCOPPERLIST MACRO
   move.w              d0,2(a1)
   ENDM
 
+  IFD                 P61
   include             "P6112-options.i"
+  ENDC
 
   SECTION             CiriCop,CODE_C
 
@@ -18,6 +20,29 @@ Inizio:
   lea                 SIN_Q5_11(PC),a0
   lea                 ROT_X_MATRIX_Q5_11(PC),a1
   bsr.w               PRECALC_BY_SIN
+
+  IFD                 PRT
+SONG_FRAMES         equ       6240
+  lea	player,a6
+	lea	myPlayer,a0
+	lea	mySong,a1
+	lea	song0,a2
+	add.l	(0,a6),a6
+	jsr	(a6)		; songInit returns in D0 needed chipmem size
+
+	lea	player,a6
+	lea	myPlayer,a0
+	lea	chipmem,a1
+	lea	mySong,a2
+	add.l	(4,a6),a6
+	jsr	(a6)		; playerInit
+
+	lea	player,a6
+	lea	myPlayer,a0
+	moveq	#64,d0			; volume (0-64)
+	add.l	(24,a6),a6
+	jsr	(a6)		; setVolume
+  ENDC
 
   ; draw sand
   ;lea                 SANDDOWN,a3
@@ -348,12 +373,14 @@ tileplatform5:
   move.w              #0,$1fc(a6)                                                    ; FMODE - NO AGA
   move.w              #$c00,$106(a6)                                                 ; BPLCON3 - NO AGA
 
+  IFD                 P61
   lea                 Module1,a0
   sub.l               a1,a1
   sub.l               a2,a2
   moveq               #0,d0
 
   jsr                 P61_Init
+  ENDC
 
   jsr                 _ammxmainloop3_init
 
@@ -361,7 +388,9 @@ mouse:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   bne.s               mouse                                                          ; Se non ancora, non andare avanti
 
+  IFD                 P61
   jsr                 P61_Music                                                      ;and call the playroutine manually.
+  ENDC
 
   IFD                 DEBUGCOLORS
   move.w              #$0F00,$dff180
@@ -370,13 +399,34 @@ mouse:
   jsr                 ammxmainloop3
 
   IFD                 DEBUGCOLORS
-  move                #$003,$180(a6)
+  move                #$003,$dff180
   ENDC
 
   IFD                 EFFECTS
   bsr.w               muovicopper                                                    ; barra rossa sotto linea $ff
   bsr.w               scrollcolors                                                   ; scorrimento ciclico dei colori
   ENDC
+
+  IFD                 PRT
+  subi.w              #1,FRAMECOUNTER
+  bne.s               framecounterdonotreset
+  lea	player,a6
+  lea	myPlayer,a0
+  add.l	(20,a6),a6
+	jsr	(a6)		; stop
+  lea	player,a6
+	lea	myPlayer,a0
+	move.l	#0,d0
+	add.l	(12,a6),a6
+	jsr	(a6)		; start song
+  move.w #SONG_FRAMES,FRAMECOUNTER
+framecounterdonotreset:
+  lea	player,a6
+	lea	myPlayer,a0
+	add.l	(8,a6),a6
+	jsr	(a6)		; playerTick
+  ENDC
+
 Aspetta:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   beq.s               Aspetta                                                        ; Se si, non andare avanti, aspetta la linea
@@ -390,13 +440,18 @@ Aspetta:
   POINTINCOPPERLIST
 
   btst                #6,$bfe001                                                     ; tasto sinistro del mouse premuto?
-  bne.s               mouse                                                          ; se no, torna a mouse:
+  bne.w               mouse                                                          ; se no, torna a mouse:
 exit_demo:
   WAITBLITTER
+  IFD                 P61
   bsr.w               P61_End
+  ENDC
   bsr.w               Restore_all
   clr.l               d0
   rts                                                                                ; USCITA DAL PROGRAMMA
+
+FRAMECOUNTER:
+  dc.w               SONG_FRAMES
 
 POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
@@ -535,8 +590,10 @@ Name:                 dc.b "graphics.library",0
   even
 ;----------------------------------------------------------------
 
+  IFD                 P61
 Playrtn:
   include             "P6112-Play.i"
+  ENDC
 
   IFD                 EFFECTS
 
@@ -715,8 +772,27 @@ PLATFORM:             dcb.b 2*16*3,$FF
   ELSE
 PLATFORM:             incbin "assets/brush/platform16x5.raw"
   ENDC
+
+  IFD                 P61
 Module1:
   incbin              "P61.chippy_nr.399"                                            ; usecode $945A
   even
+  ENDC
+
+  IFD                 PRT
+player:	incbin	"./assets/pretracker/aYS_PreTracker_1_5/amiga_replayer/asm/player.bin"
+;song0:	incbin	"./assets/pretracker/aYS_PreTracker_1_5/amiga_replayer/asm/tinyus.prt"
+song0:  incbin 	"./assets/pretracker/mA2E_-_Kittys_Market_Stroll.prt"
+  ENDC
+
+  IFD                 PRT
+  section bss,bss
+mySong:	ds.w	2048/2
+myPlayer:	ds.l	8*1024/4
+
+	section	chip,bss_c
+;chipmem	ds.b	$7892 ; in a real production you should use the returned size of songInit()
+chipmem   dcb.b $7892,$00
+  ENDC
   end
 
