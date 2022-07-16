@@ -113,7 +113,7 @@ buildskyshades:
 scrollskycolors:
   ;movem.l             d0/d1/d2/a0,-(sp)
   move.w              FRAMECOUNTER,d0
-  andi.w              #$003F,d0
+  andi.w              #$000F,d0
   bne.w               dontchangeskycolor
   move.w              SKY_COLORSTABLE_INCREMENT,d1
   move.w              SKY_COLORSTABLE_COUNTER,d2

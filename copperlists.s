@@ -86,6 +86,9 @@ BPLPTR5:
 
   IFD EFFECTS
   include "coplistfragments/sky.s"
+  dc.w    $4207,$FFFE    ; salto 4 linee
+  include "coplistfragments/pyramidcolors.s"
+  include   "coplistfragments/sky3.s"
   ELSE
   dc.w       $4207,$FFFE
   include "coplistfragments/pyramidcolors.s"
@@ -157,6 +160,8 @@ col14:
   dc.w       COLORTEST,COLOR2                                                ; Decidiamo il colore NERO per la parte
 				; di schermo sotto l'effetto
 
+  include   "coplistfragments/sky4.s"
+
   ENDC
 
   IFD COPPLATFORM
@@ -174,6 +179,10 @@ col14:
   dc.w       $18e,COLORCOPPLATFORM6
   dc.w       $6707,$fffe
   dc.w       $18e,COLOR3
+
+  IFD EFFECTS
+  include   "coplistfragments/sky5.s"
+  ENDC
 
 
   ;dc.w       $8F07,$fffe

@@ -209,7 +209,7 @@ tileplatform4:
   dbra                d4,tileplatform4
 
 ; start blitting platform 5
-  moveq               #2-1,d4
+  moveq               #3-1,d4
   moveq               #8,d6
 tileplatform5:
   move.l              d6,d0
