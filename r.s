@@ -12,6 +12,9 @@ POINTINCOPPERLIST MACRO
   SECTION             CiriCop,CODE_C
 
   include             "AProcessing/libs/ammxmacros.i"
+
+SKY_COLOR_SHADES    equ     128
+
 Inizio:
 
   bsr.w               Save_all
@@ -223,6 +226,8 @@ tileplatform5:
   lea BIGSPACESHIP_COLORSTABLE,a0
   jsr buildcolortable
 
+  ; build sky shades
+  jsr               buildskyshades
 
   IFD LOL
   move.w #%00001110,d0
@@ -403,12 +408,13 @@ mouse:
   ENDC
 
   IFD                 EFFECTS
-  bsr.w               muovicopper                                                    ; barra rossa sotto linea $ff
-  bsr.w               scrollcolors                                                   ; scorrimento ciclico dei colori
+  bsr.w               muovicopper                                                    ; red bar after $ff
+  bsr.w               scrollcolors                                                   ; color cycling
+  jsr                 scrollskycolors                                                ; change sky colors
   ENDC
 
-  IFD                 PRT
   subi.w              #1,FRAMECOUNTER
+  IFD                 PRT
   bne.s               framecounterdonotreset
   lea	player,a6
   lea	myPlayer,a0
@@ -668,11 +674,36 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
 
   include             "initnoprecalc.s"
   include             "ammxmainloopnoprecalc.s"
+  include             "sky/skyshades.s"
 
   include             "copperlists.s"
 
 SCREEN_2:
   dcb.b 40*224*3,$00
+
+SKY_COLORSTABLE_INCREMENT:
+  dc.w 2
+SKY_COLORSTABLE_COUNTER:
+  dc.w 0
+
+SKY_COLORSTABLE_0:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_1:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_2:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_3:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_4:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_5:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_6:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_7:
+  dcb.w SKY_COLOR_SHADES,$00
+SKY_COLORSTABLE_8:
+  dcb.w SKY_COLOR_SHADES,$00
 
   IFD LADDERS
 LADDER_1:
