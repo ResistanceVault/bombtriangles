@@ -10,7 +10,16 @@ TILE_DATA:
   dc.l TILETXT_EMPTY
 
   dc.l PATTERN_FULL
-  dc.l TILETXT1
+  dc.l TILETXT2
+
+  dc.l A1000
+  dc.l TILETXT_EMPTY
+
+  dc.l PATTERN_FULL
+  dc.l TILETXT3
+
+  dc.l PATTERN_FULL
+  dc.l TILETXT4
 
   dc.l PA2022
   dc.l TILETXT_EMPTY
@@ -73,6 +82,44 @@ EMPTYTILEPATTERN_5:
   dc.b      0
 
 ;--------------------------------------------------
+A1000:
+A1000_1:
+  dc.b      %11110000
+  dc.b      %00000000
+  dc.b      %00001100
+  dc.b      %11110011
+  dc.b      %11001111
+
+A1000_2:
+  dc.b      %10010000
+  dc.b      %00000000
+  dc.b      %00010100
+  dc.b      %10010010
+  dc.b      %01001001
+
+A1000_3:
+  dc.b      %10010000
+  dc.b      %00000000
+  dc.b      %00000100
+  dc.b      %10010010
+  dc.b      %01001001
+
+A1000_4:
+  dc.b      %11110000
+  dc.b      %00000000
+  dc.b      %00000100
+  dc.b      %10010010
+  dc.b      %01001001
+
+A1000_5:
+  dc.b      %10010000
+  dc.b      %00000000
+  dc.b      %00000100
+  dc.b      %11110011
+  dc.b      %11001111
+
+
+
 PA2022:
 PA2022_1:
   dc.b      %11110001
@@ -261,7 +308,7 @@ blittilecpu:
   tst.w     TILETEXT_NOP
   beq.s     notiletextnop
   subq      #1,TILETEXT_NOP
-  lea       WFONT(PC),a4
+  lea       SPACEFONT(PC),a4
   bra.s     tilestartdrawingprocess
 notiletextnop
 
@@ -276,7 +323,7 @@ notiletextnop
 
   sub.b     #65,d0 ; normalize it according to ascii table (A=65, B=66 ... and so on)
   bpl.s     tilevalidfont ; if we got a negative number it means we are at the end of the line, in this case just nop the amount indicated
-  lea       WFONT,a4      ; end of line, force print W (which is an empty font)
+  lea       SPACEFONT,a4      ; end of line, force print space (which is an empty font)
   add.b     #64,d0
   move.b    d0,TILETEXT_NOP+1
   bra.s     tilestartdrawingprocess
@@ -340,20 +387,35 @@ TILETXT_PTR:
 TILETEXT_NOP:
   dc.w 0
 
-; TEXT ON TILES, USE THE W AS SPACES!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+; TEXT ON TILES
 TILETXT1:
+  dc.b 5,"OZZYBOSHI",1,"IS",1,"PROUD",1,"TO",1,"PRESENT",6
   dc.b  40
-  DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ",14
-  DC.B "ALESSIO",33
-  DC.B "GARZI",35
-  DC.B "A",39
+  DC.B 4,"A",1,"NEW",1,"PRODUCTION",1,"FOR",1,"FLASHPARTY",5
+  dc.b  40
+  dc.b  40
 
 TILETXT2:
-  dc.b  13,"PASSIONEWAMIGA",13
-  dc.b  17,"OPPURE",17
-  dc.b  15,"FLASHPARTY",15
   dc.b  40
-  dc.b  "QUESTOWEWUNWBELWDILEMMA",17
+  dc.b  2,"THIS",1,"TIME",1,"I",1,"CAME",1,"UP",1,"WITH",1,"A",1,"TWENTY",1,"KB",2
+  dc.b  40
+  dc.b  5,"INTRO",1,"MEANT",1,"FOR",1,"AN",1,"UNEXPANDED",6
+  dc.b  40
+
+TILETXT3:
+  dc.b  14,"GREETINGS",1,"TO",14
+  dc.b  14,"PRINCE",1,"PHAZE",14
+  dc.b  18,"MAZE",18
+  dc.b  18,"ZEK",19
+  dc.b  15,"DR",1,"PROCTON",15
+
+TILETXT4:
+  dc.b  13,"PASSIONE",1,"AMIGA",13
+  dc.b  12,"NOVAMIGA",1,"FORUM",13
+  dc.b  40
+  dc.b  40
+  dc.b  5,"ALL",1,"PEOPLE",1,"KEEPING",1,"AMIGA",1,"ALIVE",5
+
 
 
 TILETXT_EMPTY:
@@ -453,10 +515,10 @@ VFONT:
   dc.b %10101010
   dc.b %10101010
   dc.b %10100100
-WFONT: ; empty font , real W not representable with such low bits
-  dc.b 0
-  dc.b 0
-  dc.b 0
+WFONT:
+  dc.b %10011001
+  dc.b %10011101
+  dc.b %11111001
 XFONT:
   dc.b %10101010
   dc.b %11101010
@@ -469,4 +531,8 @@ ZFONT:
   dc.b %11100010
   dc.b %00100100
   dc.b %10001110
+SPACEFONT:
+  dc.b %00000000
+  dc.b %00000000
+  dc.b %00000000
   even
