@@ -105,7 +105,7 @@ blanktwisterrow:
 	cmp.l        #SIN_TWISTER_TABLE_END,a1
 	bcs.s        SIN_TWISTER_PTR_END
 	move.l 		   a1,a4
-	sub.l		     #SIN_TWISTER_TABLE_END,a4
+	suba.l		     #SIN_TWISTER_TABLE_END,a4
 	lea          SIN_TWISTER_TABLE(PC),a1 ; Load addr of twister sin table into a1
 	add.l		     a4,a1
 	SIN_TWISTER_PTR_END:

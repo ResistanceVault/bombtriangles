@@ -134,12 +134,26 @@ SETSTAGE MACRO
   move.l #\1,STAGEPOINTER_OFFSET(a3)
   ENDM
 
+  IFD                 DEBUGCOLORS
+DBGTRIGCOLS:
+    dc.w $0333
+    dc.w $0666
+    dc.w $0999
+    dc.w $0CCC
+  ENDC
+
 ; Entry function
 WALKINGTRIANGLE:
   ; For each triangle
   lea                    TRIANGLES(PC),a3
   moveq                  #NUMTRIANGLES-1,d5
 walkingtriangle_start:
+  IFD                 DEBUGCOLORS
+  lea DBGTRIGCOLS,a0
+  lsl.w #1,d5
+  move.w              (a0,d5.w),$dff180
+  lsr.w #1,d5
+  ENDC
   tst.w                  SLEEP_OFFSET(a3)
   beq.s                  walkingtriangle_nodelay
   subq                   #1,SLEEP_OFFSET(a3)
@@ -180,7 +194,8 @@ walkingtriangle_xwalk:
 
   ; Rotate around right-bottom vertex
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; each time angle is 241 I have a full revolution aroung the vertex, in this case:
   ; - reset the angle
@@ -230,7 +245,8 @@ bigspaceship_activation:
   move.w                 BIGSPACESHIP_SHEAR,d0
   moveq                  #0,d1
   sub.w                  #1,BIGSPACESHIP_SHEAR
-  jsr                    SHEAR
+  ;jsr                    SHEAR
+  jsr                     SHEAR_REG
 
   ; ray is descending
   move.w                 #1,TWISTERFLAG
@@ -270,6 +286,7 @@ MIRRORFLAG:
   dc.w %0000000001000000
 
 ; ***************************** START IMPLEMENTATION OF Y CLIMBING ------------------
+YCLIMBCOUNTER: dc.w 3
 walkingtriangle_ywalk:
                     ; Translate
   move.w                 #STARTWALKXPOS+STARTDXCLIMB-13,d0
@@ -279,6 +296,10 @@ walkingtriangle_ywalk:
   sub.w                  d2,d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
+  move.w YCLIMBCOUNTER,d7
+  subq #1,d7
+  ; start shear
+
   move.w                 BIGSPACESHIP_SHEAR,d0
   moveq                  #0,d1
   add.w                  #1,BIGSPACESHIP_SHEAR
@@ -286,7 +307,8 @@ walkingtriangle_ywalk:
   ble.s                  shearnotzero
   moveq                  #0,d0
 shearnotzero:
-  jsr                    SHEAR
+  ;jsr                    SHEAR
+  jsr                     SHEAR_REG
 
   ; Scale on X to point the triangle to the right - start
 
@@ -297,14 +319,19 @@ shearnotzero:
   move.w                 #0,ANGLE_OFFSET(a3)
 .increase_angle_by_1_exitlol:
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr                    ROTATE_REG
+norotate:
+
+  
   move.w                 MIRRORFLAG,d0
   moveq                  #%0000000001000000,d1
   cmpi.w                 #%1111111110111110,d0
   beq.s                  donotmirror
   subq.w                 #1,MIRRORFLAG
 donotmirror:
-  jsr                    SCALE
+  ;jsr                    SCALE
+  jsr SCALE_REG
 noinverttrigend:
   ; Scale on X to point the triangle to the right - end
 
@@ -383,7 +410,8 @@ donotdecreasetwister:
   move.w                 #0,ANGLE_OFFSET(a3)
   .increase_angle_by_1_exit:
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ;,UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
   cmpi.w                 #30,ANGLE_OFFSET(a3)
@@ -443,7 +471,8 @@ notdownborder;
 .increase_angle_by_1_exit:
 
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -495,7 +524,8 @@ walkingtriangle_xwalk_right:
 .decrease_angle_by_3_exit:
 
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -540,7 +570,8 @@ walkingtriangle_xwalk_right_2:
 
   move.w                 ANGLE_OFFSET(a3),d0
   move.w                 d0,SAVE_ANGLE
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; Sub 1 to angle
   subq                   #1,ANGLE_OFFSET(a3)
@@ -607,7 +638,8 @@ walkingtriangle_reverse_dive:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; Add 5 to angle
   addq                    #5,ANGLE_OFFSET(a3)
@@ -665,7 +697,8 @@ walkingfloor1:
   jsr                    LOADIDENTITYANDTRANSLATE
 
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; Add 5 to angle
   addq                   #5,ANGLE_OFFSET(a3)
@@ -728,10 +761,12 @@ teletrasportationstart:
   move.w                 #0,XVELOCITYVECTOR_OFFSET(a3)
   move.w                 #0,YVELOCITYVECTOR_OFFSET(a3)
 .noscale
-  jsr                    SCALE
+  ;jsr                    SCALE
+  jsr                     SCALE_REG
 
   move.w                 ANGLE_OFFSET(a3),d0
-  jsr                    ROTATE_INV_Q_5_11_F
+  ;jsr                    ROTATE_INV_Q_5_11_F
+  jsr ROTATE_REG
 
   ; Draw triangle
   VERTEX2D_INIT_I        1,0000,FFF2   ;#-15+15,#-26+12
@@ -773,7 +808,8 @@ teletrasportationend:
   ; reset initial values
   move.w                 #30,YROLLINGOFFSET_OFFSET(a3)
 .noscale2
-  jsr                    SCALE
+  ;jsr                    SCALE
+  jsr SCALE_REG
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
   VERTEX2D_INIT_I        1,0000,FFEC  ;#0,#-13

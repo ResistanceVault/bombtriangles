@@ -7,7 +7,7 @@
 
 ammxmainloop3:
             SWAP_BPL
-            bsr.w            CLEARTOP
+            bsr.s            CLEARTOP
 
             IFD LADDERS
             ; move ladders
@@ -15,24 +15,28 @@ ammxmainloop3:
             ENDC
 
             ; execute the drawing routine
+            IFD                 DEBUGCOLORS
+            move.w              #$0F00,$dff180
+            ENDC
             bsr.w              WALKINGTRIANGLE
+            IFD                 DEBUGCOLORS
+            move.w              #$00F0,$dff180
+            ENDC
 
             rts
 
 CLEARTOP:
+            move.l          SCREEN_PTR_0,d0
+            addi.l          #40*3,d0
             WAITBLITTER
             move.w           #$0100,$dff040
             move.w           #$0000,$dff042
-            move.l          SCREEN_PTR_0,d0
-            addi.l          #40*3,d0
-            move.l          d0,$dff054
+            move.l           d0,$dff054
             ;move.l           SCREEN_PTR_0,$dff054 ; copy to d channel
             move.w           #2,$DFF066           ; D mod
             move.w           #$2D93,$dff058
 
-            bsr.w            TWISTERMANAGER
             bsr.w            BOMBMANAGER
-            bsr.w            SPACESHIPMANAGER
 
             ; execute banner routine
             subq             #1,TILE_COUNTER
@@ -51,14 +55,20 @@ tiledatanoreset:
 donoresettilecounter:
 
             bsr.w            banner
-
+            IFD                 EFFECTS
+            jsr              muovicopper                                                    ; red bar after $ff
+            jsr              scrollcolors                                                   ; color cycling
+            bsr              scrollskycolors                                               ; change sky colors
+            ENDC
+            bsr.w            SPACESHIPMANAGER
 
             WAITBLITTER
             ;move.l           SCREEN_PTR_1,$dff054 ; copy to d channel
             move.l          SCREEN_PTR_1,d0
             addi.l          #40*3,d0
             move.l          d0,$dff054
-            move.w           #$2D93,$dff058
+            move.w          #$2D93,$dff058
+            bsr.w           TWISTERMANAGER
 
             rts
 

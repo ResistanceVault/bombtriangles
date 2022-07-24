@@ -17,7 +17,13 @@ SKY_COLOR_SHADES    equ     128
 
 Inizio:
 
+  clr.w                  $100
+  move.w                 #$1234,d3
+
   bsr.w               Save_all
+
+  clr.w                  $100
+  move.w                 #$1234,d3
 
   ; Build trigonometric table
   lea                 SIN_Q5_11(PC),a0
@@ -389,16 +395,22 @@ tileplatform5:
 
   jsr                 _ammxmainloop3_init
 
+; START OF MAIN LOOP
 mouse:
   cmpi.b              #$ff,$dff006                                                   ; Siamo alla linea 255?
   bne.s               mouse                                                          ; Se non ancora, non andare avanti
+;.loop; Wait for vblank
+;	move.l $dff004,d0
+;	and.l #$1ff00,d0
+;	cmp.l #303<<8,d0
+;	bne.b .loop
 
   IFD                 P61
   jsr                 P61_Music                                                      ;and call the playroutine manually.
   ENDC
 
   IFD                 DEBUGCOLORS
-  move.w              #$0F00,$dff180
+  move.w              #$0FF0,$dff180
   ENDC
 
   jsr                 ammxmainloop3
@@ -407,30 +419,26 @@ mouse:
   move                #$003,$dff180
   ENDC
 
-  IFD                 EFFECTS
-  bsr.w               muovicopper                                                    ; red bar after $ff
-  bsr.w               scrollcolors                                                   ; color cycling
-  jsr                 scrollskycolors                                                ; change sky colors
-  ENDC
-
+  ; Play music tick with pretracker
   subi.w              #1,FRAMECOUNTER
   IFD                 PRT
+  ; start over the song after FRAMECOUNTER reaches zero
   bne.s               framecounterdonotreset
-  lea	player,a6
-  lea	myPlayer,a0
-  add.l	(20,a6),a6
-	jsr	(a6)		; stop
-  lea	player,a6
-	lea	myPlayer,a0
-	move.l	#0,d0
-	add.l	(12,a6),a6
-	jsr	(a6)		; start song
-  move.w #SONG_FRAMES,FRAMECOUNTER
+  lea	                player,a6
+  lea	                myPlayer,a0
+  add.l	              (20,a6),a6
+  jsr	                (a6)		        ; stop
+  lea	                player,a6
+  lea	                myPlayer,a0
+  moveq	              #0,d0
+  add.l	              (12,a6),a6
+  jsr	(a6)		                        ; start song
+  move.w              #SONG_FRAMES,FRAMECOUNTER
 framecounterdonotreset:
   lea	player,a6
-	lea	myPlayer,a0
-	add.l	(8,a6),a6
-	jsr	(a6)		; playerTick
+  lea	myPlayer,a0
+  add.l	(8,a6),a6
+  jsr	(a6)		; playerTick
   ENDC
 
 Aspetta:
@@ -457,7 +465,11 @@ exit_demo:
   rts                                                                                ; USCITA DAL PROGRAMMA
 
 FRAMECOUNTER:
+  IFD                PTR
   dc.w               SONG_FRAMES
+  ELSE
+  dc.w               1
+  ENDC
 
 POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
@@ -570,6 +582,14 @@ Save_all:
   or.w                #$c000,Saveint
   move.w              $dff002,SaveDMA
   or.w                #$8100,SaveDMA
+
+  move.l	4.w,a6		; ExecBase in A6
+	JSR	-$84(a6)	; FORBID - Disabilita il Multitasking
+	JSR	-$78(A6)	; DISABLE - Disabilita anche gli interrupt
+				;	    del sistema operativo
+  ; set new intena
+  MOVE.L	#$7FFF7FFF,$dff09A	; DISABILITA GLI INTERRUPTS & INTREQS
+
   rts
 Restore_all:
   move.l              SaveIRQ,$6c
@@ -653,12 +673,12 @@ scrollcolors_startcycle
 
   include             "AProcessing/libs/rasterizers/globaloptions.s"
   include             "AProcessing/libs/matrix/matrix.s"
-  ;include             "AProcessing/libs/matrix/matrixreg.s"
-  ;include             "AProcessing/libs/matrix/rotatereg.s"
+  include             "AProcessing/libs/matrix/matrixreg.s"
+  include             "AProcessing/libs/matrix/rotatereg.s"
   include             "AProcessing/libs/matrix/scale.s"
-  ;include             "AProcessing/libs/matrix/scalereg.s"
+  include             "AProcessing/libs/matrix/scalereg.s"
   include             "AProcessing/libs/matrix/shear.s"
-  ;include             "AProcessing/libs/matrix/shearreg.s"
+  include             "AProcessing/libs/matrix/shearreg.s"
   ;include             "AProcessing/libs/trigtables.i"
   include             "AProcessing/libs/precalc/precalc_by_sin.s"
   include             "AProcessing/libs/precalc/precalc_col_table.s"

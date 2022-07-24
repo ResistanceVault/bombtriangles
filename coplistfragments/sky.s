@@ -16,16 +16,18 @@ SKY_COLOR_3:
 SKY_COLOR_4:
     dc.w    $009
 
-    dc.w    $3e07,$FFFE
-    dc.w    $180
-SKY_COLOR_5:
-    dc.w $00a
-
+     dc.w    $3b07,$FFFE
 BIGSPACESHIP_ACTIVE_COLORS:
             dc.w       $182,$fff
             dc.w       $184,$ddd
             dc.w       $186,$bbb
             dc.w       $188,$888
+
+    dc.w    $3e07,$FFFE
+    dc.w    $180
+SKY_COLOR_5:
+    dc.w $00a
+
 
     dc.w    $4307,$FFFE
     dc.w    $180
