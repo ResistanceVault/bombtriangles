@@ -29,20 +29,20 @@ SONG_FRAMES         equ       6240
 	lea	myPlayer,a0
 	lea	mySong,a1
 	lea	song0,a2
-	add.l	(0,a6),a6
+	add.l	0(a6),a6
 	jsr	(a6)		; songInit returns in D0 needed chipmem size
 
 	lea	player,a6
 	lea	myPlayer,a0
 	lea	chipmem,a1
 	lea	mySong,a2
-	add.l	(4,a6),a6
+	add.l	4(a6),a6
 	jsr	(a6)		; playerInit
 
 	lea	player,a6
 	lea	myPlayer,a0
 	moveq	#64,d0			; volume (0-64)
-	add.l	(24,a6),a6
+	add.l	24(a6),a6
 	jsr	(a6)		; setVolume
   ENDC
 
@@ -419,18 +419,18 @@ mouse:
   bne.s               framecounterdonotreset
   lea	                player,a6
   lea	                myPlayer,a0
-  add.l	              (20,a6),a6
+  add.l	              20(a6),a6
   jsr	                (a6)		        ; stop
   lea	                player,a6
   lea	                myPlayer,a0
   moveq	              #0,d0
-  add.l	              (12,a6),a6
+  add.l	              12(a6),a6
   jsr	(a6)		                        ; start song
   move.w              #SONG_FRAMES,FRAMECOUNTER
 framecounterdonotreset:
   lea	player,a6
   lea	myPlayer,a0
-  add.l	(8,a6),a6
+  add.l	8(a6),a6
   jsr	(a6)		; playerTick
   ENDC
 
