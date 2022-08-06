@@ -412,8 +412,8 @@ TILETXT3:
 TILETXT4:
   dc.b  13,"PASSIONE",1,"AMIGA",13
   dc.b  12,"NOVAMIGA",1,"FORUM",13
-  dc.b  40
-  dc.b  40
+  dc.b  16,"PELLICUS",16
+  dc.b  17,"BIGGUN",17
   dc.b  5,"ALL",1,"PEOPLE",1,"KEEPING",1,"AMIGA",1,"ALIVE",5
 
 

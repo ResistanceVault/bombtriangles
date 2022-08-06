@@ -458,7 +458,7 @@ exit_demo:
   rts                                                                                ; USCITA DAL PROGRAMMA
 
 FRAMECOUNTER:
-  IFD                PTR
+  IFD                PRT
   dc.w               SONG_FRAMES
   ELSE
   dc.w               1
@@ -824,8 +824,8 @@ Module1:
   ENDC
 
   IFD                 PRT
-player:	incbin	"./pretracker/player.bin"
-song0:  incbin 	"./pretracker/mA2E_-_Kittys_Market_Stroll.prt"
+player:	incbin	"pretracker/player.bin"
+song0:  incbin 	"pretracker/mA2E_-_Kittys_Market_Stroll.prt"
   ENDC
 
   IFD                 PRT
