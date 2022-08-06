@@ -16,14 +16,7 @@ POINTINCOPPERLIST MACRO
 SKY_COLOR_SHADES    equ     128
 
 Inizio:
-
-  clr.w                  $100
-  move.w                 #$1234,d3
-
   bsr.w               Save_all
-
-  clr.w                  $100
-  move.w                 #$1234,d3
 
   ; Build trigonometric table
   lea                 SIN_Q5_11(PC),a0
@@ -672,12 +665,12 @@ scrollcolors_startcycle
   ENDC
 
   include             "AProcessing/libs/rasterizers/globaloptions.s"
-  include             "AProcessing/libs/matrix/matrix.s"
+  include             "AProcessing/libs/matrix/matrixcommon.s"
   include             "AProcessing/libs/matrix/matrixreg.s"
   include             "AProcessing/libs/matrix/rotatereg.s"
-  include             "AProcessing/libs/matrix/scale.s"
+  ;include             "AProcessing/libs/matrix/scale.s"
   include             "AProcessing/libs/matrix/scalereg.s"
-  include             "AProcessing/libs/matrix/shear.s"
+  ;include             "AProcessing/libs/matrix/shear.s"
   include             "AProcessing/libs/matrix/shearreg.s"
   ;include             "AProcessing/libs/trigtables.i"
   include             "AProcessing/libs/precalc/precalc_by_sin.s"
@@ -687,7 +680,7 @@ scrollcolors_startcycle
 ROT_Z_MATRIX_Q5_11: ; cos -sin sin cos
 ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
   dcb.b 361*8,$00
-  include             "AProcessing/libs/matrix/point.s"
+  include             "AProcessing/libs/matrix/pointreg.s"
   include             "AProcessing/libs/rasterizers/processing_bitplanes_fast.s"
   include             "AProcessing/libs/blitter/lines.s"
   include             "AProcessing/libs/blitter/triangle.s"
@@ -831,9 +824,8 @@ Module1:
   ENDC
 
   IFD                 PRT
-player:	incbin	"./assets/pretracker/aYS_PreTracker_1_5/amiga_replayer/asm/player.bin"
-;song0:	incbin	"./assets/pretracker/aYS_PreTracker_1_5/amiga_replayer/asm/tinyus.prt"
-song0:  incbin 	"./assets/pretracker/mA2E_-_Kittys_Market_Stroll.prt"
+player:	incbin	"./pretracker/player.bin"
+song0:  incbin 	"./pretracker/mA2E_-_Kittys_Market_Stroll.prt"
   ENDC
 
   IFD                 PRT
