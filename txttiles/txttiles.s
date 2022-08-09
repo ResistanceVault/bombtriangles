@@ -6,6 +6,10 @@ SET_TILES MACRO
 TILES_TIMEOUT_SECONDS equ 10
 
 TILE_DATA:
+
+  dc.l PATTERN_FULL
+  dc.l TILETXT1
+
   dc.l EMPTYTILEPATTERN
   dc.l TILETXT_EMPTY
 
@@ -33,8 +37,6 @@ TILE_DATA:
   dc.l EMPTYTILEPATTERN
   dc.l TILETXT_EMPTY
 
-  dc.l PATTERN_FULL
-  dc.l TILETXT2
 TILE_DATA_END:
 
 TILE_PTR:
@@ -233,7 +235,7 @@ tile_empty:
   dc.b      $0
   dc.b      $0
   dc.b      $0
-  dc.b      $00
+  dc.b      $0
 
 space_1:
   dc.b      $FE
@@ -313,7 +315,7 @@ blittilecpu:
 notiletextnop
 
   ; Load address of current text into a0
-  movea.l    TILETXT_PTR,a0
+  movea.l    TILETXT_PTR(PC),a0
 
   move.b    (a0),d0 ; fetch the letter
 
@@ -323,7 +325,7 @@ notiletextnop
 
   sub.b     #65,d0 ; normalize it according to ascii table (A=65, B=66 ... and so on)
   bpl.s     tilevalidfont ; if we got a negative number it means we are at the end of the line, in this case just nop the amount indicated
-  lea       SPACEFONT,a4      ; end of line, force print space (which is an empty font)
+  lea       SPACEFONT(PC),a4      ; end of line, force print space (which is an empty font)
   add.b     #64,d0
   move.b    d0,TILETEXT_NOP+1
   bra.s     tilestartdrawingprocess
@@ -383,7 +385,7 @@ blitwithnolettersend:
   rts
 
 TILETXT_PTR:
-  dc.l TILETXT1
+  dc.l TILETXT_EMPTY
 TILETEXT_NOP:
   dc.w 0
 
@@ -411,7 +413,7 @@ TILETXT3:
 
 TILETXT4:
   dc.b  13,"PASSIONE",1,"AMIGA",13
-  dc.b  12,"NOVAMIGA",1,"FORUM",13
+  dc.b  12,"NOVAMIGA",1,"FORUM",14
   dc.b  16,"PELLICUS",16
   dc.b  17,"BIGGUN",17
   dc.b  5,"ALL",1,"PEOPLE",1,"KEEPING",1,"AMIGA",1,"ALIVE",5
@@ -460,9 +462,9 @@ HFONT:
   dc.b %11101010
   dc.b %10101010
 IFONT:
-  dc.b %00100010
-  dc.b %00100010
-  dc.b %00100010
+  dc.b %01000100
+  dc.b %01000100
+  dc.b %01000100
 JFONT:
   dc.b %00100010
   dc.b %00100010
@@ -480,9 +482,9 @@ MFONT:
   dc.b %11101010
   dc.b %10101010
 NFONT:
-  dc.b %10101010
-  dc.b %11101110
-  dc.b %10101010
+  dc.b %10011001
+  dc.b %11011101
+  dc.b %10111001
 OFONT:
   dc.b %11101010
   dc.b %10101010
@@ -520,9 +522,9 @@ WFONT:
   dc.b %10011101
   dc.b %11111001
 XFONT:
-  dc.b %10101010
-  dc.b %11101010
-  dc.b %10101010
+  dc.b %10011001
+  dc.b %01100110
+  dc.b %10011001
 YFONT:
   dc.b %10101010
   dc.b %01000100

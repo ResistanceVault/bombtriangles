@@ -374,7 +374,7 @@ tileplatform5:
   move.l              #COPPERLIST,$80(a6)                                            ; Copperlist point
   move.w              d0,$88(a6)                                                     ; Copperlist start
 
-  move.w              #0,$1fc(a6)                                                    ; FMODE - NO AGA
+  move.w              d0,$1fc(a6)                                                    ; FMODE - NO AGA
   move.w              #$c00,$106(a6)                                                 ; BPLCON3 - NO AGA
 
   IFD                 P61
