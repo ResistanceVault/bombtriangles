@@ -122,33 +122,8 @@ tiles_vloop:
 
   dbra d6,tiles_vloop
 
-  IFD OLD
-  lea                 TILEFULL,a0
-  moveq               #6-1,d4
-  moveq               #1,d0
-  moveq               #5,d1
-  bsr.w               BLIT_TILES
+    IFD BLIT_PYR
 
-  moveq               #8-1,d4
-  moveq               #0,d0
-  moveq               #6,d1
-  bsr.w               BLIT_TILES
-
-  moveq               #9-1,d4
-  moveq               #0,d0
-  moveq               #7,d1
-  bsr.w               BLIT_TILES
-
-  moveq               #10-1,d4
-  moveq               #0,d0
-  moveq               #8,d1
-  bsr.w               BLIT_TILES
-
-  moveq               #11-1,d4
-  moveq               #0,d0
-  moveq               #9,d1
-  bsr.w               BLIT_TILES
-  ENDC
 
 ; left slope tile (trashing the full tile)
   moveq               #0,d0
@@ -166,6 +141,8 @@ rightslopesstart:
   addq                #1,d0
   addq                #1,d1
   dbra                d6,rightslopesstart
+      ENDC
+
 
   ; start blitting platform 1
   moveq               #14-1,d4
@@ -692,7 +669,8 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
   include             "copperlists.s"
 
 SCREEN_2:
-  dcb.b 40*224*3,$00
+  dcb.b 40*224*1,$FF
+  dcb.b 40*224*2,$00
 
 SKY_COLORSTABLE_INCREMENT:
   dc.w 2
@@ -807,10 +785,13 @@ LADDER_2_VSTOP2:
 ; background tiles
 ;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
 SANDTOP:              incbin "assets/tiles/sandtop.raw"
-TILEFULL:             incbin "assets/tiles/full.raw"
+TILEFULL:             ;incbin "assets/tiles/full.raw"
+                      incbin "assets/tiles/ciao.raw" ; col1 and 6 swapped
+
 TILELEFTSLOPE:        incbin "assets/tiles/leftslope.raw"
 TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
-PYRAMIDTOP:           incbin "assets/brush/pyramidtop112x54.raw"
+PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
+                      incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
   IFD COPPLATFORM
 PLATFORM:             dcb.b 2*16*3,$FF
   ELSE

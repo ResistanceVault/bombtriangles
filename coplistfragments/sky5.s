@@ -1,4 +1,4 @@
     dc.w    $7707,$FFFE
-    dc.w    $180
+    dc.w    SKY_COL_INDEX
 SKY_COLOR_9:
-    dc.w $00e            ; blu a 14
+    dc.w $00e ; blue to 14

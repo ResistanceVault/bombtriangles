@@ -62,7 +62,9 @@ Sprite7pointers:
   dc.w       $104,$0064
 
   dc.w       $108,0                                                    ; Bpl1Mod
-  dc.w       $10a,0                                                    ; Bpl2Mod
+  dc.w       $10a,0
+
+  dc.w       $180,0 ; background always black to hide left right borders                                                    ; Bpl2Mod
 
 ; Set dual playfield mode, activating PLAYFIELD 1 with bitplanes 1 3 5 and PLAYFIELD 2 with bitplanes 2 4
 ; Bitplanes 2 4 are double buffered and will be used to paint stuff, PLAYFIELD 1 will contain static image.
@@ -184,12 +186,6 @@ col14:
   include   "coplistfragments/sky5.s"
   ENDC
 
-
-  ;dc.w       $8F07,$fffe
-  ;dc.w       $180,$0FFF
-  ;dc.w       $9007,$fffe
-  ;dc.w       $180,$0000
-
   dc.w       $8F07,$fffe
   dc.w       $18e,COLORCOPPLATFORM1
   dc.w       $9207,$fffe
@@ -216,7 +212,7 @@ col14:
   dc.w       $9E07,$fffe
   dc.w       $18e,COLORCOPPLATFORM6
   IFD        EFFECTS
-  dc.w       $180,$540
+  dc.w       SKY_COL_INDEX,$540
   ENDC
 
   dc.w       $9F07,$fffe
@@ -228,12 +224,14 @@ col14:
   IFD EFFECTS
   include    "coplistfragments/sand.s"
 
+
   ;dc.w       $dA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
   ;dc.w       $180,$010
   ;dc.w       $eB07-$0000,$FFFE
   ;dc.w       $180,$020
   dc.w       $eC07-$0000,$FFFE
   dc.w       $180,$030
+  dc.w       $182,$ba6 ; continue with last color of sandtop
   dc.w       $ED07-$0000,$FFFE
   dc.w       $180,$040
   dc.w       $EE07-$0000,$FFFE
@@ -245,6 +243,9 @@ col14:
   dc.w       $F107-$0000,$FFFE
   dc.w       $180,$000
   ENDC
+
+
+
 
   ; Bitplanes Tile Pointers
   dc.w       $fddf,$FFFE                                               ; aspetto la linea $79
