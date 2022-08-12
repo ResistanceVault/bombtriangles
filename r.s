@@ -122,7 +122,28 @@ tiles_vloop:
 
   dbra d6,tiles_vloop
 
-    IFD BLIT_PYR
+  ; Triangle crop pyramid
+  IFD CROP
+  lea VERTEX_LIST_2D_1,a4
+  moveq #0,d1
+  move.l         d1,(a4)+
+  move.l         #$00300000,(a4)+
+  move.l         #$00300030,(a4)+
+  lea                    OFFBITPLANEMEM,a4
+  jsr                    TRIANGLE_BLIT
+
+  lea            $dff040,a4
+  move.w         #$09f0,(a4)+ ; bltcon0 D=A
+  move.w         d1,(a4)+ ; bltcon1 set to zero
+
+  lea            $dff064,a4
+  move.w         d1,(a4)+ ; AMOD
+  move.w         d1,(a4)+ ; DMOD
+
+  move.l         SCREEN_PTR_0,$dff050 ; APTR
+  move.l         #SCREEN_2+40*224*1,$dff054 ; DPTR
+  ENDC
+
 
 
 ; left slope tile (trashing the full tile)
@@ -130,6 +151,9 @@ tiles_vloop:
   moveq               #5,d1
   lea                 TILELEFTSLOPE,a0
   bsr.w               BLIT_TILE
+
+    ;IFD BLIT_PYR
+
 
   ; right slopes start
   moveq               #5-1,d6
@@ -141,7 +165,7 @@ rightslopesstart:
   addq                #1,d0
   addq                #1,d1
   dbra                d6,rightslopesstart
-      ENDC
+      ;ENDC
 
 
   ; start blitting platform 1
@@ -788,8 +812,12 @@ SANDTOP:              incbin "assets/tiles/sandtop.raw"
 TILEFULL:             ;incbin "assets/tiles/full.raw"
                       incbin "assets/tiles/ciao.raw" ; col1 and 6 swapped
 
-TILELEFTSLOPE:        incbin "assets/tiles/leftslope.raw"
-TILERIGHTSLOPE:       incbin "assets/tiles/rightslope.raw"
+TILELEFTSLOPE:        ;incbin "assets/tiles/leftslope.raw"
+                       incbin "assets/tiles/ciao3.raw"
+
+TILERIGHTSLOPE:       ;incbin "assets/tiles/rightslope.raw"
+                      incbin "assets/tiles/ciao4.raw"
+
 PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
                       incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
   IFD COPPLATFORM

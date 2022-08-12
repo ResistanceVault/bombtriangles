@@ -87,6 +87,49 @@ bigspaceship_each_byte:
   dbra d7,bigspaceship_each_bpl
   rts
 
+BIGSPACESHIP_BPL1:
+  dc.w $FCFF ; line 1
+  dc.w $F1CF ; line 2
+  dc.w $E38F ; line 3
+  dc.w $C413 ; line 4
+  dc.w $CE3F ; line 5
+  dc.w $8001 ; line 6
+  dc.w $38FC ; line 7
+  dc.w $38FC ; line 8
+  ;dc.w $A421 ; line 9
+  ;dc.w $DE73 ; line 10
+  dc.w $A529
+  dc.w $DEF7
+
+BIGSPACESHIP_BPL2:  
+  dc.w $03C0 ; line 1
+  dc.w $0FC0 ; line 2 
+  dc.w $1F88 ; line 3
+  dc.w $3FDC ; line 4
+  dc.w $3E38 ; line 5
+  dc.w $0000 ; line 6 
+  dc.w $F8E0 ; line 7
+  dc.w $F8E0 ; line 8
+  ;dc.w $63DE ; line 9
+  ;dc.w $318C ; line 10 
+  dc.w $6318 ; line 9
+  dc.w $318C ; line 10
+
+BIGSPACESHIP_BPL3:
+  dc.w $0000 ; line 1
+  dc.w $0030 ; line 2
+  dc.w $0078 ; line 3
+  dc.w $33FC ; line 4 
+  dc.w $01FC ; line 5
+  dc.w $0000 ; line 6
+  dc.w $07FC ; line 7
+  dc.w $07FC ; line 8
+  ;dc.w $1BDE ; line 9
+  ;dc.w $018C ; line 10
+  dc.w $18C6
+  dc.w $0000
+
+  IFD LOL
 
 BIGSPACESHIP_BPL1:
   dc.w %0000001100000000
@@ -126,6 +169,7 @@ BIGSPACESHIP_BPL3:
   ;dc.w %0000001111011110
   ;dc.w %0000000110001100
   dc.l 0
+  ENDC
 
 BIGSPACESHIP_COLORSTABLE: dcb.w 64,$00
 BIGSPACESHIP_COLORSTABLE_END:

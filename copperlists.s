@@ -64,7 +64,6 @@ Sprite7pointers:
   dc.w       $108,0                                                    ; Bpl1Mod
   dc.w       $10a,0
 
-  dc.w       $180,0 ; background always black to hide left right borders                                                    ; Bpl2Mod
 
 ; Set dual playfield mode, activating PLAYFIELD 1 with bitplanes 1 3 5 and PLAYFIELD 2 with bitplanes 2 4
 ; Bitplanes 2 4 are double buffered and will be used to paint stuff, PLAYFIELD 1 will contain static image.
@@ -85,6 +84,8 @@ BPLPTR5:
   ; wait for the top of the screen and set big spaceship colors
   dc.w       $2B07,$FFFE
   include    "coplistfragments/bigspaceshipcolors.s"
+  dc.w       $180,0 ; background always black to hide left right borders                                                    ; Bpl2Mod
+
 
   IFD EFFECTS
   include "coplistfragments/sky.s"
