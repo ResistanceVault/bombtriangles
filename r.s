@@ -55,6 +55,27 @@ SONG_FRAMES         equ       6240
   ;moveq               #11,d4
   ;jsr                 BLITLINEOFTILES
 
+  ; prepare sin table for twister - start
+  lea SIN_TABLE,a0
+  lea SIN_TWISTER_TABLE,a1
+  lea SIN_TWISTER_TABLE_END,a2
+	move.w #360-1,d7
+.loop:
+	move.w (a0)+,d0
+	lsl.w #3,d0
+	
+	add.w #%0100000000000000,d0
+	
+	lsr.w #8,d0
+	lsr.w #2,d0
+
+  move.w d0,(a1)+
+  move.w d0,(a2)+
+	
+	dbra d7,.loop
+  ; prepare sin table for twister - end
+
+
   lea                  SANDTOP,a0
   moveq                #20-1,d4
   moveq                #0,d0

@@ -1,5 +1,8 @@
 ; sin table in format q2,14 with offset 1 (value ranges 0-2)
 SIN_TWISTER_TABLE:
+	IFND LOL
+	dcb.w 360,0
+	ELSE
 	dc.w 16 ; degrees: 0
 	dc.w 16 ; degrees: 1
 	dc.w 16 ; degrees: 2
@@ -360,7 +363,12 @@ SIN_TWISTER_TABLE:
 	dc.w 15 ; degrees: 357
 	dc.w 15 ; degrees: 358
 	dc.w 15 ; degrees: 359
+	ENDC
 SIN_TWISTER_TABLE_END:
+
+	IFND LOL
+	dcb.w 360,0
+	ELSE
 
 
 		dc.w 16 ; degrees: 0
@@ -723,3 +731,4 @@ SIN_TWISTER_TABLE_END:
 	dc.w 15 ; degrees: 357
 	dc.w 15 ; degrees: 358
 	dc.w 15 ; degrees: 359
+	ENDC
