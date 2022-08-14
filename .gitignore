@@ -4,3 +4,4 @@ reffect
 rliscio
 build/*.o
 *.adf
+do.sh

@@ -206,7 +206,7 @@ walkingtriangle_xwalk:
 ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
   cmpi.w                 #STARTDXCLIMB,XROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
-  cmpi.w                 #325,ANGLE_OFFSET(a3)
+  cmpi.w                 #326,ANGLE_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
   ;SETSTAGE               walkingtriangle_ywalk

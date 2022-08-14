@@ -225,11 +225,10 @@ col14:
   IFD EFFECTS
   include    "coplistfragments/sand.s"
 
+  dc.w       $eC07,$FFFE
+  dc.w       $182,$ba6 ; continue with last color of sandtop
 
-  ;dc.w       $dA07-$0000,$FFFE                                               ; una barretta fissa verde SOTTO la linea $FF!
-  ;dc.w       $180,$010
-  ;dc.w       $eB07-$0000,$FFFE
-  ;dc.w       $180,$020
+  IFD GREENBAR
   dc.w       $eC07-$0000,$FFFE
   dc.w       $180,$030
   dc.w       $182,$ba6 ; continue with last color of sandtop
@@ -243,6 +242,7 @@ col14:
   dc.w       $180,$010
   dc.w       $F107-$0000,$FFFE
   dc.w       $180,$000
+  ENDC
   ENDC
 
 

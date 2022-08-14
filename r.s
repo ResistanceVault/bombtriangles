@@ -55,6 +55,24 @@ SONG_FRAMES         equ       6240
   ;moveq               #11,d4
   ;jsr                 BLITLINEOFTILES
 
+  ; prepare table for first round of angles - start
+  lea ROTATIONS_ANGLES_64,a0
+	moveq #0,d0
+	moveq #2-1,d6
+.loop2rot
+	moveq #64-1,d7
+.looprot
+	add.l 	#%101101000,d0
+	move.l d0,d1
+  ;add.l #%100000,d1
+	lsr.w #6,d1
+	move.w d1,(a0)+
+	dbra d7,.looprot
+	move.l #180*64,d0
+	dbra d6,.loop2rot
+  move.w #0,ROTATIONS_ANGLES_64_180-2
+	; prepare table for first round of angles - end
+
   ; prepare sin table for twister - start
   lea SIN_TABLE,a0
   lea SIN_TWISTER_TABLE,a1
