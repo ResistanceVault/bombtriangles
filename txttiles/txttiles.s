@@ -10,7 +10,7 @@ TILE_DATA:
   dc.l PATTERN_FULL
   dc.l TILETXT1
 
-  dc.l EMPTYTILEPATTERN
+  dc.l PATTERN_EMPTY
   dc.l TILETXT_EMPTY
 
   dc.l PATTERN_FULL
@@ -20,21 +20,33 @@ TILE_DATA:
   dc.l TILETXT_EMPTY
 
   dc.l PATTERN_FULL
-  dc.l TILETXT3
+  dc.l MUSIC
 
-  dc.l PATTERN_FULL
-  dc.l TILETXT4
-
-  dc.l PA2022
+  dc.l Z3K
   dc.l TILETXT_EMPTY
 
-  dc.l EMPTYTILEPATTERN
+  dc.l PATTERN_FULL
+  dc.l CODE
+
+  dc.l Z3K
+  dc.l TILETXT_EMPTY
+
+  dc.l PATTERN_FULL
+  dc.l BETA_TESTING
+
+  dc.l Z3K
   dc.l TILETXT_EMPTY
 
   dc.l SPOLETO
   dc.l TILETXT_EMPTY
 
-  dc.l EMPTYTILEPATTERN
+  dc.l PATTERN_EMPTY
+  dc.l TILETXT_EMPTY
+
+  dc.l PATTERN_FULL
+  dc.l TILETXT4
+
+  dc.l PATTERN_EMPTY
   dc.l TILETXT_EMPTY
 
 TILE_DATA_END:
@@ -47,36 +59,36 @@ TILE_COUNTER:
 
 WIDTHTILE equ 9
 
-EMPTYTILEPATTERN:
-EMPTYTILEPATTERN_1:
+PATTERN_EMPTY:
+PATTERN_EMPTY_1:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-EMPTYTILEPATTERN_2:
+PATTERN_EMPTY_2:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-EMPTYTILEPATTERN_3:
+PATTERN_EMPTY_3:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-EMPTYTILEPATTERN_4:
+PATTERN_EMPTY_4:
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
   dc.b      0
 
-EMPTYTILEPATTERN_5:
+PATTERN_EMPTY_5:
   dc.b      0
   dc.b      0
   dc.b      0
@@ -120,43 +132,6 @@ A1000_5:
   dc.b      %11110011
   dc.b      %11001111
 
-
-
-PA2022:
-PA2022_1:
-  dc.b      %11110001
-  dc.b      %10000000
-  dc.b      %00111100
-  dc.b      %01100011
-  dc.b      %11001111
-
-PA2022_2:
-  dc.b      %10010010
-  dc.b      %01000000
-  dc.b      %00000100
-  dc.b      %10010000
-  dc.b      %01000001
-
-PA2022_3:
-  dc.b      %11110010
-  dc.b      %01000000
-  dc.b      %00001000
-  dc.b      %10010000
-  dc.b      %10000010
-
-PA2022_4:
-  dc.b      %10000011
-  dc.b      %11000000
-  dc.b      %00010000
-  dc.b      %10010001
-  dc.b      %00000100
-
-PA2022_5:
-  dc.b      %10000010
-  dc.b      %01000000
-  dc.b      %00111100
-  dc.b      %01100011
-  dc.b      %11001111
 
 PATTERN_FULL:
 PATTERN_FULL_1:
@@ -226,6 +201,13 @@ SPOLETO_5:
   dc.b      %11110001
   dc.b      %10001111
 
+Z3K:
+  dc.b $FB,$D2,$00,$00,$00,$10,$54,$00 
+  dc.b $00,$00,$21,$D8,$00,$00,$00,$41 
+  dc.b $D4,$00,$00,$00,$FB,$D2,$00,$00 
+  dc.b $00
+  even
+
 tile_empty:
   dc.b      $0
   dc.b      $0
@@ -265,16 +247,19 @@ BANNER_CURRENT_X:
 BANNER_CURRENT_Y:
   dc.w      0
 TILE_POINTER:
-  dc.l      PATTERN_FULL
+  dc.l      PATTERN_EMPTY
 
 banner:
-  cmpi.w    #40*5*WIDTHTILE,BANNER_CURRENT_Y
+  lea       BANNER_CURRENT_X(PC),a3
+  move.w    (a3),d3
+  cmpi.w    #40*5*WIDTHTILE,2(a3)
   beq.s     donotresetbannerx
 
   ; before drawing tiles fetch the pattern and determine if the file
   ; has to be drawn OR cleared
-  move.w    BANNER_CURRENT_X(PC),d0
+  move.w    (a3),d0
   move.w    d0,d2
+  move.w    d0,d3
   andi.w    #7,d2
   not.w     d2
   andi.w    #7,d2
@@ -285,7 +270,7 @@ banner:
   btst      d2,d1
   bne.s     donotcleartile
   lea       tile_empty(PC),a1
-  lea       tile_empty(PC),a2
+  move.l    a1,a2
   bra.s     drawtile
 donotcleartile:
   ; Draw (or clear) the tile
@@ -295,14 +280,15 @@ drawtile:
   bsr.s     blittilecpu
 
   ; Go to the next X location for next frame
-  addq      #1,BANNER_CURRENT_X
-  cmpi.w    #40,BANNER_CURRENT_X                ; check if raw is done, in this case reset X and go to next Y
+  addq      #1,d3
+  cmpi.w    #40,d3                ; check if raw is done, in this case reset X and go to next Y
   bne.s     donotresetbannerx
-  move.w    #0,BANNER_CURRENT_X
-  add.w     #40*WIDTHTILE,BANNER_CURRENT_Y
+  move.w    #0,d3
+  add.w     #40*WIDTHTILE,2(a3)
   addq.l    #5,TILE_POINTER
 
 donotresetbannerx:
+  move.w    d3,(a3)
   rts
 
 blittilecpu:
@@ -317,10 +303,9 @@ notiletextnop
   ; Load address of current text into a0
   movea.l    TILETXT_PTR(PC),a0
 
-  move.b    (a0),d0 ; fetch the letter
+  move.b    (a0)+,d0 ; fetch the letter
 
   ; go to next letter
-  addq      #1,a0
   move.l    a0,TILETXT_PTR
 
   sub.b     #65,d0 ; normalize it according to ascii table (A=65, B=66 ... and so on)
@@ -391,25 +376,62 @@ TILETEXT_NOP:
 
 ; TEXT ON TILES
 TILETXT1:
-  dc.b 5,"OZZYBOSHI",1,"IS",1,"PROUD",1,"TO",1,"PRESENT",6
+;  dc.b 5,"OZZYBOSHI",1,"IS",1,"PROUD",1,"TO",1,"PRESENT",6
+;  dc.b  40
+;  DC.B 4,"A",1,"NEW",1,"PRODUCTION",1,"FOR",1,"FLASHPARTY",5
+;  dc.b  40
+;  dc.b  40
+  dc.b 7,"OZZYBOSHI",1,"PROUDLY",1,"PRESENTS",7
+  dc.b  40
+  dc.b 13,"BOMBTRIANGLES",14
   dc.b  40
   DC.B 4,"A",1,"NEW",1,"PRODUCTION",1,"FOR",1,"FLASHPARTY",5
-  dc.b  40
-  dc.b  40
 
 TILETXT2:
   dc.b  40
-  dc.b  2,"THIS",1,"TIME",1,"I",1,"CAME",1,"UP",1,"WITH",1,"A",1,"TWENTY",1,"KB",2
+  dc.b  7,"THIS",1,"IS",1,"A",1,"TWENTY",1,"KB",1,"INTRO",8
   dc.b  40
-  dc.b  5,"INTRO",1,"MEANT",1,"FOR",1,"AN",1,"UNEXPANDED",6
+  dc.b  10,"MEANT",1,"FOR",1,"UNEXPANDED",10
   dc.b  40
 
-TILETXT3:
+GREETINGS_TO:
+  dc.b  40
+  dc.b  40
   dc.b  14,"GREETINGS",1,"TO",14
-  dc.b  14,"PRINCE",1,"PHAZE",14
-  dc.b  18,"MAZE",18
-  dc.b  18,"ZEK",19
-  dc.b  15,"DR",1,"PROCTON",15
+  dc.b  40
+  dc.b  40
+
+BETA_TESTING:
+  dc.b  40
+  dc.b  40
+  dc.b  5,"BETA",1,"TESTING",1,"ON",1,"REAL",1,"AMIGA",1,"IOOO",4
+  dc.b  40
+  dc.b  40
+
+MUSIC:
+  dc.b  40
+  dc.b  40
+  dc.b  17,"MUSIC",18
+  dc.b  40
+  dc.b  40
+
+GFX:
+  dc.b  40
+  dc.b  40
+  dc.b  18,"GFX",19
+  dc.b  40
+  dc.b  40
+
+CODE:
+  dc.b  40
+  dc.b  40
+  dc.b  18,"CODE",18
+  dc.b  40
+  dc.b  40
+  ;dc.b  14,"PRINCE",1,"PHAZE",14
+  ;dc.b  18,"MAZE",18
+  ;dc.b  18,"ZEK",19
+  ;dc.b  15,"DR",1,"PROCTON",15
 
 TILETXT4:
   dc.b  13,"PASSIONE",1,"AMIGA",13

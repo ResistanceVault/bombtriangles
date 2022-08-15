@@ -98,7 +98,7 @@ BOMB_SHORT:
   ;move.l #BOMB3_BPL0,(a0)+
   ;move.l #BOMB3_BPL1,(a0)
 
-  rts
+  ;rts
 
 BOMB_ON:
   move.l #BOMBMANAGER_SPRITESLIST_BOMB_ON,BOMBMANAGER_PTR
