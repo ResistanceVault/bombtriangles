@@ -57,7 +57,9 @@ donoresettilecounter:
             bsr.w            banner
             IFD                 EFFECTS
             jsr              muovicopper                                                    ; red bar after $ff
+            IFND        NOGREENGLOW
             jsr              scrollcolors                                                   ; color cycling
+            ENDC
             bsr              scrollskycolors                                               ; change sky colors
             ENDC
             bsr.w            SPACESHIPMANAGER

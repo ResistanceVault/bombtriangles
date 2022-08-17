@@ -693,6 +693,7 @@ SuGiu:
 ; ************************
 ; *		Color cycling		   *
 ; ************************
+  IFND        NOGREENGLOW
 scrollcolors:
   moveq               #13-1,d7
   lea                 col1,a4
@@ -702,6 +703,7 @@ scrollcolors_startcycle
   dbra                d7,scrollcolors_startcycle
   move.w              col1,col14
   rts
+  ENDC
   ENDC
 
   include             "AProcessing/libs/rasterizers/globaloptions.s"

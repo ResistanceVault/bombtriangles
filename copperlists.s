@@ -100,6 +100,8 @@ BPLPTR5:
 COLORTEST EQU $194
 OFFSETTEST EQU $1000
   IFD        EFFECTS
+
+  IFND        NOGREENGLOW
 ;	L'effetto di Lezione3e.s spostato piu' in ALTO
 
   dc.w       $3a07+OFFSETTEST,$fffe                                               ; aspettiamo la linea 154 ($9a in esadecimale)
@@ -162,6 +164,7 @@ col14:
 
   dc.w       COLORTEST,COLOR2                                                ; Decidiamo il colore NERO per la parte
 				; di schermo sotto l'effetto
+  ENDC
 
   include   "coplistfragments/sky4.s"
 
