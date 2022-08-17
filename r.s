@@ -883,12 +883,11 @@ song0:  incbin 	"pretracker/mA2E_-_Kittys_Market_Stroll.prt"
   ENDC
 
   IFD                 PRT
-  ;section bss,bss
+  section bss,bss
 mySong:	ds.w	2048/2
 myPlayer:	ds.l	8*1024/4
 
-	;section	chip,bss_c
-;chipmem	ds.b	$7892 ; in a real production you should use the returned size of songInit()
+	section	chip,bss_c
 chipmem   dcb.b $7892,$00
   ENDC
   end
