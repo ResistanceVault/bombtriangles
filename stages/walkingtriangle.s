@@ -37,12 +37,7 @@ SPACESHIP_LOCATION_LOAD_Y   EQU 160
 SPACESHIP_LOCATION_UNLOAD_X EQU 68
 SPACESHIP_LOCATION_UNLOAD_Y EQU 195
 
-; VARIABLES
-OFFBITPLANEMEM:
-  dcb.b                  40*185,$00
 
-OFFBITPLANEMEM2:
-  dcb.b                  40*185,$00
 
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
@@ -223,7 +218,7 @@ walkingtriangle_no_vertical_climbing:
   VERTEX2D_INIT_I        2,FFE2,0000  ; -30,0
   VERTEX2D_INIT_I        3,0000,0000  ;   0,0
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -266,7 +261,7 @@ bigspaceship_activation_draw:
   VERTEX2D_INIT_I        2,000D,000F ;   13,15
   VERTEX2D_INIT_I        3,FFF3,0000 ;   -13,0
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   IFD EFFECTS
@@ -375,7 +370,7 @@ walkingtriangle_no_horizontal_climbing:
   VERTEX2D_INIT_I        2,000D,000F ;   13,15
   VERTEX2D_INIT_I        3,FFF3,0000 ; -13,0
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -433,7 +428,7 @@ walkingtriangle_no_vertical_descending:
   VERTEX2D_INIT_I         2,0000,FFE2
   VERTEX2D_INIT_I         3,FFE6,FFF1
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 
@@ -498,7 +493,7 @@ notleftborder;
   VERTEX2D_INIT_I        2,000D,FFF1  ; 13,-15
   VERTEX2D_INIT_I        3,FFF3,0000  ; -13,0
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 ; ***************************** END IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
@@ -554,7 +549,7 @@ notdownborder2;
   VERTEX2D_INIT_I        1,000D,000F     ; 13,15
   VERTEX2D_INIT_I        2,000D,FFF1     ; 13,-15
   VERTEX2D_INIT_I        3,FFF3,0000     ; -13,0
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
@@ -611,7 +606,7 @@ walkingtriangle_xwalk_right_2:
   VERTEX2D_INIT_I        1,FFF1,FFE6 ;#-15,#-26
   VERTEX2D_INIT_I        2,FFE2,0000 ;#-30,#0
   VERTEX2D_INIT_I        3,0000,0000 ; #0,#0
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   move.w                 SAVE_X,d6
@@ -680,7 +675,7 @@ walkingtriangle_reverse_dive:
   VERTEX2D_INIT_I        1,0000,FFF2 ; #-15+15,#-26+12
   VERTEX2D_INIT_I        2,FFF1,000C ; #-30+15,#0+12
   VERTEX2D_INIT_I        3,000F,000C ;  #0+15,#0+12
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -731,7 +726,7 @@ walkingfloor1:
   VERTEX2D_INIT_I        1,0000,FFF2  ; #-15+15,#-26+12
   VERTEX2D_INIT_I        2,FFF1,000C  ; #-30+15,#0+12
   VERTEX2D_INIT_I        3,000F,000C  ; #0+15,#0+12
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 
@@ -772,7 +767,7 @@ teletrasportationstart:
   VERTEX2D_INIT_I        1,0000,FFF2   ;#-15+15,#-26+12
   VERTEX2D_INIT_I        2,FFF1,000C   ;#-30+15,#0+12
   VERTEX2D_INIT_I        3,000F,000C   ;#0+15,#0+12
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -816,7 +811,7 @@ teletrasportationend:
   VERTEX2D_INIT_I        2,FFF1,000C  ;#-15,#13
   VERTEX2D_INIT_I        3,000F,000C  ;#15,#13
 
-  lea                    OFFBITPLANEMEM(PC),a4
+  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts

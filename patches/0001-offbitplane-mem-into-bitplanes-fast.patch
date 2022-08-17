@@ -1,0 +1,30 @@
+From 69321154bb90cc69145aecc33b9318e0d777508f Mon Sep 17 00:00:00 2001
+From: Ozzyboshi <gun101@email.it>
+Date: Wed, 17 Aug 2022 08:19:17 +0200
+Subject: [PATCH] offbitplane mem into bitplanes fast
+
+---
+ libs/rasterizers/processing_bitplanes_fast.s | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/libs/rasterizers/processing_bitplanes_fast.s b/libs/rasterizers/processing_bitplanes_fast.s
+index b96984f..c782e58 100644
+--- a/libs/rasterizers/processing_bitplanes_fast.s
++++ b/libs/rasterizers/processing_bitplanes_fast.s
+@@ -73,6 +73,13 @@ SCREEN_11:
+ 
+     ELSE
+ 
++; VARIABLES
++OFFBITPLANEMEM:
++  dcb.b                  40*185,$00
++
++OFFBITPLANEMEM2:
++  dcb.b                  40*185,$00
++
+ SCREEN_0:
+     dcb.b 40*256,$00
+ 
+-- 
+2.7.4
+
