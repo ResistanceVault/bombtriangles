@@ -84,10 +84,10 @@ BPLPTR5:
   ; wait for the top of the screen and set big spaceship colors
   dc.w       $2B07,$FFFE
   include    "coplistfragments/bigspaceshipcolors.s"
-  dc.w       $180,0 ; background always black to hide left right borders                                                    ; Bpl2Mod
 
 
   IFD EFFECTS
+  dc.w       $180,0 ; background always black to hide left right borders                                                    ; Bpl2Mod
   include "coplistfragments/sky.s"
   dc.w    $4207,$FFFE    ; salto 4 linee
   include "coplistfragments/pyramidcolors.s"

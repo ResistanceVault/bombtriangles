@@ -732,7 +732,11 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
   include             "copperlists.s"
 
 SCREEN_2:
+  IFD DEBUGCOLORS
+  dcb.b 40*224*1,$0
+  ELSE
   dcb.b 40*224*1,$FF
+  ENDC
   dcb.b 40*224*2,$00
 
 SKY_COLORSTABLE_INCREMENT:
