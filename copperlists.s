@@ -171,6 +171,8 @@ col14:
   ENDC
 
   IFD COPPLATFORM
+
+  IFD LOL
   dc.w       $5F07,$fffe
   dc.w       $18e,COLORCOPPLATFORM1
   dc.w       $6207,$fffe
@@ -185,11 +187,13 @@ col14:
   dc.w       $18e,COLORCOPPLATFORM6
   dc.w       $6707,$fffe
   dc.w       $18e,COLOR3
+  ENDC
 
   IFD EFFECTS
   include   "coplistfragments/sky5.s"
   ENDC
 
+  IFD LOL
   dc.w       $8F07,$fffe
   dc.w       $18e,COLORCOPPLATFORM1
   dc.w       $9207,$fffe
@@ -215,6 +219,7 @@ col14:
   dc.w       $18e,COLORCOPPLATFORM5
   dc.w       $9E07,$fffe
   dc.w       $18e,COLORCOPPLATFORM6
+  ENDC
   IFD        EFFECTS
   dc.w       SKY_COL_INDEX,$540
   ENDC
@@ -265,7 +270,7 @@ BPLPTR2_TILE:
 
   dc.w       $ffdf,$fffe    ; wait line 255
 
-  IFD        EFFECTS
+  IFD        EFFECTS1
 BARRA:
   dc.w       $0907,$FFFE                                               ; aspetto la linea $79
   dc.w       $180,$300                                                 ; inizio la barra rossa: rosso a 3

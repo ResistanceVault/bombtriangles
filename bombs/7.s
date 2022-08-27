@@ -6,7 +6,7 @@ BOMB7_BPL0_VSTART:  dc.b    BOMB7_VERTICAL_START
 BOMB7_BPL0_HSTART:  dc.b    $90
 BOMB7_BPL0_VSTOP:   dc.b    BOMB7_VERTICAL_STOP
                     dc.b    $00
-
+                    IFD LOL
                     dc.w    $0000,$0000      ; line 1
                     dc.w    $0002,$0001      ; line 2
                     dc.w    $0007,$0000      ; line 3
@@ -38,13 +38,14 @@ BOMB7_BPL0_VSTOP:   dc.b    BOMB7_VERTICAL_STOP
                     dc.w    $0000,$0000      ; line 29
                     dc.w    $0000,$0000      ; line 30
                     dc.w    $0000,$0000      ; line 31
+                    ENDC
                     dc.w    0,0
 BOMB7_BPL1:
 BOMB7_BPL1_VSTART:  dc.b    BOMB7_VERTICAL_START
 BOMB7_BPL1_HSTART:  dc.b    $98
 BOMB7_BPL1_VSTOP:   dc.b    BOMB7_VERTICAL_STOP
                     dc.b    0
-
+                    IFD LOL
                     dc.w    $0000,$0000      ; line 1
                     dc.w    $0000,$C000      ; line 2
                     dc.w    $C000,$2000      ; line 3
@@ -76,4 +77,5 @@ BOMB7_BPL1_VSTOP:   dc.b    BOMB7_VERTICAL_STOP
                     dc.w    $0800,$0000      ; line 29
                     dc.w    $1000,$0000      ; line 30
                     dc.w    $0000,$0000      ; line 31
+                    ENDC
                     dc.w    0,0

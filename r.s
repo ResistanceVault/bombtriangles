@@ -55,6 +55,11 @@ SONG_FRAMES         equ       6240
   ;moveq               #11,d4
   ;jsr                 BLITLINEOFTILES
 
+  ; Prepare spaceship ray sprite asset
+  IFD PROGRAMMATICRAY
+  jsr                  BUILDRAYSPRITE
+  ENDC
+
   ; prepare table for first round of angles - start
   lea ROTATIONS_ANGLES_64,a0
 	moveq #0,d0
@@ -111,19 +116,24 @@ SONG_FRAMES         equ       6240
 
   IFD STARS
   ; stars start
-  moveq #80-1,d7
-  lea SCREEN_2+40*1+20,a0
-  move.l d7,d6
+  lea SCREEN_2+40*30,a0
+  moveq #6-1,d5
+startstarfield0:
+  moveq #20-1,d7
+  lea STARNOISEOFFSET,a1
+  lea STARNOISEBITS,a2
 startstarfield:
-  add.w d7,d6
-  divs.w d7,d6
-  swap d6
-  ;andi.l #$7,d6
-  bset d6,(a0)
-  bset d6,40*224*1(a0)
+
+  adda.w (a1)+,a0
+  adda.w d5,a0
+  sub.w d5,d6
+  move.w (a2)+,d6
+  ;bset d6,40*224*1(a0)
   bset d6,40*224*2(a0)
-  addq  #2,a0
+
   dbra d7,startstarfield
+  dbra d5,startstarfield0
+
 ; endstartfield
   ENDC
 
@@ -208,6 +218,7 @@ rightslopesstart:
 
 
   ; start blitting platform 1
+  IFD LOLLAMELO
   moveq               #14-1,d4
   moveq               #16,d6
 tileplatform1:
@@ -256,6 +267,7 @@ tileplatform5:
   bsr.w               BLIT_PLATFORM
   subq                #1,d6
   dbra                d4,tileplatform5
+  ENDC
 
   jsr               DRAWBIGSPACESHIP
 
@@ -508,6 +520,7 @@ POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
   rts
 
+  IFD LOL
 ; blit a platform into background - origin is at top left
 ; d0 : x position (trashed)
 ; d1 : y position (trashed)
@@ -533,6 +546,7 @@ blitplatform_startloop:
   adda.l           #224*40,a1
   dbra             d7,blitplatform_startloop
   rts
+  ENDC
 
 BLITTOPPYRAMID:
   lea              SCREEN_2,a1
@@ -656,6 +670,7 @@ Playrtn:
 
   IFD                 EFFECTS
 
+  IFD LOL
 muovicopper:
   LEA                 BARRA,a0
   TST.B               SuGiu                                                          ; Dobbiamo salire o scendere?
@@ -668,6 +683,9 @@ movecopper_startloop:
   addq                #8,a0
   dbra                d7,movecopper_startloop
   rts
+  ENDC
+
+
 
 MettiGiu:
   clr.b               SuGiu                                                          ; Azzerando SuGiu, al TST.B SuGiu il BEQ
@@ -718,7 +736,9 @@ scrollcolors_startcycle
   include             "AProcessing/libs/precalc/precalc_by_sin.s"
   include             "AProcessing/libs/precalc/precalc_col_table.s"
   include             "AProcessing/libs/precalc/double_byte.s"
-  include             "AProcessing/libs/trigtables_sin.i"
+SIN_Q5_11:
+SIN_TABLE:
+  ;include             "AProcessing/libs/trigtables_sin.i"
 ROT_Z_MATRIX_Q5_11: ; cos -sin sin cos
 ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
   dcb.b 361*8,$00
@@ -730,16 +750,20 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
   include             "initnoprecalc.s"
   include             "ammxmainloopnoprecalc.s"
   include             "sky/skyshades.s"
-
+  IFD STARS
+  include             "stars/starspositions.i"
+  ENDC
   include             "copperlists.s"
+
 
 SCREEN_2:
   IFD DEBUGCOLORS
-  dcb.b 40*224*1,$0
+  ;dcb.b 40*224*1,$0
   ELSE
-  dcb.b 40*224*1,$FF
+  ;dcb.b 40*224*1,$FF
   ENDC
-  dcb.b 40*224*2,$00
+  dcb.b 40*224,$00
+  dcb.b 40*224,$00
 
 SKY_COLORSTABLE_INCREMENT:
   dc.w 2
@@ -835,6 +859,9 @@ LADDER_2_VSTOP2:
   dc.w                0,0
   ENDC
 
+      section data_c,data_c
+player:	incbin	"pretracker/player.bin"
+
 ; start of bomb sprites
   include             "bombs/0.s"
   include             "bombs/1.s"
@@ -862,13 +889,14 @@ TILELEFTSLOPE:        ;incbin "assets/tiles/leftslope.raw"
 
 TILERIGHTSLOPE:       ;incbin "assets/tiles/rightslope.raw"
                       incbin "assets/tiles/ciao4.raw"
+  
 
 PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
-                      incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
+                      ;incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
   IFD COPPLATFORM
-PLATFORM:             dcb.b 2*16*3,$FF
+;PLATFORM:             dcb.b 2*16*3,$FF
   ELSE
-PLATFORM:             incbin "assets/brush/platform16x5.raw"
+;PLATFORM:             incbin "assets/brush/platform16x5.raw"
   ENDC
 
   IFD                 P61
@@ -878,11 +906,12 @@ Module1:
   ENDC
 
   IFD                 PRT
-player:	incbin	"pretracker/player.bin"
+;player:	;incbin	"pretracker/player.bin"
 song0:  incbin 	"pretracker/mA2E_-_Kittys_Market_Stroll.prt"
   ENDC
 
   IFD                 PRT
+
   section bss,bss
 mySong:	ds.w	2048/2
 myPlayer:	ds.l	8*1024/4
@@ -890,5 +919,7 @@ myPlayer:	ds.l	8*1024/4
 	section	chip,bss_c
 chipmem   dcb.b $7892,$00
   ENDC
+  
+
   end
 

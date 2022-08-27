@@ -55,7 +55,7 @@ tiledatanoreset:
 donoresettilecounter:
 
             bsr.w            banner
-            IFD                 EFFECTS
+            IFD                 EFFECTS1
             jsr              muovicopper                                                    ; red bar after $ff
             IFND        NOGREENGLOW
             jsr              scrollcolors                                                   ; color cycling

@@ -117,8 +117,6 @@ spaceship_place_coords:
   lsr.w                #7,d0
   lsr.w                #6,d1
 
-  ;DEBUG 1234
-
   move.b               d0,SPACESHIP1_BPL0_HSTART
   move.b               d0,SPACESHIP1_BPL1_HSTART
 
@@ -130,3 +128,50 @@ spaceship_place_coords:
   move.b               d1,SPACESHIP1_BPL0_VSTOP
   move.b               d1,SPACESHIP1_BPL1_VSTOP
   rts
+
+  IFD PROGRAMMATICRAY
+; build ray sprite programmatically
+BUILDRAYSPRITE:
+  moveq                #0,d0 ; counter, this will go from 0 to 15
+  moveq                #0,d6 ; output pattern for odd
+  moveq                #0,d7 ; output pattern for even
+  moveq                #15+16,d3 ; rol counter
+  lea                  SPACESHIP1_BPL1_RAY,a0
+.rayspriteloop
+  btst                 #0,d0  ; if we are at odd cycle process d6 otherwise do d7
+  bne.s                .rayspriteodd
+  bset                 d0,d7 ; set pattern bit
+  move.w               d7,d1
+  bra.s                .rayspritewrite
+.rayspriteodd
+  ;DEBUG 1234
+  bset                 d0,d6 ; set pattern bit
+  move.w               d6,d1
+
+.rayspritewrite
+  ; mirror copy into d2
+  moveq                #0,d2
+  move.w               d1,d2
+  swap                 d2
+  rol.l                d3,d2
+  subq                 #1,d3
+  lsr.w                #8,d2
+
+  ; Copy pattern into sprite
+  move.b               d1,(a0)+
+  move.b               d2,(a0)+
+  move.b               d1,(a0)+
+  move.b               d2,(a0)+
+  move.b               d1,(a0)+
+  move.b               d2,(a0)+
+  move.b               d1,(a0)+
+  move.b               d2,(a0)+
+
+  addq                 #1,d0
+  cmp.w                #10,d0
+  beq.s                .rayspriteendloop
+  bra.s                .rayspriteloop
+
+.rayspriteendloop
+  rts
+  ENDC

@@ -23,6 +23,7 @@ SAND_COL_INDEX EQU $182
   dc.w    SAND_COL_INDEX,$cb7
 
   ; start platform
+  IFD LOL
   dc.w       $18e,COLORCOPPLATFORM1
   dc.w       $c207,$FFFE
   dc.w       $18e,COLORCOPPLATFORM2
@@ -36,11 +37,13 @@ SAND_COL_INDEX EQU $182
   dc.w       $18e,COLORCOPPLATFORM6
   dc.w       $c707,$fffe
   dc.w       $18e,COLORCOPPLATFORM1
+  ENDC
   ; end plaform
 
   dc.w       $c807,$FFFE
   dc.w       SAND_COL_INDEX,$dc7
 
+  IFD LOL
   dc.w       $ca07,$FFFE
   dc.w       $18e,COLORCOPPLATFORM2
   dc.w       $cb07,$FFFE
@@ -51,6 +54,7 @@ SAND_COL_INDEX EQU $182
   dc.w       $18e,COLORCOPPLATFORM5
   dc.w       $ce07,$FFFE
   dc.w       $18e,COLORCOPPLATFORM6
+  ENDC
 
   dc.w    $d807,$FFFE
   dc.w    SAND_COL_INDEX,$DC8

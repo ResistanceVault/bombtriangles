@@ -6,7 +6,7 @@ BOMB10_BPL0_VSTART:  dc.b    BOMB10_VERTICAL_START
 BOMB10_BPL0_HSTART:  dc.b    $9c
 BOMB10_BPL0_VSTOP:   dc.b    BOMB10_VERTICAL_STOP
                      dc.b    0
-
+                     IFD LOL
                      dc.w    $0000,$0000              ; line 1
                      dc.w    $0000,$0000              ; line 2
                      dc.w    $0000,$0000              ; line 3
@@ -38,12 +38,14 @@ BOMB10_BPL0_VSTOP:   dc.b    BOMB10_VERTICAL_STOP
                      dc.w    $0000,$0000              ; line 29
                      dc.w    $0000,$0000              ; line 30
                      dc.w    $0000,$0000              ; line 31
+                    ENDC
                      dc.w    0,0
 BOMB10_BPL1:
 BOMB10_BPL1_VSTART:  dc.b    BOMB10_VERTICAL_START
 BOMB10_BPL1_HSTART:  dc.b    $a4
 BOMB10_BPL1_VSTOP:   dc.b    BOMB10_VERTICAL_STOP
                      dc.b    0
+                     IFD LOL
                      dc.w    $8000,$8000              ; line 1
                      dc.w    $0000,$0000              ; line 2
                      dc.w    $0400,$0400              ; line 3
@@ -75,4 +77,5 @@ BOMB10_BPL1_VSTOP:   dc.b    BOMB10_VERTICAL_STOP
                      dc.w    $0000,$0000              ; line 29
                      dc.w    $2000,$2000              ; line 30
                      dc.w    $0000,$0000              ; line 31
+                     ENDC
                      dc.w    0,0

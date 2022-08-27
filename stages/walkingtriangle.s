@@ -37,8 +37,6 @@ SPACESHIP_LOCATION_LOAD_Y   EQU 160
 SPACESHIP_LOCATION_UNLOAD_X EQU 68
 SPACESHIP_LOCATION_UNLOAD_Y EQU 195
 
-
-
 ACCELLERATIONVECTOR:
   dc.l                   $00000001
 
@@ -155,7 +153,6 @@ walkingtriangle_start:
   subq                   #1,SLEEP_OFFSET(a3)
   bra.s                  walkingtriangle_gotonext
 walkingtriangle_nodelay
-  ;bsr.s                  WALKINGTRIANGLE_PROCESS
   movem.l                d5/a3,-(sp)
   STROKE                 STROKE_OFFSET(a3)
   FILL                   FILL_OFFSET(a3)
@@ -219,7 +216,6 @@ walkingtriangle_no_vertical_climbing:
   VERTEX2D_INIT_I        2,FFE2,0000  ; -30,0
   VERTEX2D_INIT_I        3,0000,0000  ;   0,0
 
-  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   rts
@@ -241,7 +237,6 @@ bigspaceship_activation:
   move.w                 BIGSPACESHIP_SHEAR,d0
   moveq                  #0,d1
   sub.w                  #1,BIGSPACESHIP_SHEAR
-  ;jsr                    SHEAR
   jsr                     SHEAR_REG
 
   ; ray is descending
@@ -262,7 +257,6 @@ bigspaceship_activation_draw:
   VERTEX2D_INIT_I        2,000D,000F ;   13,15
   VERTEX2D_INIT_I        3,FFF3,0000 ;   -13,0
 
-  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
 
   IFD EFFECTS
@@ -315,7 +309,6 @@ shearnotzero:
   move.w                 #0,ANGLE_OFFSET(a3)
 .increase_angle_by_1_exitlol:
   move.w                 ANGLE_OFFSET(a3),d0
-  ;jsr                    ROTATE_INV_Q_5_11_F
   jsr                    ROTATE_REG
 norotate:
 
@@ -326,7 +319,6 @@ norotate:
   beq.s                  donotmirror
   subq.w                 #1,MIRRORFLAG
 donotmirror:
-  ;jsr                    SCALE
   jsr SCALE_REG
 noinverttrigend:
   ; Scale on X to point the triangle to the right - end
@@ -393,7 +385,6 @@ walkingtriangle_xwalk_rev:
   cmp.w                  #0,TWISTER_MASK_ROWS_COUNTER
   beq.s                  donotdecreasetwister
   subq.w                 #1,TWISTERDECR ; we dont want to decrement each frame
-  ;tst.w                  TWISTERDECR
   bne.s                  donotdecreasetwister
   subq.w                 #1,TWISTER_MASK_ROWS_COUNTER
   move.w                 #TWISTER_DEC_SPEED,TWISTERDECR
@@ -406,10 +397,8 @@ donotdecreasetwister:
   move.w                 #0,ANGLE_OFFSET(a3)
   .increase_angle_by_1_exit:
   move.w                 ANGLE_OFFSET(a3),d0
-  ;jsr                    ROTATE_INV_Q_5_11_F
   jsr ROTATE_REG
 
-  ;,UPDATE_TRANSLATION    #241,XROLLINGOFFSET,#30
   cmpi.w                 #30,ANGLE_OFFSET(a3)
   bne.s                  .walkingtriangle_no_reset_angle
   move.w                 #270,ANGLE_OFFSET(a3)
@@ -429,12 +418,10 @@ walkingtriangle_no_vertical_descending:
   VERTEX2D_INIT_I         2,0000,FFE2
   VERTEX2D_INIT_I         3,FFE6,FFF1
 
-  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 
 ; ***************************** END IMPLEMENTATION OF X REVERSE ------------------
-
 
 ; ***************************** START IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
 walkingtriangle_ywalk_desending:
@@ -467,8 +454,7 @@ notdownborder;
 .increase_angle_by_1_exit:
 
   move.w                 ANGLE_OFFSET(a3),d0
-  ;jsr                    ROTATE_INV_Q_5_11_F
-  jsr ROTATE_REG
+  jsr                    ROTATE_REG
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -477,8 +463,7 @@ notdownborder;
   ADD2DVECTOR
 
   ; add velocity to position
-  movea.l                a3,a0
-  adda.w                 #VELOCITYVECTOR_OFFSET,a0
+  movea.l                a1,a0
   movea.l                a3,a1
   adda.w                 #POSITIONVECTOR_OFFSET,a1
   ADD2DVECTOR
@@ -494,7 +479,6 @@ notleftborder;
   VERTEX2D_INIT_I        2,000D,FFF1  ; 13,-15
   VERTEX2D_INIT_I        3,FFF3,0000  ; -13,0
 
-  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
 ; ***************************** END IMPLEMENTATION OF Y DESCENDING ON LEFT SCREEN ------------------
@@ -520,8 +504,7 @@ walkingtriangle_xwalk_right:
 .decrease_angle_by_3_exit:
 
   move.w                 ANGLE_OFFSET(a3),d0
-  ;jsr                    ROTATE_INV_Q_5_11_F
-  jsr ROTATE_REG
+  jsr                    ROTATE_REG
 
   ; add accelleration to velocity
   lea                    ACCELLERATIONVECTOR(PC),a0
@@ -550,7 +533,6 @@ notdownborder2;
   VERTEX2D_INIT_I        1,000D,000F     ; 13,15
   VERTEX2D_INIT_I        2,000D,FFF1     ; 13,-15
   VERTEX2D_INIT_I        3,FFF3,0000     ; -13,0
-  ;lea                    OFFBITPLANEMEM(PC),a4
   jsr                    TRIANGLE_BLIT
   rts
   ; ***************************** END IMPLEMENTATION OF X WALKING TO RIGHT second floor  ------------------
@@ -560,14 +542,13 @@ SAVE_X: dc.w 0
 SAVE_ANGLE: dc.w 0
 walkingtriangle_xwalk_right_2:
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
-  move.w d0,SAVE_X
+  move.w                 d0,SAVE_X
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   jsr                    LOADIDENTITYANDTRANSLATE
 
   move.w                 ANGLE_OFFSET(a3),d0
   move.w                 d0,SAVE_ANGLE
-  ;jsr                    ROTATE_INV_Q_5_11_F
-  jsr ROTATE_REG
+  jsr                    ROTATE_REG
 
   ; Sub 1 to angle
   subq                   #1,ANGLE_OFFSET(a3)
