@@ -268,81 +268,6 @@ tileplatform5:
   ; build sky shades
   jsr               buildskyshades
 
-  IFD LOL
-  move.w #%00001110,d0
-  jsr DOUBLE_BYTE
-  move.w d0,(a0)
-  move.w #%00110000,d0
-  jsr DOUBLE_BYTE
-  move.w d0,2(a0)
-
-  ;move.w #%0000001100000000,0*40(a0) ; row 1
-  move.w #%0000111000110000,1*40(a0) ; row 2
-  move.w #%0001110001110000,2*40(a0) ; row 3
-  move.w #%0011101111101100,3*40(a0) ; row 4
-  move.w #%0011000111000000,4*40(a0) ; row 5
-  move.w #%0111111111111110,5*40(a0) ; row 6
-  move.w #%1100011100000011,6*40(a0) ; row 7
-  move.w #%1100011100000011,7*40(a0) ; row 8
-  move.w #%0101101111011110,8*40(a0) ; row 9
-  move.w #%0010000110001100,9*40(a0) ; row 10
-
-  ;second bpl
-  lea SCREEN_2+1*40*224,a0
-  move.w #%0000000011000000,(a0)     ; row 1
-  move.w #%0000000111110000,1*40(a0) ; row 2
-  move.w #%0000001111110000,2*40(a0) ; row 3
-  move.w #%0000010000100000,3*40(a0) ; row 4
-  move.w #%0000111111000100,4*40(a0) ; row 5
-  move.w #%0111111111111110,5*40(a0) ; row 6
-  move.w #%0011111100011111,6*40(a0) ; row 7
-  move.w #%0011111100011111,7*40(a0) ; row 8
-  move.w #%0011100000000000,8*40(a0) ; row 9
-  move.w #%0001000000000000,9*40(a0) ; row 10
-
-  ;third bpl
-  lea SCREEN_2+2*40*224,a0
-  move.w #%0000000000000000,(a0)     ; row 1
-  move.w #%0000000000000000,1*40(a0) ; row 2
-  move.w #%0000000000001000,2*40(a0) ; row 3
-  move.w #%0011001111011100,3*40(a0) ; row 4
-  move.w #%0000000000111100,4*40(a0) ; row 5
-  move.w #%0111111111111110,5*40(a0) ; row 6
-  move.w #%0000000011111111,6*40(a0) ; row 7
-  move.w #%0000000011111111,7*40(a0) ; row 8
-  move.w #%0000001111011110,8*40(a0) ; row 9
-  move.w #%0000000110001100,9*40(a0) ; row 10
-  ENDC
-
-;dc.w    $1a0,$bfc    ; color transparency
-;dc.w    $1a2,$fff    ; color17
-;dc.w    $1a4,$ddd    ; color18
-;dc.w    $1a6,$bbb    ; color19
-;dc.w    $1a8,$888    ; color20
-;dc.w    $1aa,$f00    ; color21
-;dc.w    $1ac,$555    ; color22
-;dc.w    $1ae,$000    ; color23
-;dc.w    $1b0,$f0f    ; color24
-;dc.w    $1b2,$f0f    ; color25
-;dc.w    $1b4,$f0f    ; color26
-;dc.w    $1b6,$f0f    ; color27
-;dc.w    $1b8,$f0f    ; color28
-;dc.w    $1ba,$f0f    ; color29
-;dc.w    $1bc,$f0f    ; color30
-;dc.w    $1be,$f0f    ; color31
-  ; draw big spaceship start
-
-  ; Init active playfield with same data, we will change this later in gameloop
-  IFD LOL
-  move.l              #SCREEN_3,d0
-  lea                 BPLPTR2,A1
-  bsr.w               POINTINCOPPERLIST_FUNCT
-
-  move.l              #SCREEN_4,d0
-  lea                 BPLPTR2,A1
-  bsr.w               POINTINCOPPERLIST_FUNCT
-  ENDC
-
   ; Init tiles bitplanes
   move.l              #SCREEN_0+40*(255-9*5),d0
   lea                 BPLPTR1_TILE,a1
@@ -362,20 +287,15 @@ tileplatform5:
   LEA                 SpritePointers+8,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-	; Sprite 0 init
-  IFD LADDERS
-  MOVE.L              #LADDER_1,d0
-  LEA                 SpritePointers,a1                                              ; SpritePointers is in copperlist
+   ; Sprite 2 init - spaceship first 2 bitplanes of attached sprite
+  move.l              #SPACESHIP2_BPL0,d0
+  lea                 Sprite2pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  ; Sprite 1 init
-  MOVE.L              #LADDER_2,d0
-  addq.w              #8,a1
+  ; Sprite 3 init - bomb first 2 bitplanes of attached sprite
+  move.l              #SPACESHIP2_BPL1,d0
+  lea                 Sprite3pointers,a1
   bsr.w               POINTINCOPPERLIST_FUNCT
-
-  ; Sprite 2 init
-  jsr                 drawtopstep
-  ENDC
 
   ; Sprite 4 init - bomb first 2 bitplanes of attached sprite
   move.l              #BOMB1_BPL0,d0
@@ -710,11 +630,8 @@ scrollcolors_startcycle
   include             "AProcessing/libs/matrix/matrixcommon.s"
   include             "AProcessing/libs/matrix/matrixreg.s"
   include             "AProcessing/libs/matrix/rotatereg.s"
-  ;include             "AProcessing/libs/matrix/scale.s"
   include             "AProcessing/libs/matrix/scalereg.s"
-  ;include             "AProcessing/libs/matrix/shear.s"
   include             "AProcessing/libs/matrix/shearreg.s"
-  ;include             "AProcessing/libs/trigtables.i"
   include             "AProcessing/libs/precalc/precalc_by_sin.s"
   include             "AProcessing/libs/precalc/precalc_col_table.s"
   include             "AProcessing/libs/precalc/double_byte.s"
@@ -850,6 +767,7 @@ LADDER_2_VSTOP2:
   include             "spaceship/spaceship_spr1_ray.s"
   include             "spaceship/spaceship_spr_diffs.s"
   include             "spaceship/bigspaceship.s"
+  include             "spaceship/spaceship2_spr1.s"
 
 ; background tiles
 ;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
