@@ -156,8 +156,8 @@ startstarfield:
 tiles_vloop:
 
   bsr.w               BLIT_TILES
-  addq    #1,d1
-  addq #1,d4
+  addq                #1,d1
+  addq                #1,d4
 
   dbra d6,tiles_vloop
 
@@ -208,62 +208,58 @@ rightslopesstart:
 
 
   ; start blitting platform 1
-  moveq               #14-1,d4
-  moveq               #16,d6
-tileplatform1:
-  move.l              d6,d0
-  move.w              #51*40,d1
-  bsr.w               BLIT_PLATFORM
-  subq                #1,d6
-  dbra                d4,tileplatform1
+  moveq                #13-1,d4
+  moveq                #4,d0
+  moveq                #51,d1
+  move.w               #1,TILE_MULTIPLIER
+  move.w               #$0201,TILE_BLITSIZE
+  move.w               #$09FF,TILE_BPLCON0
+  bsr.w                BLIT_TILES
+
+  lea                  SCREEN_2+51*40+6,a0
+  moveq               #3-1,d7
+platform1_start:
+  moveq               #8-1,d6
+  move.l              a0,a1
+platform2_start:
+  ori.w               #$F,(a1)
+  adda.w              #40,a1
+  dbra                d6,platform2_start
+  adda.l              #224*40,a0
+  dbra                d7,platform1_start
 
 ; start blitting platform 2
-  moveq               #8-1,d4
-  moveq               #12,d6
-tileplatform2:
-  move.l              d6,d0
-  move.w              #99*40,d1
-  bsr.w               BLIT_PLATFORM
-  subq                #1,d6
-  dbra                d4,tileplatform2
+  moveq                #8-1,d4
+  moveq                #5,d0
+  moveq                #99,d1
+  bsr.w                BLIT_TILES
 
 ; start blitting platform 3
-  moveq               #2-1,d4
-  moveq               #2,d6
-tileplatform3:
-  move.l              d6,d0
-  move.w              #107*40,d1
-  bsr.w               BLIT_PLATFORM
-  subq                #1,d6
-  dbra                d4,tileplatform3
+  moveq                #2-1,d4
+  moveq                #1,d0
+  moveq                #107,d1
+  bsr.w                BLIT_TILES
 
 ; start blitting platform 4
-  moveq               #2-1,d4
-  moveq               #15,d6
-tileplatform4:
-  move.l              d6,d0
-  move.w              #147*40,d1
-  bsr.w               BLIT_PLATFORM
-  subq                #1,d6
-  dbra                d4,tileplatform4
+  moveq                #2-1,d4
+  moveq                #14,d0
+  move.w               #147,d1
+  bsr.w                BLIT_TILES
 
 ; start blitting platform 5
-  moveq               #3-1,d4
-  moveq               #8,d6
-tileplatform5:
-  move.l              d6,d0
-  move.w              #155*40,d1
-  bsr.w               BLIT_PLATFORM
-  subq                #1,d6
-  dbra                d4,tileplatform5
+  moveq                #3-1,d4
+  moveq                #6,d0
+  move.w               #155,d1
+  bsr.w                BLIT_TILES
 
+  ; Draw big spaceship
   jsr               DRAWBIGSPACESHIP
 
-  move.w #$0F00,d0
-  move.w #$00F0,d1
-  moveq  #64-1,d7
-  lea BIGSPACESHIP_COLORSTABLE,a0
-  jsr buildcolortable
+  move.w            #$0F00,d0
+  move.w            #$00F0,d1
+  moveq             #64-1,d7
+  lea               BIGSPACESHIP_COLORSTABLE,a0
+  jsr               buildcolortable
 
   ; build sky shades
   jsr               buildskyshades
@@ -428,32 +424,6 @@ POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
   rts
 
-; blit a platform into background - origin is at top left
-; d0 : x position (trashed)
-; d1 : y position (trashed)
-BLIT_PLATFORM:
-  lea              PLATFORM,a0
-  lea              SCREEN_2,a1
-; add vertical position
-  adda.l           d1,a1
-  lsl.w            #1,d0
-  adda.l           d0,a1
-  moveq            #3-1,d7
-blitplatform_startloop:
-  WAITBLITTER
-  move.w           #$09F0,$dff040
-  move.w           #$0000,$dff042
-  move.l           a0,$dff050            ; copy from a channel
-  move.l           a1,$dff054            ; copy to d channel
-  move.w           #$0000,$dff064               ; A mod
-  move.w           #38,$dff066                  ; D mod
-  move.l           #$FFFFFFFF,$DFF044 ; mask
-  move.w           #$0201,$dff058
-  adda.l           #10,a0
-  adda.l           #224*40,a1
-  dbra             d7,blitplatform_startloop
-  rts
-
 BLITTOPPYRAMID:
   lea              SCREEN_2,a1
   mulu.w           #40*16,d1
@@ -504,26 +474,30 @@ BLIT_TILE:
   movem.l           d0/d1/a0,-(sp)
   lea               SCREEN_2,a1
   ; add vertical position
-  mulu.w            #40*16,d1
+  mulu.w            #40,d1
+  mulu.w            TILE_MULTIPLIER(PC),d1
   adda.l            d1,a1
   lsl.w             #1,d0
   adda.l            d0,a1
   moveq             #3-1,d7
 blittile_startloop:
   WAITBLITTER
-  move.w           #$09F0,$dff040
+  move.w           TILE_BPLCON0(PC),$dff040
   move.w           #$0000,$dff042
   move.l           a0,$dff050            ; copy from a channel
   move.l           a1,$dff054            ; copy to d channel
   move.w           #$0000,$dff064               ; A mod
   move.w           #38,$dff066                  ; D mod
   move.l           #$FFFFFFFF,$DFF044 ; mask
-  move.w           #$0401,$dff058
+  move.w           TILE_BLITSIZE(PC),$dff058
   adda.l           #32,a0
   adda.l           #224*40,a1
   dbra             d7,blittile_startloop
   movem.l          (sp)+,d0/d1/a0
   rts
+TILE_MULTIPLIER: dc.w 16
+TILE_BLITSIZE: dc.w $0401
+TILE_BPLCON0: dc.w $09F0
 
 ;---------------------------------------------------------------
 Save_all:
@@ -783,11 +757,6 @@ TILERIGHTSLOPE:       ;incbin "assets/tiles/rightslope.raw"
 
 PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
                       incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
-  IFD COPPLATFORM
-PLATFORM:             dcb.b 2*16*3,$FF
-  ELSE
-PLATFORM:             incbin "assets/brush/platform16x5.raw"
-  ENDC
 
   IFD                 P61
 Module1:
