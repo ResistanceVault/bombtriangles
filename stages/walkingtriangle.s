@@ -1,5 +1,5 @@
 ; DEFINES
-NUMTRIANGLES           EQU 4                                                           ; How many triangles do we want?? range(0,4)
+NUMTRIANGLES           EQU 5                                                           ; How many triangles do we want?? range(0,4)
 STARTWALKXPOS          EQU 30                                                          ; Start triangle position X (signed value)
 STARTWALKYPOS          EQU 184
 LADDERVERTICALPOSITION   equ STARTWALKYPOS+49                                          ; Start triangle position Y (signed value)
@@ -30,7 +30,8 @@ XVELOCITYVECTOR_OFFSET EQU 20
 YVELOCITYVECTOR_OFFSET EQU 22
 SCALEFACTOR_OFFSET     EQU 24
 STAGEPOINTER_OFFSET    EQU 26
-TRIANGLE_END_OFFSET    EQU 30
+COUNTER_OFFSET         EQU 30
+TRIANGLE_END_OFFSET    EQU 32
 
 SPACESHIP_LOCATION_LOAD_X   EQU 122
 SPACESHIP_LOCATION_LOAD_Y   EQU 160
@@ -59,6 +60,7 @@ TRIANGLE_1:
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
   dc.l                   teletrasportationend                                          ; STAGE_POINTER
+  dc.w                   -1                                                            ; GENERAL PURPOSE COUNTER
 TRIANGLE_2:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -74,6 +76,7 @@ TRIANGLE_2:
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
   dc.l                   teletrasportationend                                          ; STAGE_POINTER
+  dc.w                   -1                                                            ; GENERAL PURPOSE COUNTER
 TRIANGLE_3:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -89,6 +92,7 @@ TRIANGLE_3:
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
   dc.l                   teletrasportationend                                          ; STAGE_POINTER
+  dc.w                   -1                                                            ; GENERAL PURPOSE COUNTER
 TRIANGLE_4:
   dc.w                   0                                                             ; ANGLE
   dc.w                   0                                                             ; XROLLINGOFFSET
@@ -104,6 +108,23 @@ TRIANGLE_4:
   dc.w                   0                                                             ; VELOCITYVECTOR Y
   dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
   dc.l                   teletrasportationend                                          ; STAGE_POINTER
+  dc.w                   -1                                                            ; GENERAL PURPOSE COUNTER
+TRIANGLE_5:
+  dc.w                   0                                                             ; ANGLE
+  dc.w                   0                                                             ; XROLLINGOFFSET
+  dc.w                   30                                                            ; YROLLINGOFFSET
+  dc.w                   STARTSTAGE                                                    ; STAGE
+  dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
+  dc.b                   2                                                             ; STROKE
+  dc.b                   2                                                             ; FILL
+  dc.w                   TIMEDELAY*4                                                   ; SLEEP
+  dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
+  dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y
+  dc.w                   0                                                             ; VELOCITYVECTOR X
+  dc.w                   0                                                             ; VELOCITYVECTOR Y
+  dc.w                   START_SCALE_FACTOR                                            ; SCALE_FACTOR
+  dc.l                   teletrasportationend                                          ; STAGE_POINTER
+  dc.w                   -1                                                            ; GENERAL PURPOSE COUNTER
 
 ; ********************************* ARRAY OF TRIANGLES DEFINITION - START
 
@@ -132,6 +153,7 @@ SETSTAGE MACRO
 
   IFD                 DEBUGCOLORS
 DBGTRIGCOLS:
+    dc.w $0F00
     dc.w $0333
     dc.w $0666
     dc.w $0999
@@ -200,19 +222,76 @@ walkingtriangle_xwalk:
   UPDATE_TRANSLATION2    #241,XROLLINGOFFSET_OFFSET(a3),#30
 
 ; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
-  cmpi.w                 #STARTDXCLIMB,XROLLINGOFFSET_OFFSET(a3)
+  cmpi.w                 #STARTDXCLIMB/2,XROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
-  cmpi.w                 #326,ANGLE_OFFSET(a3)
-  bne.s                  walkingtriangle_no_vertical_climbing
+  ;cmpi.w                 #326,ANGLE_OFFSET(a3)
+  ;bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
-  ;SETSTAGE               walkingtriangle_ywalk
-  SETSTAGE                bigspaceship_activation
-  move.w                 #359,ANGLE_OFFSET(a3)
+  SETSTAGE               bounce
+  move.w                 #-2*64,YVELOCITYVECTOR_OFFSET(a3)
+  move.l                 #0,POSITIONVECTOR_OFFSET(a3)
+  move.w                 #64,SCALEFACTOR_OFFSET(a3)
+  ;SETSTAGE                bigspaceship_activation
+  ;move.w                 #359,ANGLE_OFFSET(a3)
   IFD LADDERS
   START_LADDERS
   ENDC
 
 walkingtriangle_no_vertical_climbing:
+
+  ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
+  VERTEX2D_INIT_I        1,FFF1,FFE6  ; -15,-26
+  VERTEX2D_INIT_I        2,FFE2,0000  ; -30,0
+  VERTEX2D_INIT_I        3,0000,0000  ;   0,0
+
+  jsr                    TRIANGLE_BLIT
+
+  rts
+  ; ***************************** END OF FIRST HORIZONTAL WALKING
+
+   ; ***************************** START OF FIRST HORIZONTAL WALKING
+  ; Calculate the origin point which is the lower right vertex of the triangle
+  ; This is important because the triangle must rotate around this vertex
+  ; To calculate this point:
+  ; - the X position is the start walking position X coord * num revolutions
+  ; - the Y position is the Y start walking position Y coord
+  ; Pseudocode:
+  ; - resetMatrix();
+  ; - translate(STARTWALKXPOS+XROLLINGOFFSET,STARTWALKYPOS)
+walkingtriangle_xwalk2:
+  moveq                  #STARTWALKXPOS,d0
+  add.w                  XROLLINGOFFSET_OFFSET(a3),d0
+  move.w                 #STARTWALKYPOS,d1
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  ; Put the angle into the ANGLE variable - then point to the next angle;
+  ; Data is taken from the XROLLINGANGLE table
+  NEXT_WALKING_ANGLE2    ANGLE_OFFSET(a3)
+
+  ; Rotate around right-bottom vertex
+  move.w                 ANGLE_OFFSET(a3),d0
+  jsr                    ROTATE_REG
+
+  ; each time angle is 241 I have a full revolution aroung the vertex, in this case:
+  ; - reset the angle
+  ; - reset the angle pointer
+  ; add the length of the triangle to the XROLLINGOFFSET
+  UPDATE_TRANSLATION2    #241,XROLLINGOFFSET_OFFSET(a3),#30
+
+; If got N revolutions and the angle is >= 360-30 SET the stage to 1 to start vertical climbing for next frame
+  cmpi.w                 #STARTDXCLIMB,XROLLINGOFFSET_OFFSET(a3)
+  bne.s                  walkingtriangle_no_vertical_climbing2
+  cmpi.w                 #326,ANGLE_OFFSET(a3)
+  bne.s                  walkingtriangle_no_vertical_climbing2
+  move.w                 #1,STAGEWALK_OFFSET(a3)
+  SETSTAGE               bigspaceship_activation
+  move.w                 #64,SCALEFACTOR_OFFSET(a3)
+  move.w                 #359,ANGLE_OFFSET(a3)
+  IFD LADDERS
+  START_LADDERS
+  ENDC
+
+walkingtriangle_no_vertical_climbing2:
 
   ; Triangle calculation (notice the third vertex is the origin, important to rotate around this point)
   VERTEX2D_INIT_I        1,FFF1,FFE6  ; -15,-26
@@ -733,6 +812,7 @@ walkingfloor1:
 
   ; ***************************** START IMPLEMENTATION OF TELETRANSPORTATION START ------------------
 teletrasportationstart:
+  DEBUG 1234
   move.w                 XPOSITIONVECTOR_OFFSET(a3),d0
   move.w                 YPOSITIONVECTOR_OFFSET(a3),d1
   asr.w                  #6,d0
@@ -816,6 +896,144 @@ teletrasportationend:
   jsr                    TRIANGLE_BLIT
 
   rts
+
+
+bounce:
+
+    ;DEBUG 1235
+    ;move.w ANGLE_OFFSET(a3),d0
+  
+  ; add gravity
+  lea                     ACCELLERATIONVECTOR(PC),a0
+  
+  move.l                  a3,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+
+  ; velocity vector is UP
+  ;lea XBOUNCEVELOCITYVECTOR,a0
+  move.l a1,a0
+  move.l a3,a1
+  adda.w #POSITIONVECTOR_OFFSET,a1
+  ;lea XBOUNCEPOSITIONVECTOR,a1
+  ADD2DVECTOR
+
+
+  moveq                  #STARTWALKXPOS,d0
+  add.w                  XROLLINGOFFSET_OFFSET(a3),d0
+  sub.w                  #15,d0
+  move.w                 #STARTWALKYPOS,d1
+  sub.w                  #13,d1
+
+  move.w XPOSITIONVECTOR_OFFSET(a3),d2
+  move.w YPOSITIONVECTOR_OFFSET(a3),d3
+  bpl.s bounceend ; if d3 < 0 we are done with the bouncing
+
+  
+  asr.w #6,d2
+  asr.w #6,d3
+  add.w d2,d0
+  add.w d3,d1
+bounceground:  
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  moveq #64,d0
+  move.w                  SCALEFACTOR_OFFSET(a3),d1
+  jsr SCALE_REG
+  move.w COUNTER_OFFSET(a3),d0
+  add.w d0,SCALEFACTOR_OFFSET(a3)
+  cmp.w #-64,SCALEFACTOR_OFFSET(a3)
+  bne.s donotinvertbouncingscaling
+  neg.w COUNTER_OFFSET(a3)
+donotinvertbouncingscaling
+
+  ; Centered triangle
+  VERTEX2D_INIT_I        1,0000,FFEC  ;#0,#-13
+  VERTEX2D_INIT_I        2,FFF1,000C  ;#-15,#13
+  VERTEX2D_INIT_I        3,000F,000C  ;#15,#13
+
+  jsr                    TRIANGLE_BLIT
+
+  rts
+
+bounceend:
+    ;    DEBUG 1201
+    moveq #0,d3
+    move.w                   #0,XPOSITIONVECTOR_OFFSET(a3)         ; POSITIONVECTOR X
+    move.w                   #0,YPOSITIONVECTOR_OFFSET(a3)                           ; POSITIONVECTOR Y
+     move.w                 #64,SCALEFACTOR_OFFSET(a3)
+    move.w #-2*64,YVELOCITYVECTOR_OFFSET(a3)
+    move.w #-1,COUNTER_OFFSET(a3)
+    SETSTAGE bounce2
+    bra.s bounceground
+
+
+
+
+; Second bounce
+bounce2:
+  ; add gravity
+  lea                     ACCELLERATIONVECTOR(PC),a0
+  move.l                  a3,a1
+  adda.w                  #VELOCITYVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+
+  ; velocity vector is UP
+  move.l a1,a0
+  move.l a3,a1
+  adda.w #POSITIONVECTOR_OFFSET,a1
+  ADD2DVECTOR
+
+  moveq                  #STARTWALKXPOS,d0
+  add.w                  XROLLINGOFFSET_OFFSET(a3),d0
+  sub.w                  #15,d0
+  move.w                 #STARTWALKYPOS,d1
+  sub.w                  #13,d1
+
+  move.w XPOSITIONVECTOR_OFFSET(a3),d2
+  move.w YPOSITIONVECTOR_OFFSET(a3),d3
+  bpl.s bounceend2 ; if d3 < 0 we are done with the bouncing
+
+  
+  asr.w #6,d2
+  asr.w #6,d3
+  add.w d2,d0
+  add.w d3,d1
+bounceground2:  
+  jsr                    LOADIDENTITYANDTRANSLATE
+
+  moveq #64,d0
+  move.w                  SCALEFACTOR_OFFSET(a3),d1
+  jsr SCALE_REG
+  move.w COUNTER_OFFSET(a3),d0
+  add.w d0,SCALEFACTOR_OFFSET(a3)
+  cmp.w #-64,SCALEFACTOR_OFFSET(a3)
+  bne.s donotinvertbouncingscaling2
+  neg.w COUNTER_OFFSET(a3)
+donotinvertbouncingscaling2
+
+  ; Centered triangle
+  VERTEX2D_INIT_I        1,0000,FFEC  ;#0,#-13
+  VERTEX2D_INIT_I        2,FFF1,000C  ;#-15,#13
+  VERTEX2D_INIT_I        3,000F,000C  ;#15,#13
+
+  jsr                    TRIANGLE_BLIT
+
+  rts
+
+bounceend2:
+    ;    DEBUG 1201
+    moveq #0,d3
+    move.w                   #64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET),XPOSITIONVECTOR_OFFSET(a3)         ; POSITIONVECTOR X
+    move.w                   #64*(STARTWALKYPOS+15-STARTDYCLIMB),YPOSITIONVECTOR_OFFSET(a3)                           ; POSITIONVECTOR Y
+    move.w #0,YVELOCITYVECTOR_OFFSET(a3)
+    move.w #-1,COUNTER_OFFSET(a3)
+    SETSTAGE walkingtriangle_xwalk2
+    bra.s bounceground2
+
+
 
   IFD EFFECTS
 cyclebigspaceshipcolors:
