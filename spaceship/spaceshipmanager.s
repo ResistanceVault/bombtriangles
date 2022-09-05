@@ -141,6 +141,10 @@ spaceship_do_not_update_lights:
   move.w               d0,d1
   swap                 d0
 
+  ; normalize for sprite
+  lsr.w                #7,d0
+  lsr.w                #6,d1
+
   ; if d0 is odd we are moving the spaceship to an odd location, in this case we must set
   btst                 #0,d0
   beq.s                spaceship_no_odd_x
@@ -151,11 +155,6 @@ spaceship_no_odd_x:
   bclr                 #0,3+SPACESHIP1_BPL0
   bclr                 #0,3+SPACESHIP1_BPL1
 spaceship_place_coords:
-
-  ; normalize for sprite
-  lsr.w                #7,d0
-  lsr.w                #6,d1
-
   move.b               d0,SPACESHIP1_BPL0_HSTART
   move.b               d0,SPACESHIP1_BPL1_HSTART
 
@@ -212,6 +211,10 @@ spaceship_place_coords:
 
 spaceship2donotreset:
 
+  ; normalize for sprite
+  lsr.w                #7,d0
+  lsr.w                #6,d1
+
   ; if d0 is odd we are moving the spaceship to an odd location, in this case we must set
   btst                 #0,d0
   beq.s                spaceship2_no_odd_x
@@ -222,11 +225,6 @@ spaceship2_no_odd_x:
   bclr                 #0,3+SPACESHIP2_BPL0
   bclr                 #0,3+SPACESHIP2_BPL1
 spaceship2_place_coords:
-
-  ; normalize for sprite
-  lsr.w                #7,d0
-  lsr.w                #6,d1
-
   move.b               d0,SPACESHIP2_BPL0_HSTART
   move.b               d0,SPACESHIP2_BPL1_HSTART
 
