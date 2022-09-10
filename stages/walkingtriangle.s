@@ -223,7 +223,7 @@ walkingtriangle_xwalk:
   cmpi.w                 #STARTDXCLIMB/2,XROLLINGOFFSET_OFFSET(a3)
   bne.s                  walkingtriangle_no_vertical_climbing
   move.w                 #1,STAGEWALK_OFFSET(a3)
-  SETSTAGE               bounce
+  SETSTAGE               compress
   move.w                 #-2*64,YVELOCITYVECTOR_OFFSET(a3)
   move.l                 #0,POSITIONVECTOR_OFFSET(a3)
   move.w                 #64,SCALEFACTOR_OFFSET(a3)
@@ -852,6 +852,45 @@ teletrasportationend:
 
   jsr                    TRIANGLE_BLIT
 
+  rts
+
+compress:
+
+  moveq                   #STARTWALKXPOS-15,d0
+  add.w                   XROLLINGOFFSET_OFFSET(a3),d0
+  move.w                  #STARTWALKYPOS,d1
+
+  jsr                     LOADIDENTITYANDTRANSLATE
+
+  DEBUG 1234
+
+  addi.w                  #1,COUNTER_OFFSET(a3)
+  andi.w                  #$0007,COUNTER_OFFSET(a3)
+  seq                     d7
+  ext.w                   d7
+
+  move.w                  SCALEFACTOR_OFFSET(a3),d0
+  move.w                  d0,d1
+  subi.w                  #64,d0
+  neg d0
+  addi.w                  #64,d0
+  add.w                   d7,SCALEFACTOR_OFFSET(a3)
+
+  cmp.w                   #$55,d0
+  bne.s                   noendcompress
+  SETSTAGE                bounce
+  move.w                  #64,SCALEFACTOR_OFFSET(a3)
+  move.w                  #-1,COUNTER_OFFSET(a3)
+noendcompress:
+
+  jsr                     SCALE_REG
+
+  ; Centered triangle
+  VERTEX2D_INIT_I         1,0000,FFE6  ;#0,#-26
+  VERTEX2D_INIT_I        2,FFF1,0000  ;#-15,0
+  VERTEX2D_INIT_I        3,000F,0000  ;#15,0
+
+  jsr                    TRIANGLE_BLIT
   rts
 
 bounce:
