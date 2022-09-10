@@ -115,8 +115,8 @@ TRIANGLE_5:
   dc.w                   30                                                            ; YROLLINGOFFSET
   dc.w                   STARTSTAGE                                                    ; STAGE
   dc.l                   ROTATIONS_ANGLES_64_180-2                                     ; XROLLINGANGLE
-  dc.b                   2                                                             ; STROKE
-  dc.b                   2                                                             ; FILL
+  dc.b                   1                                                             ; STROKE
+  dc.b                   1                                                             ; FILL
   dc.w                   TIMEDELAY*4                                                   ; SLEEP
   dc.w                   64*(STARTWALKXPOS+STARTDXCLIMB-STARTDXDESCEND_OFFSET)         ; POSITIONVECTOR X
   dc.w                   64*(STARTWALKYPOS+15-STARTDYCLIMB)                            ; POSITIONVECTOR Y

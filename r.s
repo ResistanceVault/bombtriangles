@@ -745,7 +745,8 @@ LADDER_2_VSTOP2:
 
 ; background tiles
 ;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
-SANDTOP:              incbin "assets/tiles/sandtop.raw"
+SANDTOP:              ;incbin "assets/tiles/sandtop.raw"
+                      incbin "assets/tiles/eric/top_sand_eric.raw"
 TILEFULL:             ;incbin "assets/tiles/full.raw"
                       incbin "assets/tiles/eric/full_eric.raw"
 
