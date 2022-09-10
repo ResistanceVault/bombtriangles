@@ -747,16 +747,16 @@ LADDER_2_VSTOP2:
 ;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
 SANDTOP:              incbin "assets/tiles/sandtop.raw"
 TILEFULL:             ;incbin "assets/tiles/full.raw"
-                      incbin "assets/tiles/ciao.raw" ; col1 and 6 swapped
+                      incbin "assets/tiles/eric/full_eric.raw"
 
 TILELEFTSLOPE:        ;incbin "assets/tiles/leftslope.raw"
-                       incbin "assets/tiles/ciao3.raw"
+                      incbin "assets/tiles/eric/left_eric2.raw"
 
 TILERIGHTSLOPE:       ;incbin "assets/tiles/rightslope.raw"
-                      incbin "assets/tiles/ciao4.raw"
+                      incbin "assets/tiles/eric/right_eric.raw"
 
 PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
-                      incbin "assets/tiles/ciao2.raw" ; col1 and 6 swapped
+                      incbin "assets/tiles/eric/top_eric2.raw" ; col1 and 6 swapped
 
   IFD                 P61
 Module1:
