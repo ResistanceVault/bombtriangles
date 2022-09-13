@@ -228,6 +228,18 @@ platform2_start:
   adda.l              #224*40,a0
   dbra                d7,platform1_start
 
+  lea                  SCREEN_2+99*40+25,a0
+  moveq               #3-1,d7
+platform1_start2:
+  moveq               #8-1,d6
+  move.l              a0,a1
+platform2_start2:
+  ori.b               #$F8,1(a1)
+  adda.w              #40,a1
+  dbra                d6,platform2_start2
+  adda.l              #224*40,a0
+  dbra                d7,platform1_start2
+
 ; start blitting platform 2
   moveq                #8-1,d4
   moveq                #5,d0
