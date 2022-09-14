@@ -86,20 +86,20 @@ SPACESHIPMANAGER:
   lea                  SPACESHIP2_BPL0,a3
   lea                  SPACESHIP_FRAME_PTR(PC),a0
   move.l               (a0),a1
-  move.l               (a1),16(a3)
-  move.l               (a1)+,16(a2)
-  move.l               (a1),36(a3)
-  move.l               (a1)+,36(a2)
-  move.l               (a1),40(a3)
-  move.l               (a1)+,40(a2)
+  move.l               (a1),20(a3)
+  move.l               (a1)+,20(a2)
+  move.l               (a1),28(a3)
+  move.l               (a1)+,28(a2)
+  move.l               (a1),32(a3)
+  move.l               (a1)+,32(a2)
   lea                  SPACESHIP1_BPL1,a2
   lea                  SPACESHIP2_BPL1,a3
-  move.l               (a1),16(a3)
-  move.l               (a1)+,16(a2)
-  move.l               (a1),36(a3)
-  move.l               (a1)+,36(a2)
-  move.l               (a1),40(a3)
-  move.l               (a1)+,40(a2)
+  move.l               (a1),20(a3)
+  move.l               (a1)+,20(a2)
+  move.l               (a1),28(a3)
+  move.l               (a1)+,28(a2)
+  move.l               (a1),32(a3)
+  move.l               (a1)+,32(a2)
   move.w               #SPACESHIP_FRAME_RATE,SPACESHIP_FRAME_COUNTER
 
   ; if a1 contains now the same address of SPACESHIP_DIFF_END

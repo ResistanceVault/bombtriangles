@@ -1,35 +1,44 @@
 SPACESHIP1_BPL0:
 SPACESHIP1_BPL0_VSTART:  dc.b    $30
-SPACESHIP1_BPL0_HSTART   dc.b    $90
-SPACESHIP1_BPL0_VSTOP    dc.b    $3a,$00
-                         dc.w    $0300,$0300      ; line 1
-                         dc.w    $0E30,$0E30      ; line 2
-                         dc.w    $1C70,$1C78      ; line 3
-                         dc.w    $0820,$0830      ; line 4
-                         dc.w    $31C4,$31F8      ; line 5
-                         dc.w    $7FFE,$7FFE      ; line 6
-                         dc.w    $C71F,$C7E3      ; line 7
-                         dc.w    $C71F,$C7E3      ; line 8
-                         dc.w    $5800,$5800      ; line 9
-                         dc.w    $2000,$2000      ; line 10
+SPACESHIP1_BPL0_HSTART:  dc.b    $90
+SPACESHIP1_BPL0_VSTOP:   dc.b    $3a,$00
+SPACESHIP1_BPL0_DATA:    dc.w    $03C0,$03C0      ; line 1
+                         dc.w    $0020,$0420      ; line 2
+                         dc.w    $04C0,$0BC0      ; line 3
+                         dc.w    $1960,$27E0      ; line 4
+                         dc.w    $60B8,$1FF8      ; line 5
+                         dc.w    $FE80,$017F      ; line 6
+                         dc.w    $1E70,$1E60      ; line 7
+                         dc.w    $0640,$0220      ; line 8
+                         dc.w    $0380,$0140      ; line 9
+                         dc.w    $0100,$0080      ; line 10
                          dc.w    0,0
 SPACESHIP1_BPL1:
-SPACESHIP1_BPL1_VSTART   dc.b    $30
-SPACESHIP1_BPL1_HSTART   dc.b    $90
-SPACESHIP1_BPL1_VSTOP    dc.b    $3a,%10000000
-                         dc.w    $0300,$00C0      ; line 1
-                         dc.w    $0E30,$01F0      ; line 2
-                         dc.w    $1C78,$03F8      ; line 3
-                         dc.w    $3BFC,$0430      ; line 4
-                         dc.w    $31FC,$0FFC      ; line 5
-                         dc.w    $0000,$0000      ; line 6
-                         dc.w    $C7FC,$3FFC      ; line 7
-                         dc.w    $C7FC,$3FFC      ; line 8
-                         dc.w    $5BDE,$3800      ; line 9
-                         dc.w    $218C,$1000      ; line 10
+SPACESHIP1_BPL1_VSTART:  dc.b    $30
+SPACESHIP1_BPL1_HSTART:  dc.b    $90
+SPACESHIP1_BPL1_VSTOP:   dc.b    $3a,%10000000
+SPACESHIP1_BPL1_DATA:    dc.w    $03C0,$0340      ; line 1
+                         dc.w    $0420,$0420      ; line 2
+                         dc.w    $0FC0,$0FF0      ; line 3
+                         dc.w    $3FE0,$3FFC      ; line 4
+                         dc.w    $FFFB,$7FFC      ; line 5
+                         dc.w    $FFFF,$FFFF      ; line 6
+                         dc.w    $019C,$0010      ; line 7
+                         dc.w    $05EC,$0460      ; line 8
+                         dc.w    $02C0,$02C0      ; line 9
+                         dc.w    $0180,$0180      ; line 10
                          dc.w    0,0
 
-
+; color swap, just a note dont uncomment this code
+; 17->20
+; 18->23
+; 19->31
+; 17->30
+; 21 -> 30
+; 21 -> 31
+; 21 - 24
+; 22 -> 29
+; 18 -> 19
 
 ;Spaceship palette, just a note dont uncomment this code
 ;dc.w    $1a0,$bfc    ; color transparency
