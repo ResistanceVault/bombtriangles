@@ -157,30 +157,10 @@ spaceship_do_not_update_lights:
   move.w               d0,d1
   swap                 d0
 
-  ; normalize for sprite
-  lsr.w                #7,d0
-  lsr.w                #6,d1
-
-  ; if d0 is odd we are moving the spaceship to an odd location, in this case we must set
-  btst                 #0,d0
-  beq.s                spaceship_no_odd_x
-  bset                 #0,3+SPACESHIP1_BPL0
-  bset                 #0,3+SPACESHIP1_BPL1
-  bra.s                spaceship_place_coords
-spaceship_no_odd_x:
-  bclr                 #0,3+SPACESHIP1_BPL0
-  bclr                 #0,3+SPACESHIP1_BPL1
-spaceship_place_coords:
-  move.b               d0,SPACESHIP1_BPL0_HSTART
-  move.b               d0,SPACESHIP1_BPL1_HSTART
-
-  move.b               d1,SPACESHIP1_BPL0_VSTART
-  move.b               d1,SPACESHIP1_BPL1_VSTART
-
-  add.w                SPACESHIP_SPRITE_HEIGHT,d1
-
-  move.b               d1,SPACESHIP1_BPL0_VSTOP
-  move.b               d1,SPACESHIP1_BPL1_VSTOP
+  lea                  SPACESHIP1_BPL0,a0
+  lea                  SPACESHIP1_BPL1,a1
+  move.w               SPACESHIP_SPRITE_HEIGHT(PC),d7
+  bsr.w                movespaceshipsprite
 
   ; Compute position of spaceship 2
   lea                  BOMBDROP(PC),a4
@@ -207,7 +187,7 @@ spaceship_place_coords:
   ; d1 is the sprite vertical position, if d1 is > 255 it surely means
   ; that we are moving away from the dropzone and we are far enough that
   ; the spaceship is not into the screen, hence, we reset the sprite to initial state
-  cmpi.w                #250*SPACESHIP_DECIMALDIGITS,d1
+  cmpi.w               #250*SPACESHIP_DECIMALDIGITS,d1
   blt.s                spaceship2donotreset
   move.l               #$00600010,SPACESHIP2_BPL0_BOMB ; reconstruct sprite
   move.w               #$0FF0,SPACESHIP2_BPL1_BOMB ; reconstruct sprite
@@ -227,30 +207,11 @@ spaceship_place_coords:
 
 spaceship2donotreset:
 
-  ; normalize for sprite
-  lsr.w                #7,d0
-  lsr.w                #6,d1
+  lea                  SPACESHIP2_BPL0,a0
+  lea                  SPACESHIP2_BPL1,a1
+  move.w               SPACESHIP2_SPRITE_HEIGHT(PC),d7
+  bsr.w                movespaceshipsprite
 
-  ; if d0 is odd we are moving the spaceship to an odd location, in this case we must set
-  btst                 #0,d0
-  beq.s                spaceship2_no_odd_x
-  bset                 #0,3+SPACESHIP2_BPL0
-  bset                 #0,3+SPACESHIP2_BPL1
-  bra.s                spaceship2_place_coords
-spaceship2_no_odd_x:
-  bclr                 #0,3+SPACESHIP2_BPL0
-  bclr                 #0,3+SPACESHIP2_BPL1
-spaceship2_place_coords:
-  move.b               d0,SPACESHIP2_BPL0_HSTART
-  move.b               d0,SPACESHIP2_BPL1_HSTART
-
-  move.b               d1,SPACESHIP2_BPL0_VSTART
-  move.b               d1,SPACESHIP2_BPL1_VSTART
-
-  add.w                SPACESHIP2_SPRITE_HEIGHT,d1
-
-  move.b               d1,SPACESHIP2_BPL0_VSTOP
-  move.b               d1,SPACESHIP2_BPL1_VSTOP
 spaceship2_end:
   cmpi.w               #1,(a4)
   bne.s                dontruntimer
@@ -269,4 +230,31 @@ spaceship2_end:
   neg.w                SPACESHIP2ACCELLERATION+2
 
 dontruntimer:
+  rts
+
+movespaceshipsprite:
+    ; normalize for sprite
+  lsr.w                #7,d0
+  lsr.w                #6,d1
+
+  ; if d0 is odd we are moving the spaceship to an odd location, in this case we must set
+  btst                 #0,d0
+  beq.s                .fspaceship2_no_odd_x
+  bset                 #0,3(a0)
+  bset                 #0,3(a1)
+  bra.s                .fspaceship2_place_coords
+.fspaceship2_no_odd_x:
+  bclr                 #0,3(a0)
+  bclr                 #0,3(a1)
+.fspaceship2_place_coords:
+  move.b               d0,1(a0)
+  move.b               d0,1(a1)
+
+  move.b               d1,(a0)
+  move.b               d1,(a1)
+
+  add.w                d7,d1
+
+  move.b               d1,2(a0)
+  move.b               d1,2(a1)
   rts
