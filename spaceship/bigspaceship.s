@@ -88,88 +88,13 @@ bigspaceship_each_byte:
   rts
 
 BIGSPACESHIP_BPL1:
-  dc.w $FCFF ; line 1
-  dc.w $F1CF ; line 2
-  dc.w $E38F ; line 3
-  dc.w $C413 ; line 4
-  dc.w $CE3F ; line 5
-  dc.w $8001 ; line 6
-  dc.w $38FC ; line 7
-  dc.w $38FC ; line 8
-  ;dc.w $A421 ; line 9
-  ;dc.w $DE73 ; line 10
-  dc.w $A529
-  dc.w $DEF7
-
-BIGSPACESHIP_BPL2:  
-  dc.w $03C0 ; line 1
-  dc.w $0FC0 ; line 2 
-  dc.w $1F88 ; line 3
-  dc.w $3FDC ; line 4
-  dc.w $3E38 ; line 5
-  dc.w $0000 ; line 6 
-  dc.w $F8E0 ; line 7
-  dc.w $F8E0 ; line 8
-  ;dc.w $63DE ; line 9
-  ;dc.w $318C ; line 10 
-  dc.w $6318 ; line 9
-  dc.w $318C ; line 10
-
-BIGSPACESHIP_BPL3:
-  dc.w $0000 ; line 1
-  dc.w $0030 ; line 2
-  dc.w $0078 ; line 3
-  dc.w $33FC ; line 4 
-  dc.w $01FC ; line 5
-  dc.w $0000 ; line 6
-  dc.w $07FC ; line 7
-  dc.w $07FC ; line 8
-  ;dc.w $1BDE ; line 9
-  ;dc.w $018C ; line 10
-  dc.w $18C6
-  dc.w $0000
-
-  IFD LOL
-
-BIGSPACESHIP_BPL1:
-  dc.w %0000001100000000
-  dc.w %0000111000110000
-  dc.w %0001110001110000
-  dc.w %0011101111101100
-  dc.w %0011000111000000
-  dc.w %0111111111111110
-  dc.w %1100011100000011
-  dc.w %1100011100000011
-  ;dc.w %0101101111011110
-  ;dc.w %0010000110001100
-  dc.l %01011010110101100010000100001000
+  dc.b $FF,$7F,$FB,$FF,$F0,$FF,$C1,$7F,$80,$BF,$00,$00,$F1,$8F,$F9,$9F,$FC,$3F,$FE,$7F
 
 BIGSPACESHIP_BPL2:
-  dc.w %0000000011000000
-  dc.w %0000000111110000
-  dc.w %0000001111110000
-  dc.w %0000010000100000
-  dc.w %0000111111000100
-  dc.w %0111111111111110
-  dc.w %0011111100011111
-  dc.w %0011111100011111
-  ;dc.w %0011100000000000
-  ;dc.w %0001000000000000
-  dc.l %00111001110011100001000010000100
+  dc.b $03,$C0,$04,$20,$0B,$F0,$27,$FC,$1F,$FC,$01,$7F,$00,$00,$00,$20,$00,$40,$00,$80
 
 BIGSPACESHIP_BPL3:
-  dc.w %0000000000000000
-  dc.w %0000000000000000
-  dc.w %0000000000001000
-  dc.w %0011001111011100
-  dc.w %0000000000111100
-  dc.w %0111111111111110
-  dc.w %0000000011111111
-  dc.w %0000000011111111
-  ;dc.w %0000001111011110
-  ;dc.w %0000000110001100
-  dc.l 0
-  ENDC
+  dc.b $03,$40,$04,$20,$0F,$C0,$3F,$E0,$FF,$FB,$FF,$FF,$31,$9C,$35,$EC,$02,$C0,$01,$80
 
 BIGSPACESHIP_COLORSTABLE: dcb.w 64,$00
 BIGSPACESHIP_COLORSTABLE_END:

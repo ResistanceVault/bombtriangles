@@ -13,17 +13,16 @@ SKY_COLOR_2:
     dc.w    SKY_COL_INDEX
 SKY_COLOR_3:
             dc.w  $008
+
+    dc.w    $3807,$FFFE
+BIGSPACESHIP_ACTIVE_COLORS:
+    dc.w       $18a,$f00 ; was 182
+
     dc.w    $3907,$FFFE    ; jump 3 scanlines
     dc.w    SKY_COL_INDEX
 SKY_COLOR_4:
     dc.w    $009
 
-     dc.w    $3b07,$FFFE
-BIGSPACESHIP_ACTIVE_COLORS:
-            dc.w       $184,$fff ; was 182
-            dc.w       $184,$ddd
-            dc.w       $186,$bbb
-            dc.w       $188,$888
 
     dc.w    $3e07,$FFFE
     dc.w    SKY_COL_INDEX
