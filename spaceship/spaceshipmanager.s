@@ -60,6 +60,8 @@ SPACESHIP_FRAME_COUNTER:
   dc.w                  SPACESHIP_FRAME_RATE
 SPACESHIP_FRAME_PTR:
   dc.l                  SPACESHIP2_DIFF
+BIGSPACESHIP_WINDOW_FRAME_PTR:
+  dc.l                  BIGSPACESHIP_WINDOW_FRAME_2
 
 SPACESHIP_SPRITE_HEIGHT:
   dc.w                  30
@@ -81,10 +83,22 @@ SPACESHIPMANAGER:
 
   ; spaceship light animation start
   subq                 #1,SPACESHIP_FRAME_COUNTER
-  bne.s                spaceship_do_not_update_lights
+  bne.w                spaceship_do_not_update_lights
+
+  lea                  BIGSPACESHIP_WINDOW_FRAME_PTR(PC),a4
+  move.l               (a4),a5
+  lea                  40*8+30+SCREEN_2,a2
+  moveq                #3-1,d7 ; Cycle for each bitplane
+spaceshipwindowloop:
+  move.l               (a5),(a2)
+  move.l               (a5)+,40(a2)
+  adda.w               #224*40,a2
+  dbra d7,spaceshipwindowloop
+
   lea                  SPACESHIP1_BPL0,a2
   lea                  SPACESHIP2_BPL0,a3
   lea                  SPACESHIP_FRAME_PTR(PC),a0
+
   move.l               (a0),a1
   move.l               (a1),20(a3)
   move.l               (a1)+,20(a2)
@@ -107,10 +121,12 @@ SPACESHIPMANAGER:
   cmp.l                #SPACESHIP_DIFF_END,a1
   bne.s                spaceship_ptr_do_not_reset
   move.l               #SPACESHIP1_DIFF,a1
+  move.l               #BIGSPACESHIP_WINDOW_FRAME_1,a5
 spaceship_ptr_do_not_reset:
 
-  ; update ptr
+  ; update ptrs
   move.l               a1,(a0)
+  move.l               a5,(a4)
 
 spaceship_do_not_update_lights:
   ; spaceship light animation end

@@ -88,13 +88,82 @@ bigspaceship_each_byte:
   rts
 
 BIGSPACESHIP_BPL1:
-  dc.b $FF,$7F,$FB,$FF,$F0,$FF,$C1,$7F,$80,$BF,$00,$00,$F1,$8F,$F9,$9F,$FC,$3F,$FE,$7F
+  dc.b $FF,$7F ; row 1
+  dc.b $FB,$FF ; row 2
+  dc.b $F0,$FF ; row 3
+  dc.b $C1,$7F ; row 4
+BIGSPACESHIP_WINDOW_BPL1:
+  dc.b $80,$BF ; row 5
+  dc.b $00,$00 ; row 6
+  dc.b $F1,$8F ; row 7
+  dc.b $F9,$9F ; row 8
+  dc.b $FC,$3F ; row 9
+  dc.b $FE,$7F ; row 10
 
 BIGSPACESHIP_BPL2:
-  dc.b $03,$C0,$04,$20,$0B,$F0,$27,$FC,$1F,$FC,$01,$7F,$00,$00,$00,$20,$00,$40,$00,$80
+  dc.b $03,$C0 ; row 1
+  dc.b $04,$20 ; row 2
+  dc.b $0B,$F0 ; row 3
+  dc.b $27,$FC ; row 4
+BIGSPACESHIP_WINDOW_BPL2:
+  dc.b $1F,$FC ; row 5
+  dc.b $01,$7F ; row 6
+  dc.b $00,$00 ; row 7
+  dc.b $00,$20 ; row 8
+  dc.b $00,$40 ; row 9
+  dc.b $00,$80 ; row 10
 
 BIGSPACESHIP_BPL3:
-  dc.b $03,$40,$04,$20,$0F,$C0,$3F,$E0,$FF,$FB,$FF,$FF,$31,$9C,$35,$EC,$02,$C0,$01,$80
+  dc.b $03,$40 ; row 1
+  dc.b $04,$20 ; row 2
+  dc.b $0F,$C0 ; row 3
+  dc.b $3F,$E0 ; row 4
+BIGSPACESHIP_WINDOW_BPL3:
+  dc.b $FF,$FB ; row 5
+  dc.b $FF,$FF ; row 6
+  dc.b $31,$9C ; row 7
+  dc.b $35,$EC ; row 8
+  dc.b $02,$C0 ; row 9
+  dc.b $01,$80 ; row 10
 
 BIGSPACESHIP_COLORSTABLE: dcb.w 64,$00
 BIGSPACESHIP_COLORSTABLE_END:
+
+BIGSPACESHIP_WINDOW_FRAMES:
+BIGSPACESHIP_WINDOW_FRAME_1:
+  ; frame 1
+  dc.b %11110000,%00000000,%11001111,%11111111
+  dc.b %00000011,%11111111,%11111111,%11111100 
+  dc.b %11111111,%11111111,%11111111,%11000011
+
+BIGSPACESHIP_WINDOW_FRAME_2:
+  ; frame 2
+  dc.b %00001111,%11000000,%11001111,%11111111
+  dc.b %11000000,%00111111,%11111111,%11111111
+  dc.b %11111111,%11111111,%11111111,%11000000
+
+BIGSPACESHIP_WINDOW_FRAME_3:
+  ; frame 3
+  dc.b %00000000,%11111111,%11001111,%11111111
+  dc.b %11000011,%00000000,%11111111,%11111111 
+  dc.b %11111111,%11111111,%11111111,%11000000
+
+BIGSPACESHIP_WINDOW_FRAME_4:
+  ; frame 4
+  dc.b %00000000,%00000000,%11111111,%11111111
+  dc.b %11000011,%11111111,%00000000,%11111111
+  dc.b %11111111,%11111111,%11111111,%11000000
+
+BIGSPACESHIP_WINDOW_FRAME_5:
+  ; frame 5
+  dc.b %00000000,%00000000,%11001111,%11111111
+  dc.b %11000011,%11111111,%11111100,%00001111 
+  dc.b %11111111,%11111111,%11111111,%11110000
+
+BIGSPACESHIP_WINDOW_FRAME_6:
+  ; frame 6
+  dc.b %11000000,$00000000,%11001111,%11111111
+  dc.b %00000011,%11111111,%11111111,%11110000 
+  dc.b %11111111,%11111111,%11111111,%11001111
+
+BIGSPACESHIP_WINDOW_FRAMES_END:
