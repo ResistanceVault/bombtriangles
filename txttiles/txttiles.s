@@ -10,8 +10,32 @@ TILE_DATA:
   dc.l PATTERN_FULL
   dc.l TILETXT1
 
+  dc.l PATTERN_EMPTY
+  dc.l TILETXT_EMPTY
+
   dc.l PATTERN_FULL
   dc.l TILETXT2
+
+  dc.l PATTERN_FULL
+  dc.l GREETINGS_TO
+
+  dc.l PLEASANCE
+  dc.l TILETXT_EMPTY
+
+  dc.l HARE
+  dc.l TILETXT_EMPTY
+
+  dc.l CROCI
+  dc.l TILETXT_EMPTY
+
+  dc.l PASTORE
+  dc.l TILETXT_EMPTY
+
+  dc.l DIGAETANO
+  dc.l TILETXT_EMPTY
+
+  dc.l MODEM
+  dc.l TILETXT_EMPTY
 
   dc.l PATTERN_FULL
   dc.l MUSIC
@@ -36,12 +60,6 @@ TILE_DATA:
 
   dc.l Z3K
   dc.l TILETXT_EMPTY
-
-  dc.l PATTERN_FULL
-  dc.l TILETXT3
-
-  dc.l PATTERN_FULL
-  dc.l TILETXT4
 
   dc.l PATTERN_FULL
   dc.l TILETXT5
@@ -169,6 +187,48 @@ SPOLETO_5:
   dc.b      %00111100
   dc.b      %11110001
   dc.b      %10001111
+
+MODEM:
+  dc.b $06,$8F,$30,$F3,$40 
+  dc.b $05,$49,$28,$82,$A0 
+  dc.b $04,$49,$24,$E2,$20 
+  dc.b $04,$49,$28,$82,$20 
+  dc.b $04,$4F,$30,$F2,$20
+
+HARE:
+  dc.b $00,$48,$43,$8F,$00 
+  dc.b $00,$48,$A2,$48,$00
+  dc.b $00,$79,$13,$8E,$00 
+  dc.b $00,$49,$F2,$88,$00
+  dc.b $00,$49,$12,$4F,$00
+
+PLEASANCE:
+  dc.b $E4,$77,$BD,$ED,$77 
+  dc.b $94,$44,$A1,$2D,$44 
+  dc.b $E4,$67,$BD,$EB,$46 
+  dc.b $84,$44,$85,$2B,$44
+  dc.b $87,$74,$B9,$29,$77 
+
+PASTORE:
+  dc.b $E3,$CF,$3E,$79,$C7
+  dc.b $92,$48,$08,$49,$24 
+  dc.b $E3,$CF,$08,$49,$C6
+  dc.b $82,$41,$08,$49,$44
+  dc.b $82,$4F,$08,$79,$27
+
+DIGAETANO:
+  dc.b $C4,$3B,$DD,$DE,$D7
+  dc.b $A4,$22,$50,$92,$D5 
+  dc.b $94,$23,$D8,$9E,$B5 
+  dc.b $A4,$2A,$50,$92,$B5 
+  dc.b $C4,$3A,$5C,$92,$97
+
+CROCI:
+  dc.b $00,$F3,$8F,$3C,$80
+  dc.b $00,$82,$49,$20,$80
+  dc.b $00,$83,$89,$20,$80
+  dc.b $00,$82,$89,$20,$80
+  dc.b $00,$F2,$4F,$3C,$80
 
 Z3K:
   dc.b $00,$0F,$38,$90,$00
@@ -366,30 +426,30 @@ TILETEXT_NOP:
 
 ; TEXT ON TILES
 TILETXT1:
-  dc.b 7,"OZZYBOSHI",1,"PROUDLY",1,"PRESENTS",7
+  dc.b 3,"OZZYBOSHI",1,"ORGOGLIOSAMENTE",1,"PRESENTA",3
   dc.b  40
-  dc.b 13,"BOMBTRIANGLES",14
+  dc.b  10,"TRIANGLES",1,"IN",1,"SPOLETO",10
   dc.b  40
-  DC.B 4,"A",1,"NEW",1,"PRODUCTION",1,"FOR",1,"FLASHPARTY",5
+  dc.b  40
 
 TILETXT2:
-  dc.b  40
-  dc.b  7,"THIS",1,"IS",1,"A",1,"TWENTY",1,"KB",1,"INTRO",8
-  dc.b  40
-  dc.b  10,"MEANT",1,"FOR",1,"UNEXPANDED",10
-  dc.b  15,"AMIGA",1,"IOOO",15
+  DC.B 4,"UNA",1,"NUOVA",1,"PRODUZIONE",1,"DEDICATA",1,"A",5
+  dc.b 40
+  dc.b 13,"PASSIONE",1,"AMIGA",13
+  dc.b 40
+  dc.b 3,"E",1,"PRESENTATA",1,"AL",1,"PASSIONE",1,"AMIGA",1,"DAY",3
 
 GREETINGS_TO:
   dc.b  40
   dc.b  40
-  dc.b  14,"GREETINGS",1,"TO",14
+  dc.b  16,"SALUTI",1,"A",16
   dc.b  40
   dc.b  40
 
 BETA_TESTING:
   dc.b  40
   dc.b  40
-  dc.b  5,"BETA",1,"TESTING",1,"ON",1,"REAL",1,"AMIGA",1,"IOOO",4
+  dc.b  5,"BETA",1,"TESTING",1,"ON",1,"REAL",1,"HARDWARE",6
   dc.b  40
   dc.b  40
 
@@ -413,20 +473,6 @@ CODE:
   dc.b  17,"CODE",1,"BY",16
   dc.b  40
   dc.b  40
-
-TILETXT3:
-  dc.b  14,"GREETINGS",1,"TO",14
-  dc.b  40
-  dc.b  17,"BIGGUN",17
-  dc.b  13,"DIRK",1,"THE",1,"DARING",12
-  dc.b  15,"DR",1,"PROCTON",15
-
-TILETXT4:
-  dc.b  16,"PELLICUS",16
-  dc.b  14,"PRINCE",1,"PHAZE",14
-  dc.b  12,"NOVAMIGA",1,"FORUM",14
-  dc.b  40
-  dc.b  3,"ALL",1,"THE",1,"PEOPLE",1,"KEEPING",1,"AMIGA",1,"ALIVE",3
 
 TILETXT5:
   dc.b  3,"UN",1,"SALUTO",1,"SPECIALE",1,"AI",1,"REDATTORI",1,"DI",3
