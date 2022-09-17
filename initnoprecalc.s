@@ -14,11 +14,11 @@ _ammxmainloop3_init:
                         ; set palette
   lea       $dff182,a0
   move.w    #COLOR1,(a0)+    ; color1
-  move.w    #COLOR2,(a0)+    ; color2
-  move.w    #COLOR3,(a0)+    ; color3
-  move.w    #COLOR1,(a0)+    ; color4
-  move.w    #COLOR1,(a0)+    ; color5
-  move.w    #COLOR2,(a0)+    ; color6
+  move.w    #$db9,(a0)+    ; color2
+  move.w    #$765,(a0)+    ; color3
+  move.w    #$a97,(a0)+    ; color4
+  move.w    #$443,(a0)+    ; color5
+  move.w    #$eca,(a0)+    ; color6
   move.w    #COLOR3,(a0)+    ; color7
   move.w    #COLOR2,(a0)+    ; color8
   move.w    #COLOR3,(a0)+    ; color9

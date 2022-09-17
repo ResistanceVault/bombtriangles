@@ -1,8 +1,8 @@
 SPRITES_VSTART		   equ  $2C
 
-TWISTER_SPR_START_VPOS equ	23+SPRITES_VSTART ; Vertical position of the sprite where to start plotting twister
-TWISTER_SPR_Y_STEP	   equ   4 ; Space between each row in pixel
-TWISTER_SPR_NUM_ROWS   equ  33 ; How many rows in a twister?
+TWISTER_SPR_START_VPOS equ	3+SPRITES_VSTART ; Vertical position of the sprite where to start plotting twister
+TWISTER_SPR_Y_STEP	   equ   5 ; Space between each row in pixel
+TWISTER_SPR_NUM_ROWS   equ  32 ; How many rows in a twister?
 
 ; Full vertical height of the sprite in pixels
 TWISTER_SPR_HEIGHT	   equ  TWISTER_SPR_NUM_ROWS+(TWISTER_SPR_NUM_ROWS*TWISTER_SPR_Y_STEP)

@@ -94,39 +94,7 @@ SONG_FRAMES         equ       6240
   ; prepare sin table for twister - end
 
 
-  lea                  SANDTOP,a0
-  moveq                #20-1,d4
-  moveq                #0,d0
-  moveq                #11,d1
-  bsr.w                BLIT_TILES
-
-  ; draw top of pyramids
-  moveq               #0,d0
-  moveq               #1,d1
-  bsr.w               BLITTOPPYRAMID
-
-  moveq               #12,d0
-  moveq               #4,d1
-  bsr.w               BLITTOPPYRAMID
-
-  IFD STARS
-  ; stars start
-  moveq #80-1,d7
-  lea SCREEN_2+40*1+20,a0
-  move.l d7,d6
-startstarfield:
-  add.w d7,d6
-  divs.w d7,d6
-  swap d6
-  ;andi.l #$7,d6
-  bset d6,(a0)
-  bset d6,40*224*1(a0)
-  bset d6,40*224*2(a0)
-  addq  #2,a0
-  dbra d7,startstarfield
-; endstartfield
-  ENDC
-
+  
 ;*****************************************************************************
 ;	Init bitplane pointers in copperlist
 ;*****************************************************************************
@@ -142,71 +110,7 @@ startstarfield:
   lea                 BPLPTR5,A1
   bsr.w               POINTINCOPPERLIST_FUNCT
 
-  ; Start drawing full pyramid tiles
-  lea                 TILEFULL,a0
-  moveq               #6-1,d4
-  moveq               #1,d0
-  moveq               #5,d1
-  bsr.w               BLIT_TILES
-
-  moveq #4-1,d6
-  moveq               #8-1,d4
-  moveq               #0,d0
-  moveq               #6,d1
-tiles_vloop:
-
-  bsr.w               BLIT_TILES
-  addq                #1,d1
-  addq                #1,d4
-
-  dbra d6,tiles_vloop
-
-  ; Triangle crop pyramid
-  IFD CROP
-  lea VERTEX_LIST_2D_1,a4
-  moveq #0,d1
-  move.l         d1,(a4)+
-  move.l         #$00300000,(a4)+
-  move.l         #$00300030,(a4)+
-  lea                    OFFBITPLANEMEM,a4
-  jsr                    TRIANGLE_BLIT
-
-  lea            $dff040,a4
-  move.w         #$09f0,(a4)+ ; bltcon0 D=A
-  move.w         d1,(a4)+ ; bltcon1 set to zero
-
-  lea            $dff064,a4
-  move.w         d1,(a4)+ ; AMOD
-  move.w         d1,(a4)+ ; DMOD
-
-  move.l         SCREEN_PTR_0,$dff050 ; APTR
-  move.l         #SCREEN_2+40*224*1,$dff054 ; DPTR
-  ENDC
-
-
-
-; left slope tile (trashing the full tile)
-  moveq               #0,d0
-  moveq               #5,d1
-  lea                 TILELEFTSLOPE,a0
-  bsr.w               BLIT_TILE
-
-    ;IFD BLIT_PYR
-
-
-  ; right slopes start
-  moveq               #5-1,d6
-  moveq               #7,d0
-  moveq               #5,d1
-  lea                 TILERIGHTSLOPE,a0
-rightslopesstart:
-  bsr.w               BLIT_TILE
-  addq                #1,d0
-  addq                #1,d1
-  dbra                d6,rightslopesstart
-      ;ENDC
-
-
+  
   ; start blitting platform 1
   moveq                #13-1,d4
   moveq                #4,d0
@@ -265,7 +169,7 @@ platform2_start2:
   bsr.w                BLIT_TILES
 
   ; Draw big spaceship
-  jsr               DRAWBIGSPACESHIP
+  ;jsr               DRAWBIGSPACESHIP
 
   move.w            #$0F00,d0
   move.w            #$00F0,d1
@@ -639,10 +543,11 @@ ROT_X_MATRIX_Q5_11: ; cos -sin sin cos
 SCREEN_2:
   IFD DEBUGCOLORS
   dcb.b 40*224*1,$0
-  ELSE
   dcb.b 40*224*1,$FF
-  ENDC
   dcb.b 40*224*2,$00
+  ELSE
+  incbin "assets/spoleto/spoleto.bin"
+  ENDC
 
 SKY_COLORSTABLE_INCREMENT:
   dc.w 2

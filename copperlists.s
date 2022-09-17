@@ -82,8 +82,14 @@ BPLPTR5:
   dc.w       $f0,$0000,$f2,$0000                                       ;fifth	 bitplane - BPL4PT
 
   ; wait for the top of the screen and set big spaceship colors
-  dc.w       $2B07,$FFFE
-  include    "coplistfragments/bigspaceshipcolors.s"
+  ;dc.w       $2B07,$FFFE
+  ;include    "coplistfragments/bigspaceshipcolors.s"
+
+  dc.w       $0184,$db9
+  dc.w       $0186,$765
+  dc.w       $0188,$a97
+  dc.w       $018A,$543
+  dc.w       $018C,$eca
 
 
   IFD EFFECTS

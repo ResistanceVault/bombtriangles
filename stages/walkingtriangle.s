@@ -410,7 +410,7 @@ noinverttrigend:
   move.w                 #%0000000001000000,MIRRORFLAG
   move.w                 #0,BIGSPACESHIP_SHEAR
   IFD EFFECTS
-  move.w                 #$0f00,2+BIGSPACESHIP_ACTIVE_COLORS
+  ;move.w                 #$0f00,2+BIGSPACESHIP_ACTIVE_COLORS
   move.l                 #BIGSPACESHIP_COLORSTABLE,BIGSPACESHIP_COLORSTABLE_PTR
   ENDC
   SETSTAGE               walkingtriangle_xwalk_rev
@@ -1005,13 +1005,5 @@ bounceend2:
 
   IFD EFFECTS
 cyclebigspaceshipcolors:
-  move.l                 BIGSPACESHIP_COLORSTABLE_PTR(PC),a1
-  move.w                 (a1),2+BIGSPACESHIP_ACTIVE_COLORS
-  addq                   #2,a1
-  cmp.l                  #BIGSPACESHIP_COLORSTABLE_END,a1
-  bne.s                  bigspaceship_colortable_noend
-  move.l                 #BIGSPACESHIP_COLORSTABLE,a1
-bigspaceship_colortable_noend:
-  move.l                 a1,BIGSPACESHIP_COLORSTABLE_PTR
   rts
   ENDC

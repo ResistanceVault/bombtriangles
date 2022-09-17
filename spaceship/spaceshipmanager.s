@@ -90,8 +90,8 @@ SPACESHIPMANAGER:
   lea                  40*8+30+SCREEN_2,a2
   moveq                #3-1,d7 ; Cycle for each bitplane
 spaceshipwindowloop:
-  move.l               (a5),(a2)
-  move.l               (a5)+,40(a2)
+  ;move.l               (a5),(a2)
+  ;move.l               (a5)+,40(a2)
   adda.w               #224*40,a2
   dbra d7,spaceshipwindowloop
 
