@@ -340,30 +340,6 @@ POINTINCOPPERLIST_FUNCT:
   POINTINCOPPERLIST
   rts
 
-BLITTOPPYRAMID:
-  lea              SCREEN_2,a1
-  mulu.w           #40*16,d1
-  adda.l           d1,a1
-  adda.l           #40*10,a1
-  lsl.w            #1,d0
-  adda.l           d0,a1
-  lea              PYRAMIDTOP,a0
-  moveq            #3-1,d7
-blittoputamid_startloop:
-  WAITBLITTER
-  move.w           #$09F0,$dff040
-  move.w           #$0000,$dff042
-  move.l           a0,$dff050          ; copy from a channel
-  move.l           a1,$dff054            ; copy to d channel
-  move.w           #$0000,$dff064               ; A mod
-  move.w           #40-14,$dff066               ; D mod
-  move.l           #$FFFFFFFF,$DFF044           ; mask
-  move.w           #$0D87,$dff058
-  adda.l           #756,a0
-  adda.l           #224*40,a1
-  dbra             d7,blittoputamid_startloop
-  rts
-
 ; blit tiles
 ; blit a series of tiles using blit tile
 ; a0 - address of the tile
@@ -659,22 +635,6 @@ LADDER_2_VSTOP2:
   include             "spaceship/spaceship_spr_diffs.s"
   include             "spaceship/bigspaceship.s"
   include             "spaceship/spaceship2_spr1.s"
-
-; background tiles
-;SANDDOWN:             incbin "assets/tiles/sanddown.raw"
-SANDTOP:              ;incbin "assets/tiles/sandtop.raw"
-                      incbin "assets/tiles/eric/top_sand_eric.raw"
-TILEFULL:             ;incbin "assets/tiles/full.raw"
-                      incbin "assets/tiles/eric/full_eric.raw"
-
-TILELEFTSLOPE:        ;incbin "assets/tiles/leftslope.raw"
-                      incbin "assets/tiles/eric/left_eric2.raw"
-
-TILERIGHTSLOPE:       ;incbin "assets/tiles/rightslope.raw"
-                      incbin "assets/tiles/eric/right_eric.raw"
-
-PYRAMIDTOP:           ;incbin "assets/brush/pyramidtop112x54.raw"
-                      incbin "assets/tiles/eric/top_eric2.raw" ; col1 and 6 swapped
 
   IFD                 P61
 Module1:
