@@ -48,20 +48,6 @@ BOMBTIMER:
   dc.w      BOMBTIMERSTART
 
 BOMB_EXPLODE:
-  ;move.l    #BOMB10_BPL0,d0
-  ;lea       Sprite4pointers,a1
-  ;jsr       POINTINCOPPERLIST_FUNCT
-  ;move.l    #BOMB10_BPL1,d0
-  ;lea       Sprite5pointers,a1
-  ;jsr       POINTINCOPPERLIST_FUNCT
-  ;BOMB_RESET_TIMER
-  ;lea BOMBMANAGER_SPRITESLIST(PC),a0
-  ;move.l #BOMB8_BPL0,(a0)+
-  ;move.l #BOMB8_BPL1,(a0)+
-  ;move.l #BOMB9_BPL0,(a0)+
-  ;move.l #BOMB9_BPL1,(a0)+
-  ;move.l #BOMB10_BPL0,(a0)+
-  ;move.l #BOMB10_BPL1,(a0)
   move.w    #0,BOMBDROP
   cmp.l #BOMBMANAGER_SPRITESLIST_BOMB_BLOW_END,BOMBMANAGER_PTR_END
   beq.s BOMB_EXPLODE_END

@@ -857,8 +857,6 @@ compress:
 
   jsr                     LOADIDENTITYANDTRANSLATE
 
-  DEBUG 1234
-
   addi.w                  #1,COUNTER_OFFSET(a3)
   andi.w                  #$0007,COUNTER_OFFSET(a3)
   seq                     d7

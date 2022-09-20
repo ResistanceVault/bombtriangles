@@ -49,9 +49,7 @@ _ammxmainloop3_init:
   ;move.w    #$fff,(a0)+        ; color23
   ;move.w    #$ddd,(a0)+        ; color24
 
-  move.l    #$0f0a0f0f,(a0)+
-  ;move.w    #$f0a,(a0)+        ; color25 ; sprites 4 and 5 (bomb) color 1
-  ;move.w    #$f0f,(a0)+        ; color26 ; sprites 4 and 5 (bomb) color 2
+  move.l    #$0f0a0fe0,(a0)+    ; color25 ; sprites 4 and 5 (bomb) color 1 and 2
 
   move.l    #$0f060f0f,(a0)+
   ;move.w    #$f06,(a0)+        ; color27 ; sprites 4 and 5 (bomb) color 3
