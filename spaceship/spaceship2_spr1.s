@@ -23,16 +23,16 @@ SPACESHIP2_BPL0_BOMB:
                          ;dc.w    $23A0,$05C4    ; line 4
                          ;dc.w    $01C8,$1380    ; line 5
                          ;dc.w    $24C0,$0024    ; line 6
-                         dc.w    $0060,$0010     ; line 7
-                         dc.w    $0660,$0618     ; line 8
-                         dc.w    $0C60,$0C18     ; line 9
-                         dc.w    $08E0,$081C     ; line 10
-                         dc.w    $08C4,$083C     ; line 11
-                         dc.w    $01CC,$003C     ; line 12
-                         dc.w    $0788,$0078     ; line 13
-                         dc.w    $1F18,$00F8     ; line 14
-                         dc.w    $0C30,$03F0     ; line 15
-                         dc.w    $00C0,$03C0     ; line 16
+                        dc.w $1550,$17D0 ; line 7
+	dc.w $08A0,$1CF0 ; line 8
+	dc.w $0BA0,$1550 ; line 9
+	dc.w $2BA8,$3558 ; line 10
+	dc.w $1AB0,$1C70 ; line 11
+	dc.w $0FE0,$1FF0 ; line 12
+	dc.w $0AA0,$1450 ; line 13
+	dc.w $0AA0,$1450 ; line 14
+	dc.w $0AA0,$1450 ; line 15
+	dc.w $0280,$0000 ; line 16
 
                          dc.w    0,0
 SPACESHIP2_BPL1:
@@ -60,16 +60,16 @@ SPACESHIP2_BPL1_BOMB:
                          ;dc.w    $0000,$0000    ; line 4
                          ;dc.w    $0000,$0000    ; line 5
                          ;dc.w    $03C0,$0000    ; line 6
-                         dc.w    $0FF0,$0000     ; line 7
-                         dc.w    $1FF8,$0000     ; line 8
-                         dc.w    $1FF8,$0000     ; line 9
-                         dc.w    $3FFC,$0000     ; line 10
-                         dc.w    $3FF8,$0000     ; line 11
-                         dc.w    $3FF0,$0000     ; line 12
-                         dc.w    $1FF0,$0000     ; line 13
-                         dc.w    $1FE0,$0000     ; line 14
-                         dc.w    $0FC0,$0000     ; line 15
-                         dc.w    $0300,$0000     ; line 16
+                         dc.w $0AA0,$1450 ; line 7
+	dc.w $1750,$08A0 ; line 8
+	dc.w $1450,$0100 ; line 9
+	dc.w $1450,$0100 ; line 10
+	dc.w $0540,$0000 ; line 11
+	dc.w $1110,$0000 ; line 12
+	dc.w $1550,$0000 ; line 13
+	dc.w $1550,$0000 ; line 14
+	dc.w $1550,$0000 ; line 15
+	dc.w $0100,$0000 ; line 16
 
                          dc.w    0,0
 

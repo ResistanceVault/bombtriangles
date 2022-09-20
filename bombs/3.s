@@ -1,7 +1,7 @@
 BOMB3_BPL0:
-BOMB3_BPL0_VSTART:  dc.b    $7f
+BOMB3_BPL0_VSTART:  dc.b    $80
 BOMB3_BPL0_HSTART:  dc.b    $a0
-BOMB3_BPL0_VSTOP:   dc.b    $8f,$00
+BOMB3_BPL0_VSTOP:   dc.b    $90,$00
                     dc.w    $0000,$0080      ; line 1
                     dc.w    $0000,$0040      ; line 2
                     dc.w    $0000,$0040      ; line 3
@@ -20,9 +20,9 @@ BOMB3_BPL0_VSTOP:   dc.b    $8f,$00
                     dc.w    $00C0,$03C0      ; line 16
                     dc.w    0,0
 BOMB3_BPL1:
-BOMB3_BPL1_VSTART:  dc.b    $7f
+BOMB3_BPL1_VSTART:  dc.b    $80
 BOMB3_BPL1_HSTART:  dc.b    $a0
-BOMB3_BPL1_VSTOP:   dc.b    $8f,%10000000
+BOMB3_BPL1_VSTOP:   dc.b    $90,%10000000
                     dc.w    $0000,$0000      ; line 1
                     dc.w    $0000,$0000      ; line 2
                     dc.w    $0000,$0000      ; line 3
