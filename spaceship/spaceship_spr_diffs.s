@@ -24,11 +24,11 @@ SPACESHIP3_DIFF:
 
 SPACESHIP4_DIFF:
     dc.w $6007,$9F07 ; line 5
-	dc.w $0FE0,$0FF0 ; line 7
-	dc.w $0200,$07E0 ; line 8
+	dc.w $0FF0,$0FE0 ; line 7
+	dc.w $07C0,$0220 ; line 8
     dc.w $FFF7,$FF0F ; line 5
-	dc.w $301C,$0000 ; line 7
-	dc.w $35EC,$0020 ; line 8
+	dc.w $301C,$0010 ; line 7
+	dc.w $35EC,$05E0 ; line 8
 
 SPACESHIP5_DIFF:
     dc.w $60A0,$9FE0 ; line 5
