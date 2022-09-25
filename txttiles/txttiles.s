@@ -10,8 +10,14 @@ TILE_DATA:
   dc.l PATTERN_FULL
   dc.l TILETXT1
 
-  dc.l PATTERN_FULL
-  dc.l TILETXT2
+  dc.l FLASHPARTY
+  dc.l TILETXT_EMPTY
+
+  dc.l F2022
+  dc.l TILETXT_EMPTY
+  
+  ;dc.l PATTERN_FULL
+  ;dc.l TILETXT2
 
   dc.l PATTERN_FULL
   dc.l MUSIC
@@ -43,11 +49,11 @@ TILE_DATA:
   dc.l PATTERN_FULL
   dc.l TILETXT4
 
-  dc.l PATTERN_FULL
-  dc.l TILETXT5
-
-  dc.l SPOLETO
+  dc.l PATTERN_EMPTY
   dc.l TILETXT_EMPTY
+
+  dc.l PATTERN_FULL
+  dc.l TILETXTSALUDOS
 
   dc.l PATTERN_EMPTY
   dc.l TILETXT_EMPTY
@@ -134,41 +140,19 @@ PATTERN_FULL_5:
   dc.b      %11111111
   dc.b      %11111111
 
-SPOLETO:
-SPOLETO_1:
-  dc.b      %11110011
-  dc.b      %11001111
-  dc.b      %00100000
-  dc.b      %11110011
-  dc.b      %11001111
+FLASHPARTY:
+  dc.b $E8,$EE,$AE,$EF,$75 
+  dc.b $88,$A8,$AA,$A9,$27 
+  dc.b $C8,$EE,$EE,$EE,$22 
+  dc.b $88,$A2,$A8,$AB,$22 
+  dc.b $8E,$AE,$A8,$A9,$22
 
-SPOLETO_2:
-  dc.b      %10000010
-  dc.b      %01001001
-  dc.b      %00100000
-  dc.b      %10000011
-  dc.b      %11001001
-
-SPOLETO_3:
-  dc.b      %01100011
-  dc.b      %11001001
-  dc.b      %00100000
-  dc.b      %11110001
-  dc.b      %10001001
-
-SPOLETO_4:
-  dc.b      %00110010
-  dc.b      %00001001
-  dc.b      %00100000
-  dc.b      %10000001
-  dc.b      %10001001
-
-SPOLETO_5:
-  dc.b      %11110010
-  dc.b      %00001111
-  dc.b      %00111100
-  dc.b      %11110001
-  dc.b      %10001111
+F2022:
+  dc.b $00,$79,$E7,$9E,$00 
+  dc.b $00,$09,$20,$82,$00 
+  dc.b $00,$79,$27,$9E,$00 
+  dc.b $00,$41,$24,$10,$00 
+  dc.b $00,$79,$E7,$9E,$00
 
 Z3K:
   dc.b $00,$0F,$38,$90,$00
@@ -370,14 +354,7 @@ TILETXT1:
   dc.b  40
   dc.b 13,"BOMBTRIANGLES",14
   dc.b  40
-  DC.B 4,"A",1,"NEW",1,"PRODUCTION",1,"FOR",1,"FLASHPARTY",5
-
-TILETXT2:
-  dc.b  40
-  dc.b  7,"THIS",1,"IS",1,"A",1,"TWENTY",1,"KB",1,"INTRO",8
-  dc.b  40
-  dc.b  10,"MEANT",1,"FOR",1,"UNEXPANDED",10
-  dc.b  15,"AMIGA",1,"IOOO",15
+  DC.b 10,"A",1,"NEW",1,"PRODUCTION",1,"FOR",10
 
 GREETINGS_TO:
   dc.b  40
@@ -428,12 +405,12 @@ TILETXT4:
   dc.b  40
   dc.b  3,"ALL",1,"THE",1,"PEOPLE",1,"KEEPING",1,"AMIGA",1,"ALIVE",3
 
-TILETXT5:
-  dc.b  3,"UN",1,"SALUTO",1,"SPECIALE",1,"AI",1,"REDATTORI",1,"DI",3
-  dc.b  13,"PASSIONE",1,"AMIGA",13
-  dc.b  "E",1,"A",1,"TUTTI",1,"I",1,"PRESENTI",1,"ALLA",1,"MANIFESTAZIONE"
-  dc.b  4,"PASSIONE",1,"AMIGA",1,"DAY",1,"TENUTASI",1,"NELLA",3
-  dc.b  12,"STUPENDA",1,"CITTA",1,"DI",11
+TILETXTSALUDOS:
+  dc.b  2,"ESTA",1,"PRODUCCION",1,"ESTA",1,"DEDICADA",1,"A",1,"LOS",3
+  dc.b  4,"ORGANIZADORES",1,"Y",1,"PARTECIPANTES",1,"DE",4
+  dc.b  15,"FLASHPARTY",15
+  dc.b  40
+  dc.b  10,"SALUDOS",1,"DESDE",1,"ITALIA",10
 
 TILETXT_EMPTY:
   dc.b 40
