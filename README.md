@@ -1,4 +1,4 @@
-# Flashparty 2022 intro compo entry
+# Bombtriangles - Flashparty 2022 intro compo entry
 
 Bombtriangles intro is just an idea for using the AProcessing routines.
 The main concept here is to rotate a triangle around one of his vertex, after each rotation i change rotation vertex to simulate the triangle rolling.
