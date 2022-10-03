@@ -1,24 +1,15 @@
 # Flashparty 2022 intro compo entry
 
-This is a new repo for flashparty 2022.
-The main idea here is to produce a small intro (executable <64k).
-I'd like the theme to be something like 2d figures dancing at maze chiptune.
-Inside there is the library I wrote for drawing/filling/rotating 2d figures, for now the demo only features 2 filled triangles,
-the first one on bitplane 1 the second on bitplane 2, the intersecting area generated another triangle and to my eyes it's a nice effect.
+Bombtriangle is just an idea for using the AProcessing routines.
+The main concept here is to rotate a triangle around one of his vertex, after each rotation i change rotation vertex to simulate the triangle rolling.
 
-I'd like to target an A1000, so staying under 512k of chip ram is mandatory. For this reason i must precalculate as less as possibile and the code must be quick to fit into a 68k at 50fps.
+I targeted an A1000 and tried to stay under 512k of chip ram and under 16k of final compressed executablr, but unfortunately the use of pretracker and the other assets inflated the program and it was impossible for me to meet this requirements.
 
-Right now the music it's reported to do not work on my friend's A1000 but works for me with fsuae... dunno...
+Actually, after uncompressed, the intro requires about 180k of chip ram, this theorically would mean it's possible to load the demo on an unexpanded A1000 as I initially intended, but, unfortunately, after the OS is loaded, only 100k are left for the programs to run.
+Since I use double buffering I need 7 bitplanes, each bitplane is about 10k so... adding the music it means it not possible to say under 100k even if i keep the business code very compact.
 
-### Problems
-What I need now
-
-- [x] fix the exit problem (THX Kristoff)
-- [x] fix the music problem
-- [x] migrate to pretracker
-- [ ] tiles at 3 playfields?
-- [ ] ideas on how to syncronize rotation with the music
-- [ ] ideas on general how to proceed
+This intro got second place at "Flashparty 2022" Buenos Aires, Argentina in the "Oldskool Intro compo".
+Hope you like it.
 
 ### How to build
 
