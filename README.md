@@ -1,7 +1,8 @@
 # Flashparty 2022 intro compo entry
 
-Bombtriangle is just an idea for using the AProcessing routines.
+Bombtriangles intro is just an idea for using the AProcessing routines.
 The main concept here is to rotate a triangle around one of his vertex, after each rotation i change rotation vertex to simulate the triangle rolling.
+Additionally I added a small engine to simulate gravity, accelleration and motions in general.
 
 I targeted an A1000 and tried to stay under 512k of chip ram and under 16k of final compressed executablr, but unfortunately the use of pretracker and the other assets inflated the program and it was impossible for me to meet this requirements.
 
