@@ -18,7 +18,8 @@ Youtube: https://youtu.be/laCF_g7ynyU
 
 ### How to build
 
-You just need vasm to build the whole project, shrinkler compress it, the final executable for now it's about 15k, this means we have space to add more stuff.
+You just need vasm to build the whole project and shrinkler to compress it, the final executable should be about 19k.
+Use the included Makefiles as helper.
 
 Devpac also compiles the project on a real amiga, just feed r.s to devpac and click assemble, it will work (or at least it works on my stock A600).
 
