@@ -11,7 +11,7 @@ Since I use double buffering I need 7 bitplanes, each bitplane is about 10k so..
 This intro got second place at "Flashparty 2022" Buenos Aires, Argentina in the "Oldskool Intro compo".
 Hope you like it.
 
-![workbench3-real-2209251558-01.png](workbench3-real-2209251558-01.png)
+![workbench3-crop-2209251558-01.png](workbench3-crop-2209251558-01.png)
 
 
 ### How to build
