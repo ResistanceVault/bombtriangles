@@ -11,6 +11,9 @@ Since I use double buffering I need 7 bitplanes, each bitplane is about 10k so..
 This intro got second place at "Flashparty 2022" Buenos Aires, Argentina in the "Oldskool Intro compo".
 Hope you like it.
 
+![workbench3-real-2209251558-01.png](workbench3-real-2209251558-01.png)
+
+
 ### How to build
 
 You just need vasm to build the whole project, shrinkler compress it, the final executable for now it's about 15k, this means we have space to add more stuff.
@@ -22,11 +25,7 @@ The makefile will produce this files:
 2. reffect (color debug is turned off and copper effects are in place)
 3. rcompressed (just reffect compressed with shrinkler)
 
-### Size matters
-Compressed with shrinkler: 15768 bytes
-Uncompressed with shrinkler: 114692 bytes
 
-Looking for Resistance members willing to help me
 
 
 
